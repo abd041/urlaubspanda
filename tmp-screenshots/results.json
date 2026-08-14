@@ -1,0 +1,78 @@
+[
+  {
+    "width": 320,
+    "height": 568,
+    "headingWraps": true,
+    "linkWraps": false,
+    "fullyVisibleCards": 3,
+    "truncatedTitles": [
+      "Griechenland"
+    ],
+    "headingHeight": 56,
+    "linkHeight": 16,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\width-320.png"
+  },
+  {
+    "width": 344,
+    "height": 800,
+    "headingWraps": true,
+    "linkWraps": false,
+    "fullyVisibleCards": 3,
+    "truncatedTitles": [
+      "Griechenland"
+    ],
+    "headingHeight": 56,
+    "linkHeight": 16,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\width-344.png"
+  },
+  {
+    "width": 360,
+    "height": 800,
+    "headingWraps": false,
+    "linkWraps": false,
+    "fullyVisibleCards": 3,
+    "truncatedTitles": [],
+    "headingHeight": 28,
+    "linkHeight": 16,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\width-360.png"
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "headingWraps": false,
+    "linkWraps": false,
+    "fullyVisibleCards": 3,
+    "truncatedTitles": [],
+    "headingHeight": 28,
+    "linkHeight": 16,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\width-375.png"
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "headingWraps": false,
+    "linkWraps": false,
+    "fullyVisibleCards": 3,
+    "truncatedTitles": [],
+    "headingHeight": 28,
+    "linkHeight": 16,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\width-390.png"
+  },
+  {
+    "width": 414,
+    "height": 896,
+    "headingWraps": false,
+    "linkWraps": false,
+    "fullyVisibleCards": 3,
+    "truncatedTitles": [],
+    "headingHeight": 28,
+    "linkHeight": 16,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\width-414.png"
+  }
+]

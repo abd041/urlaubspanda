@@ -1,0 +1,22 @@
+import { Suspense } from "react";
+import { HomeHero } from "@/components/home/HomeHero";
+import { PopularDestinations } from "@/components/home/PopularDestinations";
+import { DealsExplorer, DealsExplorerFallback } from "@/components/home/DealsExplorer";
+import { TrustStrip } from "@/components/home/TrustStrip";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { dealsItemListJsonLd } from "@/lib/structuredData";
+import { deals } from "@/data/deals";
+
+export default function Home() {
+  return (
+    <main className="pb-10 sm:pb-16">
+      <JsonLd data={dealsItemListJsonLd(deals)} />
+      <HomeHero deals={deals} />
+      <PopularDestinations />
+      <Suspense fallback={<DealsExplorerFallback deals={deals} />}>
+        <DealsExplorer deals={deals} />
+      </Suspense>
+      <TrustStrip />
+    </main>
+  );
+}

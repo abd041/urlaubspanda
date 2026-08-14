@@ -1,0 +1,135 @@
+[
+  {
+    "width": 375,
+    "height": 900,
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\hyphen-375.png",
+    "chips": {
+      "Familienhotel": {
+        "fullText": "Familienhotel",
+        "innerText": "Familienhotel",
+        "lines": [
+          "Familienh",
+          "otel"
+        ],
+        "lineCount": 2,
+        "hasVisibleHyphen": false,
+        "hyphensStyle": "auto",
+        "wordBreak": "normal",
+        "overflowWrap": "break-word",
+        "fontSize": "10px",
+        "chipWidth": 52.2,
+        "spanWidth": 46.2,
+        "spanHeight": 30,
+        "labelOutsideChip": false,
+        "overflow": "wrapped"
+      },
+      "Wellness": {
+        "fullText": "Wellness",
+        "innerText": "Wellness",
+        "lines": [
+          "Wellness"
+        ],
+        "lineCount": 1,
+        "hasVisibleHyphen": false,
+        "hyphensStyle": "auto",
+        "wordBreak": "normal",
+        "overflowWrap": "break-word",
+        "fontSize": "10px",
+        "chipWidth": 52.2,
+        "spanWidth": 46.2,
+        "spanHeight": 15,
+        "labelOutsideChip": false,
+        "overflow": "single-line"
+      }
+    }
+  },
+  {
+    "width": 320,
+    "height": 800,
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\hyphen-320.png",
+    "chips": {
+      "Familienhotel": {
+        "fullText": "Familienhotel",
+        "innerText": "Familienhotel",
+        "lines": [
+          "Familie",
+          "nhotel"
+        ],
+        "lineCount": 2,
+        "hasVisibleHyphen": false,
+        "hyphensStyle": "auto",
+        "wordBreak": "normal",
+        "overflowWrap": "break-word",
+        "fontSize": "9px",
+        "chipWidth": 43,
+        "spanWidth": 37,
+        "spanHeight": 27,
+        "labelOutsideChip": false,
+        "overflow": "wrapped"
+      },
+      "Wellness": {
+        "fullText": "Wellness",
+        "innerText": "Wellness",
+        "lines": [
+          "Welln",
+          "ess"
+        ],
+        "lineCount": 2,
+        "hasVisibleHyphen": false,
+        "hyphensStyle": "auto",
+        "wordBreak": "normal",
+        "overflowWrap": "break-word",
+        "fontSize": "9px",
+        "chipWidth": 43,
+        "spanWidth": 37,
+        "spanHeight": 27,
+        "labelOutsideChip": false,
+        "overflow": "wrapped"
+      }
+    }
+  },
+  {
+    "width": 414,
+    "height": 900,
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\hyphen-414.png",
+    "chips": {
+      "Familienhotel": {
+        "fullText": "Familienhotel",
+        "innerText": "Familienhotel",
+        "lines": [
+          "Familienh",
+          "otel"
+        ],
+        "lineCount": 2,
+        "hasVisibleHyphen": false,
+        "hyphensStyle": "auto",
+        "wordBreak": "normal",
+        "overflowWrap": "break-word",
+        "fontSize": "10px",
+        "chipWidth": 58.7,
+        "spanWidth": 52.7,
+        "spanHeight": 30,
+        "labelOutsideChip": false,
+        "overflow": "wrapped"
+      },
+      "Wellness": {
+        "fullText": "Wellness",
+        "innerText": "Wellness",
+        "lines": [
+          "Wellness"
+        ],
+        "lineCount": 1,
+        "hasVisibleHyphen": false,
+        "hyphensStyle": "auto",
+        "wordBreak": "normal",
+        "overflowWrap": "break-word",
+        "fontSize": "10px",
+        "chipWidth": 58.7,
+        "spanWidth": 52.7,
+        "spanHeight": 15,
+        "labelOutsideChip": false,
+        "overflow": "single-line"
+      }
+    }
+  }
+]

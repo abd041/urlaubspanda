@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --surface: #f6f8fb;
+  --foreground: #0f1a2b;
+
+  --color-brand-50: #eaf1ff;
+  --color-brand-100: #d6e4ff;
+  --color-brand-400: #3f7ff2;
+  --color-brand-500: #1b63eb;
+  --color-brand-600: #0f52d6;
+  --color-brand-700: #0d43ac;
+
+  --color-ink: #0f1a2b;
+  --color-body: #5b6779;
+  --color-muted: #8a93a3;
+  --color-line: #e7eaf0;
+
+  --color-danger: #e11d3f;
+  --color-success: #17915a;
+  --color-star: #f5a623;
+  --color-cal: #f5c518;
+  --color-cal-600: #e0b00c;
+  --color-cal-orange: #e39412;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+
+  --color-brand-50: var(--color-brand-50);
+  --color-brand-100: var(--color-brand-100);
+  --color-brand-400: var(--color-brand-400);
+  --color-brand-500: var(--color-brand-500);
+  --color-brand-600: var(--color-brand-600);
+  --color-brand-700: var(--color-brand-700);
+
+  --color-ink: var(--color-ink);
+  --color-body: var(--color-body);
+  --color-muted: var(--color-muted);
+  --color-line: var(--color-line);
+
+  --color-danger: var(--color-danger);
+  --color-success: var(--color-success);
+  --color-star: var(--color-star);
+  --color-cal: var(--color-cal);
+  --color-cal-600: var(--color-cal-600);
+  --color-cal-orange: var(--color-cal-orange);
+
+  --font-sans: var(--font-bricolage);
+  --font-mono: var(--font-bricolage);
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-bricolage), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* Utility: hide scrollbar for horizontally-scrollable carousels while keeping
+   native scroll/swipe behaviour and keyboard/focus accessibility. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.snap-x-mandatory {
+  scroll-snap-type: x mandatory;
+}
+
+.snap-start {
+  scroll-snap-align: start;
+}
+
+/* Destination photography: cinematic contrast without a visible filter overlay. */
+.destination-photo {
+  filter: contrast(1.05) saturate(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

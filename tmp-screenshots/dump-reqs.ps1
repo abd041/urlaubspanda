@@ -1,0 +1,10 @@
+$homeTxt = [IO.File]::ReadAllText('C:\Users\user\Desktop\Urlaubspanda\tmp-screenshots\req-homepage.txt')
+$bookTxt = [IO.File]::ReadAllText('C:\Users\user\Desktop\Urlaubspanda\tmp-screenshots\req-booking.txt')
+Write-Output ("homeLen=" + $homeTxt.Length + " bookLen=" + $bookTxt.Length)
+[IO.File]::WriteAllText('C:\Users\user\Desktop\Urlaubspanda\tmp-screenshots\req-home-start.txt', $homeTxt.Substring(0, [Math]::Min(4500, $homeTxt.Length)))
+[IO.File]::WriteAllText('C:\Users\user\Desktop\Urlaubspanda\tmp-screenshots\req-home-mid.txt', $homeTxt.Substring(4500, [Math]::Min(4500, $homeTxt.Length-4500)))
+[IO.File]::WriteAllText('C:\Users\user\Desktop\Urlaubspanda\tmp-screenshots\req-home-end.txt', $homeTxt.Substring([Math]::Max(0,$homeTxt.Length-4000)))
+[IO.File]::WriteAllText('C:\Users\user\Desktop\Urlaubspanda\tmp-screenshots\req-book-start.txt', $bookTxt.Substring(0, [Math]::Min(5000, $bookTxt.Length)))
+[IO.File]::WriteAllText('C:\Users\user\Desktop\Urlaubspanda\tmp-screenshots\req-book-mid.txt', $bookTxt.Substring(5000, [Math]::Min(5000, $bookTxt.Length-5000)))
+[IO.File]::WriteAllText('C:\Users\user\Desktop\Urlaubspanda\tmp-screenshots\req-book-end.txt', $bookTxt.Substring([Math]::Max(0,$bookTxt.Length-4000)))
+Write-Output 'written'

@@ -1,0 +1,167 @@
+[
+  {
+    "width": 320,
+    "height": 800,
+    "allFitOneRow": true,
+    "labels": [
+      "Mit Flug",
+      "All Inclusive",
+      "Direkte Strandlage",
+      "Familienhotel",
+      "Wellness",
+      "Last Minute"
+    ],
+    "anyTruncation": true,
+    "truncationDetails": [
+      "Direkte Strandlage",
+      "Familienhotel"
+    ],
+    "singleRow": true,
+    "allSixVisible": true,
+    "allInViewport": true,
+    "rowOverflowsViewport": false,
+    "rowScrollable": false,
+    "rowWidth": 288,
+    "rowRight": 304,
+    "viewportWidth": 320,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\filters-320.png"
+  },
+  {
+    "width": 344,
+    "height": 800,
+    "allFitOneRow": true,
+    "labels": [
+      "Mit Flug",
+      "All Inclusive",
+      "Direkte Strandlage",
+      "Familienhotel",
+      "Wellness",
+      "Last Minute"
+    ],
+    "anyTruncation": true,
+    "truncationDetails": [
+      "Direkte Strandlage",
+      "Familienhotel"
+    ],
+    "singleRow": true,
+    "allSixVisible": true,
+    "allInViewport": true,
+    "rowOverflowsViewport": false,
+    "rowScrollable": false,
+    "rowWidth": 312,
+    "rowRight": 328,
+    "viewportWidth": 344,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\filters-344.png"
+  },
+  {
+    "width": 360,
+    "height": 800,
+    "allFitOneRow": true,
+    "labels": [
+      "Mit Flug",
+      "All Inclusive",
+      "Direkte Strandlage",
+      "Familienhotel",
+      "Wellness",
+      "Last Minute"
+    ],
+    "anyTruncation": true,
+    "truncationDetails": [
+      "Direkte Strandlage",
+      "Familienhotel"
+    ],
+    "singleRow": true,
+    "allSixVisible": true,
+    "allInViewport": true,
+    "rowOverflowsViewport": false,
+    "rowScrollable": false,
+    "rowWidth": 328,
+    "rowRight": 344,
+    "viewportWidth": 360,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\filters-360.png"
+  },
+  {
+    "width": 375,
+    "height": 900,
+    "allFitOneRow": true,
+    "labels": [
+      "Mit Flug",
+      "All Inclusive",
+      "Direkte Strandlage",
+      "Familienhotel",
+      "Wellness",
+      "Last Minute"
+    ],
+    "anyTruncation": true,
+    "truncationDetails": [
+      "Familienhotel"
+    ],
+    "singleRow": true,
+    "allSixVisible": true,
+    "allInViewport": true,
+    "rowOverflowsViewport": false,
+    "rowScrollable": false,
+    "rowWidth": 343,
+    "rowRight": 359,
+    "viewportWidth": 375,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\filters-375.png"
+  },
+  {
+    "width": 390,
+    "height": 900,
+    "allFitOneRow": true,
+    "labels": [
+      "Mit Flug",
+      "All Inclusive",
+      "Direkte Strandlage",
+      "Familienhotel",
+      "Wellness",
+      "Last Minute"
+    ],
+    "anyTruncation": true,
+    "truncationDetails": [
+      "Familienhotel"
+    ],
+    "singleRow": true,
+    "allSixVisible": true,
+    "allInViewport": true,
+    "rowOverflowsViewport": false,
+    "rowScrollable": false,
+    "rowWidth": 358,
+    "rowRight": 374,
+    "viewportWidth": 390,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\filters-390.png"
+  },
+  {
+    "width": 414,
+    "height": 900,
+    "allFitOneRow": true,
+    "labels": [
+      "Mit Flug",
+      "All Inclusive",
+      "Direkte Strandlage",
+      "Familienhotel",
+      "Wellness",
+      "Last Minute"
+    ],
+    "anyTruncation": true,
+    "truncationDetails": [
+      "Familienhotel"
+    ],
+    "singleRow": true,
+    "allSixVisible": true,
+    "allInViewport": true,
+    "rowOverflowsViewport": false,
+    "rowScrollable": false,
+    "rowWidth": 382,
+    "rowRight": 398,
+    "viewportWidth": 414,
+    "consoleErrors": [],
+    "screenshot": "c:\\Users\\user\\Desktop\\Urlaubspanda\\tmp-screenshots\\filters-414.png"
+  }
+]

@@ -1,0 +1,629 @@
+
+Web Version:
+
+Mobile Version
+
+
+
+Custom Booking Flow – Functional Requirements
+The booking flow itself will be in German for the customer.
+The designs we have already created for desktop and mobile should be implemented as closely as possible to the provided mockups. We spent a lot of time refining the UI, so please do not redesign or reinterpret the booking interface.
+This specification mainly explains the functionality, pricing logic and booking behavior behind the existing design.
+1. Booking Flow
+The customer should go through the following steps:
+Select travelers and number of rooms
+Select number of nights
+Select arrival date
+Optionally select a room category
+Select an offer
+Optionally upgrade meal plan / cancellation conditions
+Continue to booking
+The selections in each step affect the availability and prices shown in the following steps.
+
+2. Travelers &amp; Number of Rooms
+The customer first selects:
+Number of adults
+Number of children
+Age of each child
+Number of rooms
+Example:
+Room 1
+2 adults
+1 child
+Child age: 4
+Room 2
+2 adults
+2 children
+Child ages: 2 and 8
+The number and ages of travelers must be taken into account when calculating all prices shown later in the booking flow.
+
+3. Number of Nights
+After selecting the travelers, the customer selects the length of stay.
+For example:
+2 nights
+3 nights
+4 nights
+5 nights
+6 nights
+7 nights
+Each duration already displays a starting price, for example:
+2 Nächteab 198 € p.P.
+3 Nächteab 285 € p.P.
+These prices must not be static.
+As soon as the traveler configuration changes, the prices displayed for the different stay durations must be recalculated.
+The displayed price should be the average price per person for that configuration.
+
+4. Calendar &amp; Automatic Departure Date
+Once the customer has selected the number of nights, they only need to select the arrival date in the calendar.
+The departure date must be calculated automatically.
+Example:
+Selected duration:
+3 nights
+Customer selects:
+10 September 2026
+The system automatically sets:
+Arrival: 10 September 2026Departure: 13 September 2026
+The customer should not have to manually select the departure date.
+In the UI:
+Arrival date = clearly highlighted
+Departure date = clearly highlighted
+Dates between arrival and departure = light blue
+This should follow the calendar design from our final mockup.
+
+5. Calendar Prices
+Prices shown inside the calendar must dynamically reflect:
+Number of adults
+Number of children
+Ages of children
+Number of rooms
+Selected number of nights
+Room availability
+Applicable pricing rules
+The displayed calendar price should represent the average price per person for the complete selected stay, starting on that particular arrival date.
+So the price displayed on September 10 for a 3-night selection means:
+Average price per person for a stay from September 10 to September 13.
+It is not simply the price of the night of September 10.
+
+6. Base Pricing Is Entered Per Night
+In the backend/admin system, hotel prices are entered per night.
+Example:
+Validity:
+01 September 2026 – 20 October 2026
+Pricing:
+Sunday – Thursday:€100 per night
+Friday – Saturday:€120 per night
+The system then calculates the total automatically depending on the selected stay.
+Example:
+3-night stay consisting of:
+Thursday: €100Friday: €120Saturday: €120
+Base total:
+€340
+The booking engine then applies occupancy rules, child discounts and any additional services.
+The admin should also be able to override prices for individual dates or specific date ranges.
+
+7. Child Pricing
+Child pricing must be flexible.
+Example configuration:
+0 – 1.9 years
+Free
+2 – 5.9 years
+50% discount
+OR alternatively:
+Fixed price, e.g. €50
+6 – 11.9 years
+25% discount
+OR:
+Fixed price, e.g. €75
+Therefore, the backend should support both:
+Percentage-based child pricing
+and
+Fixed child pricing
+Age ranges should ideally also be configurable.
+The child's exact age selected at the beginning of the booking process determines which rule applies.
+
+8. Average Price Per Person
+Throughout the booking flow, we want to show the customer an easy-to-understand average price per person.
+At offer level, however, both values must be displayed:
+€458 p.P.
+and
+€916 total
+For example:
+2 adults + 1 childTotal booking price: €900
+The system calculates the applicable prices for each traveler and then displays:
+Total price
+Average price per traveler
+The backend should remain the source of truth for the calculation.
+
+9. Selection Must Be Stored in the URL
+The booking selection should be represented in the URL.
+At minimum:
+Adults
+Children
+Child ages
+Number of rooms
+Number of nights
+Arrival date
+Departure date
+Preferably also:
+Selected room category
+Meal plan
+Cancellation option
+Conceptually:
+/hotel/rewaya-luxury-resort
+?adults=2
+&amp;children=1
+&amp;childAge=4
+&amp;rooms=1
+&amp;nights=3
+&amp;arrival=2026-09-10
+&amp;departure=2026-09-13
+This is important so that:
+Refreshing the page keeps the selection
+Browser back/forward works correctly
+A configured booking can be shared
+Marketing links can open specific dates/durations
+The booking state is not lost unnecessarily
+The URL parameters represent the selection, but they must never be trusted as the source for the final price.
+Prices must always be recalculated server-side.
+
+10. Room Category Selection
+After the date selection, the customer sees the room categories.
+Please follow the provided room-category design closely.
+On mobile, this should be a horizontal slider/carousel.
+Approximately 2.5 room cards should be visible at the same time so that the customer immediately understands that more rooms can be viewed by swiping horizontally.
+Example:
+Doppelzimmer Balkon
+2 Personen · 24–28 m²
+Unsere Empfehlung
+ab 458 € p.P.
+916 € pro Zimmer
+The selected room category receives the blue selection state/checkmark shown in the mockup.
+
+11. Room Category Selection Is Optional
+The customer does not have to select a room category.
+If no room category is selected:
+→ Show offers from all available room categories.
+If the customer selects:
+Doppelzimmer Balkon
+→ Only show offers matching that room category.
+This makes the room-category section effectively an optional filter.
+
+12. Unavailable Room Categories
+A room category may be unavailable because of:
+Selected dates
+Inventory
+Number of adults
+Number of children
+Child ages
+Minimum occupancy
+Maximum occupancy
+Room configuration
+Do not simply remove such rooms from the interface.
+Keep the room card visible but display it in a disabled/grey state.
+Clearly show:
+Nicht verfügbar
+Optionally, where we know the reason:
+Für deine ausgewählte Belegung nicht verfügbar
+or
+Für diesen Zeitraum nicht verfügbar
+The unavailable card must not be selectable.
+
+13. Room Details
+When the customer clicks:
+Zimmerdetails
+do not navigate to another page.
+Open the room details directly on top of the current booking page.
+Desktop:
+Modal / overlay
+Mobile:
+Large bottom sheet or full-screen overlay
+It can contain:
+Room name
+Image gallery
+Room size
+Maximum occupancy
+Bed configuration
+Balcony / terrace
+View
+Bathroom
+Air conditioning
+Wi-Fi
+Amenities
+Additional room information
+When the customer closes it, they should return to exactly the same position and booking state.
+
+14. Offers
+Below the room categories comes:
+4. Wähle dein Angebot
+The design should follow our final offer-card mockup.
+Important design details:
+Narrow/mobile-friendly card
+Light shadow
+Green dot next to “Angebot ist verfügbar”
+Very light green background behind the availability header
+Blue booking CTA
+Large and clearly readable price
+Room image
+Provider/organizer logo
+“Merken” and “Teilen”
+No hotel review score inside the offer card
+Keep the spacing and proportions from the approved mockup
+
+15. Meal Plan Upgrade
+Each offer has a base meal plan.
+Example:
+Verpflegung für 2 Personen
+◉ Frühstück — inkl.
+○ Frühstück &amp; Abendessen — +107 €
+The customer can optionally select the upgraded meal plan.
+The total price and average price per person must update immediately without a page reload.
+Different hotels/offers may support different meal plans, for example:
+Room only
+Breakfast
+Half Board
+Half Board Plus
+Full Board
+All Inclusive
+Ultra All Inclusive
+The system therefore must not hard-code specific meal-plan types.
+
+16. Cancellation Upgrade
+Cancellation is another optional upgrade.
+Example:
+Flexibel bleiben
+☐ Kostenlose Stornierung — +29 €
+If selected:
+Total price updates
+Price per person updates
+If free cancellation is already included:
+Kostenlose Stornierung — inkl.
+If no alternative cancellation option exists for the offer, do not display an upgrade option.
+
+17. Offer Pricing
+Every offer should clearly show both the total and per-person price.
+Example:
+Preis für 2 Erwachsene
+927,00 €
+463,50 € p.P.
+For a family:
+Preis für 2 Erwachsene + 1 Kind
+1.240,00 €
+413,33 € p.P.
+The large amount should be the total booking price.
+The smaller amount underneath is the average price per person.
+
+18. Multiple Rooms
+This part is particularly important.
+If the customer selected more than one room at the beginning, the system must guide them through the selection room by room.
+For example, if the customer selected 2 rooms:
+Room 1 of 2
+Show the traveler allocation for Room 1.
+The customer selects:
+Room category
+Offer
+Meal plan
+Cancellation option
+The CTA should clearly say:
+1. Zimmer auswählen
+After clicking it, Room 1 is saved and the interface continues to:
+Room 2 of 2
+The customer then selects the configuration for the second room.
+CTA:
+2. Zimmer auswählen
+Only after all rooms have been configured should the customer continue to the final booking summary.
+It must always be visually obvious which room is currently being configured.
+
+19. Different Room Types Must Be Possible
+Customers must be able to book different room categories within the same booking.
+Example:
+Room 1
+Doppelzimmer Balkon2 adults
+Room 2
+Deluxe Zimmer2 adults + 1 child
+The same applies to available optional extras if the underlying offer supports them.
+Each room therefore needs its own independent booking configuration.
+
+20. Multi-Room Price Calculation
+Internally, the system needs to keep the price breakdown separate.
+For example:
+Room 1€916
+Room 2€1,080
+Total booking price€1,996
+Average per person€399.20 p.P.
+The pricing model should separately account for:
+Adult prices
+Child prices
+Individual room prices
+Meal supplements
+Cancellation supplements
+Other optional supplements
+Total booking price
+
+21. Admin / Pricing Management
+The admin interface should make it easy to create and maintain pricing rules.
+A pricing rule should contain at least:
+Hotel
+Room category
+Valid from
+Valid until
+Applicable weekdays
+Price per night
+Occupancy / pricing basis
+Child pricing
+Minimum stay
+Maximum stay
+Inventory / availability
+Meal plan
+Cancellation options
+Example configuration:
+Hotel:
+Rewaya Luxury Resort
+Room category:
+Doppelzimmer Balkon
+Validity:
+01.09.2026 – 20.10.2026
+Sunday–Thursday:
+€100 / night
+Friday–Saturday:
+€120 / night
+Children:
+0–1.99 years: Free
+2–5.99 years: -50%
+6–11.99 years: -25%
+Alternative fixed-price configuration:
+2–5.99 years: €50
+6–11.99 years: €75
+Minimum stay:
+2 nights
+Maximum stay:
+7 nights
+It should also be possible to override the standard weekday prices for individual dates or special periods.
+
+22. Pricing Architecture
+The backend must be the single source of truth for prices and availability.
+Do not calculate or trust final booking prices purely in the frontend.
+The frontend can send something conceptually like:
+hotel
+arrivalDate
+numberOfNights
+
+rooms: [
+  {
+    adults,
+    children: [ages],
+    roomCategory,
+    offer,
+    mealPlan,
+    cancellationOption
+  }
+]
+The backend should return something conceptually like:
+availability
+arrivalDate
+departureDate
+
+availableRoomCategories
+availableOffers
+
+roomPrice
+adultPrice
+childPrice
+mealSupplement
+cancellationSupplement
+
+totalPrice
+averagePricePerPerson
+Whenever something price-relevant changes, such as:
+Travelers
+Child age
+Number of nights
+Arrival date
+Room category
+Meal plan
+Cancellation option
+the relevant prices and availability should be recalculated.
+
+Important Design Requirement
+Please do not redesign the booking flow.
+The latest provided desktop and mobile mockups are the visual reference.
+In particular, keep:
+The light grey page background
+White cards with subtle shadows
+Blue primary buttons
+Orange calendar styling
+Light-blue selected date range
+Green availability dot
+Very light green availability background
+Current typography hierarchy
+Current spacing
+Current rounded corners
+Current room-card design
+Horizontal room-category slider on mobile
+Approximately 2.5 visible room-category cards on mobile
+Current narrow/vertical mobile offer cards
+Current price hierarchy
+Current wide “Zur Buchung” button
+The website UI and all customer-facing text will be in German. This document is only written in English to explain the requirements to the development team.
+The main objective now is to implement the booking and pricing logic behind the design we have already finalized, rather than creating a new UI.
+
+23. Manual Pricing Now, API Integration Later
+For the initial version, all hotel prices, availability rules, room categories, meal supplements, child discounts and cancellation options will be entered and managed manually in our backend/admin panel.
+However, the system architecture must be designed so that we can later connect external APIs without rebuilding the booking flow.
+The frontend and booking logic should therefore not depend directly on manually entered database fields.
+Instead, there should be a clean pricing/availability layer between the frontend and the data source.
+For Phase 1:
+Frontend
+↓
+Booking / Pricing Service
+↓
+Our manually managed database
+Later:
+Frontend
+↓
+Booking / Pricing Service
+↓
+Hotel / Tour Operator / Booking API
+Or even a combination:
+Frontend
+↓
+Booking / Pricing Service
+↓
+Manual inventory
++ External APIs
++ Tour operator APIs
+The goal is that the customer-facing booking flow remains exactly the same regardless of where the price and availability data comes from.
+The API integration later may provide, for example:
+Live prices
+Live room availability
+Room categories
+Occupancy rules
+Child pricing
+Meal plans
+Cancellation conditions
+Supplements
+Minimum stay
+Maximum stay
+Booking conditions
+The booking engine should normalize this information into our own internal structure before sending it to the frontend.
+This is important because different providers will most likely return data in different formats.
+We do not want the frontend to be built specifically around one provider's API.
+
+24. Booking Parameters Must Be Shareable via URL
+The booking URL must preserve the customer's main search parameters.
+At minimum:
+Arrival date
+Departure date
+Number of nights
+Number of adults
+Number of children
+Age of each child
+Number of rooms
+Ideally traveler allocation per room
+For example:
+/hotel/rewaya-luxury-resort
+?arrival=2026-09-10
+&amp;departure=2026-09-13
+&amp;nights=3
+&amp;adults=2
+&amp;children=1
+&amp;childAges=4
+&amp;rooms=1
+For multiple rooms, the URL structure needs to support room-specific occupancy as well.
+Conceptually:
+?arrival=2026-09-10
+&amp;nights=3
+&amp;rooms=2
+&amp;room1Adults=2
+&amp;room1Children=1
+&amp;room1ChildAges=4
+&amp;room2Adults=2
+&amp;room2Children=0
+The exact parameter structure can be decided by the developer, but it should be:
+Stable
+Human-readable where practical
+Shareable
+Backward-compatible
+Easy for external systems to generate
+Validated server-side
+When a customer opens such a URL, the booking page should automatically preselect the correct:
+Traveler configuration
+Number of rooms
+Number of nights
+Arrival date
+Calculated departure date
+and immediately load the correct prices and availability.
+
+25. External Hotel Meta Search / Deep-Linking Compatibility
+This is important for the future.
+We want the booking system to be architected so that we can later send traffic from hotel metasearch and travel platforms such as:
+Google Hotels
+trivago
+Tripadvisor
+Other hotel/metasearch partners
+The long-term goal is that when a customer searches on an external platform with, for example:
+10 September 2026 – 13 September 20262 adults1 room
+and clicks through to our website, our booking page should already open with:
+2 adults1 room3 nightsArrival: 10.09.2026Departure: 13.09.2026
+preselected.
+The user should not have to enter the same search information again.
+Therefore, the booking flow needs a proper deep-link architecture from the beginning.
+External parameters should be mapped into our internal booking state.
+Conceptually:
+External platform
+↓
+Deep link to our hotel page
+↓
+Read arrival / departure / occupancy parameters
+↓
+Validate parameters
+↓
+Create internal booking state
+↓
+Load current price + availability
+↓
+Display the matching booking configuration
+Very important:
+The price passed in a URL or by an external platform must never be blindly trusted.
+When the customer lands on our website, our backend must recalculate and validate:
+Availability
+Current price
+Occupancy
+Child rules
+Room availability
+Length-of-stay restrictions
+before showing a bookable offer.
+
+26. Architecture Should Be Ready for Future Metasearch Feeds
+Even if we do not implement Google Hotels, trivago or Tripadvisor integration in Phase 1, the data structure should be built with this future use case in mind.
+In particular, hotels and offers should have stable internal identifiers for things such as:
+Hotel
+Room category
+Rate / offer
+Meal plan
+Cancellation policy
+Occupancy
+Currency
+Price
+Availability
+This will make it much easier later to map our inventory to external hotel platforms.
+For example, we should avoid identifying a room only by its visible German name such as:
+Doppelzimmer Balkon
+Instead, internally it should have a permanent identifier such as:
+room_category_id: 1842
+while the display name remains:
+Doppelzimmer Balkon
+The same principle should apply to hotels and rates.
+
+27. Important Separation Between URL State and Booking Data
+The URL should describe what the customer searched for, not contain trusted booking information.
+For example:
+arrival=2026-09-10
+nights=3
+adults=2
+children=1
+childAges=4
+is fine.
+But final calculated values such as:
+price=927
+should not be treated as authoritative.
+The flow should always be:
+URL parameters
+→ Validate search parameters
+→ Query pricing engine
+→ Query availability
+→ Calculate current price
+→ Display result
+This is especially important once external traffic starts coming from Google Hotels, trivago, Tripadvisor or API partners.
+
+Additional architectural requirement
+Please consider the booking system from the beginning as a booking engine with replaceable data sources, not simply as a page that reads manually entered prices.
+Phase 1:Manual prices and availability entered by us.
+Phase 2:Combination of manual data and external APIs.
+Later:Live pricing and availability from multiple providers, plus distribution to hotel metasearch platforms.
+The customer-facing design should remain the same throughout these phases.
+The work we are doing now should therefore create a foundation that allows us to add these integrations later without rebuilding the hotel pages or booking flow from scratch.
+
+
+CHECKOUT:Should Looks Like here in Desktop and Mobile:https://www.holidaycheck.at/wbf/booking/6015df42-f723-4212-b60d-a0a5c916a23b?ctx=hotel-offerlist&amp;hotelid=3a049b87-5928-3ca2-b344-73ab6c6df56c&amp;hotelname=hotel-norica-thermenhotels-gastein&amp;pos=3&amp;sorting=recommendationPrice&amp;tourOperator=HCT&amp;travelkind=hotelonly
+
+
