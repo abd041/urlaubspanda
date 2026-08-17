@@ -29,8 +29,8 @@ export function CounterStepper({
 }: CounterStepperProps) {
   const t = useT();
   return (
-    <div className="flex w-full min-w-0 items-center justify-between gap-2 sm:gap-3">
-      <div className="flex min-w-0 items-center gap-2">
+    <div className="flex w-full min-w-0 items-center justify-between gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
         {Icon && (
           <span
             className={cn(
@@ -41,9 +41,9 @@ export function CounterStepper({
             <Icon className="h-4 w-4" aria-hidden="true" />
           </span>
         )}
-        <div className="min-w-0">
-          <p className="text-sm font-semibold leading-tight text-ink">{label}</p>
-          {sublabel && <p className="text-xs leading-snug text-muted">{sublabel}</p>}
+        <div className="min-w-0 overflow-hidden">
+          <p className="truncate text-sm font-semibold leading-tight text-ink">{label}</p>
+          {sublabel && <p className="truncate text-xs leading-snug text-muted">{sublabel}</p>}
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">

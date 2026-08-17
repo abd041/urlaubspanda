@@ -3,30 +3,27 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { deals } from "@/data/deals";
 import { getHotelBooking } from "@/lib/hotelBooking";
-import { BookingFlow } from "@/components/booking/BookingFlow";
+import { CheckoutFlow } from "@/components/booking/CheckoutFlow";
 
-/** Prerender the booking-flow shell for every known offer at build time. */
 export function generateStaticParams() {
   return deals.map((deal) => ({ slug: deal.slug }));
 }
 
 export async function generateMetadata({
   params,
-}: PageProps<"/hotel/[slug]">): Promise<Metadata> {
+}: PageProps<"/hotel/[slug]/checkout">): Promise<Metadata> {
   const { slug } = await params;
   const booking = getHotelBooking(slug);
   if (!booking) return {};
 
   return {
-    title: `Buchung – ${booking.deal.name} | Urlaubspanda`,
-    description: `Wähle Reisende, Zeitraum, Zimmer und Angebot für ${booking.deal.name} und schließe deine Buchung ab.`,
-    // Transactional booking-flow URLs carry personal search state and should
-    // never be indexed or show up as duplicate content of the offer page.
+    title: `Buchung abschließen – ${booking.deal.name} | Urlaubspanda`,
+    description: `Reisedaten und Zahlung für ${booking.deal.name} angeben und die Buchung abschließen.`,
     robots: { index: false, follow: false },
   };
 }
 
-function BookingFlowFallback() {
+function CheckoutFallback() {
   return (
     <main className="min-h-screen bg-surface">
       <div className="mx-auto w-[calc(100%-2rem)] max-w-[1240px] animate-pulse py-10 sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)]">
@@ -36,14 +33,14 @@ function BookingFlowFallback() {
   );
 }
 
-export default async function HotelBookingPage({ params }: PageProps<"/hotel/[slug]">) {
+export default async function HotelCheckoutPage({ params }: PageProps<"/hotel/[slug]/checkout">) {
   const { slug } = await params;
   const booking = getHotelBooking(slug);
   if (!booking) notFound();
 
   return (
-    <Suspense fallback={<BookingFlowFallback />}>
-      <BookingFlow deal={booking.deal} config={booking.config} />
+    <Suspense fallback={<CheckoutFallback />}>
+      <CheckoutFlow deal={booking.deal} config={booking.config} />
     </Suspense>
   );
 }

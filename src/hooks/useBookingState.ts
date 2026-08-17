@@ -126,14 +126,19 @@ export function useBookingState() {
 
   const allRoomsConfirmed = activeRoomIndex >= state.rooms.length;
 
+  const hotelPath = pathname.replace(/\/checkout\/?$/, "");
+  const checkoutPath = `${hotelPath}/checkout`;
+
   const commit = useCallback(
-    (next: BookingState, options?: { push?: boolean }) => {
+    (next: BookingState, options?: { push?: boolean; path?: string; scroll?: boolean }) => {
       const query = serializeState(next).toString();
-      const url = query ? `${pathname}?${query}` : pathname;
+      const targetPath = options?.path ?? pathname;
+      const url = query ? `${targetPath}?${query}` : targetPath;
+      const scroll = options?.scroll ?? false;
       if (options?.push === false) {
-        router.replace(url, { scroll: false });
+        router.replace(url, { scroll });
       } else {
-        router.push(url, { scroll: false });
+        router.push(url, { scroll });
       }
     },
     [pathname, router]
@@ -198,9 +203,13 @@ export function useBookingState() {
       const rooms = state.rooms.map((room, i) =>
         i === roomIndex ? { ...room, roomCategoryId, offerId, mealPlanId, cancellationSelected } : room
       );
-      commit({ ...state, rooms });
+      const allDone = rooms.every((room) => Boolean(room.offerId));
+      commit(
+        { ...state, rooms },
+        allDone ? { path: checkoutPath, scroll: true } : { path: hotelPath }
+      );
     },
-    [state, commit]
+    [state, commit, checkoutPath, hotelPath]
   );
 
   const setMealPlan = useCallback(
@@ -224,9 +233,9 @@ export function useBookingState() {
       const rooms = state.rooms.map((room, i) =>
         i === roomIndex ? { ...room, offerId: null, mealPlanId: null, cancellationSelected: false } : room
       );
-      commit({ ...state, rooms }, { push: false });
+      commit({ ...state, rooms }, { path: hotelPath, scroll: true });
     },
-    [state, commit]
+    [state, commit, hotelPath]
   );
 
   return {

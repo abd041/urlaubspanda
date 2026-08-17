@@ -37,8 +37,9 @@ export function RoomCategoryCard({
     <div
       data-carousel-item
       className={cn(
-        "relative flex w-[38%] min-w-[150px] shrink-0 snap-start flex-col overflow-hidden rounded-xl border transition sm:w-[240px] lg:w-auto",
-        selected ? "border-brand-500 bg-white shadow-sm ring-1 ring-brand-500" : "border-line bg-white",
+        "relative flex shrink-0 snap-start overflow-hidden rounded-xl border bg-white transition",
+        "w-[92%] min-w-[18rem] flex-row sm:w-[24rem] lg:w-auto lg:min-w-0 lg:flex-col",
+        selected ? "border-brand-500 shadow-sm ring-1 ring-brand-500" : "border-line",
         unavailable && "opacity-60"
       )}
     >
@@ -47,56 +48,56 @@ export function RoomCategoryCard({
         onClick={unavailable ? undefined : onSelect}
         disabled={unavailable}
         aria-pressed={selected}
-        className="relative block h-36 w-full disabled:cursor-not-allowed"
+        className="relative h-[5.75rem] w-[6.5rem] shrink-0 disabled:cursor-not-allowed sm:h-[6.5rem] sm:w-[7.25rem] lg:h-36 lg:w-full lg:self-auto"
       >
         <Image
           src={room.images[0]}
           alt={tx(room.name, locale)}
           fill
-          sizes="280px"
+          sizes="(min-width: 1024px) 240px, 128px"
           className={cn("object-cover", unavailable && "grayscale")}
         />
         {selected && (
-          <span className="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-brand-500 text-white shadow-sm">
-            <Check className="h-4 w-4" aria-hidden="true" strokeWidth={2.6} />
+          <span className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-500 text-white shadow-sm lg:h-7 lg:w-7">
+            <Check className="h-3.5 w-3.5 lg:h-4 lg:w-4" aria-hidden="true" strokeWidth={2.6} />
           </span>
         )}
       </button>
 
-      <div className="flex flex-1 flex-col gap-1.5 p-3.5">
-        <h4 className="text-sm font-bold text-ink">{tx(room.name, locale)}</h4>
-        <p className="flex items-center gap-2 text-xs text-muted">
-          <span className="flex items-center gap-1">
-            <Users className="h-3.5 w-3.5" aria-hidden="true" />
-            {tx(room.occupancyLabel, locale)}
-          </span>
-          <span aria-hidden="true">·</span>
-          <span className="flex items-center gap-1">
-            <Maximize className="h-3.5 w-3.5" aria-hidden="true" />
-            {tx(room.sizeLabel, locale)}
-          </span>
-        </p>
+      <div className="flex min-w-0 flex-1 flex-col justify-between gap-1 p-2.5 sm:p-3 lg:gap-1.5 lg:p-3.5">
+        <div className="min-w-0">
+          <h4 className="truncate text-sm font-bold leading-snug text-ink">{tx(room.name, locale)}</h4>
+          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted lg:text-xs">
+            <span className="inline-flex items-center gap-1">
+              <Users className="h-3.5 w-3.5" aria-hidden="true" />
+              {tx(room.occupancyLabel, locale)}
+            </span>
+            <span aria-hidden="true">·</span>
+            <span className="inline-flex items-center gap-1">
+              <Maximize className="h-3.5 w-3.5" aria-hidden="true" />
+              {tx(room.sizeLabel, locale)}
+            </span>
+          </p>
+          {room.badge && !unavailable && (
+            <span className="mt-1 inline-flex w-fit items-center rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-semibold text-success lg:text-[11px]">
+              {tx(room.badge, locale)}
+            </span>
+          )}
+        </div>
 
-        {room.badge && !unavailable && (
-          <span className="inline-flex w-fit items-center rounded-md bg-success/10 px-2 py-0.5 text-[11px] font-semibold text-success">
-            {tx(room.badge, locale)}
-          </span>
-        )}
-
-        <div className="mt-1 flex items-end justify-between">
+        <div className="flex items-end justify-between gap-2">
           {unavailable ? (
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-bold text-danger">{t("booking.unavailable")}</p>
               {unavailableReason && <p className="mt-0.5 text-[11px] text-muted">{unavailableReason}</p>}
             </div>
           ) : (
-            <div>
-              <p className="text-sm font-bold text-brand-600">
-                {t("booking.fromPrice", { price: priceFormatter.format(Math.round(pricePerPerson)) })}{" "}
-                <span className="text-xs font-medium text-muted">{t("deal.perPerson")}</span>
+            <div className="min-w-0">
+              <p className="text-sm font-bold leading-tight text-ink">
+                {t("booking.ppAmount", { price: priceFormatter.format(Math.round(pricePerPerson)) })}
               </p>
               <p className="text-[11px] text-muted">
-                {t("booking.perRoom", { price: priceFormatter.format(Math.round(pricePerRoom)) })}
+                {t("booking.gesamtpreisLine", { price: priceFormatter.format(Math.round(pricePerRoom)) })}
               </p>
             </div>
           )}

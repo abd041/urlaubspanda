@@ -158,6 +158,7 @@ export const offerDetails: Record<string, OfferDetail> = {
     totalPhotoCount: 18,
     ctaMode: "direct",
     bookingUrl: "https://www.expedia.at/City-Hotel-Bellevue-Paris",
+    countdownEndsAt: "2026-08-21T21:59:59+02:00",
   },
 
   "costa-blanca-beach-hotel": {
@@ -217,6 +218,7 @@ export const offerDetails: Record<string, OfferDetail> = {
       DE: "https://www.tui.de/hotel/costa-blanca-beach-hotel",
       CH: "https://www.tui.ch/hotel/costa-blanca-beach-hotel",
     },
+    countdownEndsAt: "2026-08-21T21:59:59+02:00",
   },
 
   "rewaya-luxury-resort": {
@@ -345,6 +347,7 @@ export const offerDetails: Record<string, OfferDetail> = {
     totalPhotoCount: 38,
     ctaMode: "direct",
     bookingUrl: "https://www.tui.at/hotel/kreta-sun-village",
+    countdownEndsAt: "2026-08-21T21:59:59+02:00",
   },
 
   "falkenstein-resort-punta-skala": {

@@ -1,6 +1,8 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import type { Deal, HotelBookingConfig } from "@/types";
 import type { UseBookingStateReturn } from "@/hooks/useBookingState";
 import { RoomCategorySection } from "@/components/booking/RoomCategorySection";
@@ -92,6 +94,16 @@ export function RoomByRoomSection({ deal, config, booking }: RoomByRoomSectionPr
           </div>
         );
       })}
+
+      {activeRoomIndex >= rooms.length && (
+        <Link
+          href={`/hotel/${deal.slug}/checkout${query ? `?${query}` : ""}`}
+          className="inline-flex h-14 w-full items-center justify-center gap-1.5 rounded-xl bg-brand-500 text-sm font-bold text-white shadow-[0_8px_20px_rgba(27,99,235,0.22)] transition hover:bg-brand-600"
+        >
+          {t("booking.toBooking")}
+          <ChevronRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      )}
     </div>
   );
 }

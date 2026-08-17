@@ -77,9 +77,9 @@ export function HotelSummarySidebar({
 
         <div className="min-w-0 flex-1 lg:p-4">
           <h2 className="text-sm font-bold leading-snug text-ink lg:text-base">{deal.name}</h2>
-          <span className="mt-1 flex items-center gap-0.5 text-cal" aria-label={t("deal.stars", { count: deal.stars })}>
+          <span className="mt-1 flex items-center gap-0.5 text-[#FDB919]" aria-label={t("deal.stars", { count: deal.stars })}>
             {Array.from({ length: deal.stars }).map((_, i) => (
-              <Star key={i} className="h-3.5 w-3.5 fill-cal" aria-hidden="true" />
+              <Star key={i} className="h-3.5 w-3.5 fill-[#FDB919]" aria-hidden="true" />
             ))}
           </span>
           {deal.reviewEnabled && (

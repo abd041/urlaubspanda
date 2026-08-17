@@ -205,6 +205,11 @@ export interface OfferDetail {
   bookingUrl?: string;
   /** Required when `ctaMode` is "country_selection". */
   bookingUrls?: OfferBookingUrls;
+  /**
+   * Optional limited-time offer end (ISO datetime). When set, the mobile
+   * sticky CTA shows a countdown. Omit to hide the timer.
+   */
+  countdownEndsAt?: string;
 }
 
 /**

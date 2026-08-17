@@ -88,7 +88,7 @@ export function BookingCalendar({
   const renderMonth = (year: number, month: number, cells: (Date | null)[], hideOnMobile: boolean) => {
     const cheapest = monthPrices(cells);
     return (
-      <div key={`${year}-${month}`} className={cn("min-w-0 w-full px-2 pb-3", hideOnMobile && "hidden md:block")}>
+      <div key={`${year}-${month}`} className={cn("min-w-0 w-full px-1.5 pb-2 sm:px-2 sm:pb-3", hideOnMobile && "hidden md:block")}>
         <table className="w-full table-fixed border-collapse">
           <thead>
             <tr>
@@ -96,7 +96,7 @@ export function BookingCalendar({
                 <th
                   key={label}
                   scope="col"
-                  className="w-[14.28%] py-2 text-center text-[11px] font-semibold text-body sm:text-xs"
+                  className="w-[14.28%] py-1.5 text-center text-[11px] font-semibold text-ink sm:text-xs"
                 >
                   {label}
                 </th>
@@ -117,7 +117,7 @@ export function BookingCalendar({
                   const highlighted = isArrival || isDeparture;
 
                   return (
-                    <td key={`${week}-${i}`} className="p-0.5">
+                    <td key={`${week}-${i}`} className="p-px sm:p-0.5">
                       <button
                         type="button"
                         disabled={isPast}
@@ -125,12 +125,12 @@ export function BookingCalendar({
                         aria-pressed={Boolean(isArrival)}
                         aria-label={`${date.getDate()}. ${monthLabel.format(date)}${price !== null ? `, ${t("booking.calendarPrice", { price })}` : ""}`}
                         className={cn(
-                          "flex min-h-11 w-full min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-md px-0 py-1 text-[11px] leading-none transition disabled:cursor-not-allowed sm:min-h-12 sm:text-xs",
+                          "flex min-h-9 w-full min-w-0 flex-col items-center justify-center gap-px overflow-hidden rounded-md px-0 py-0.5 text-[11px] leading-none transition disabled:cursor-not-allowed sm:min-h-10 sm:text-xs",
                           isPast && "text-muted",
-                          !isPast && !highlighted && !inRange && "text-ink hover:bg-surface",
-                          inRange && !highlighted && "bg-brand-100 text-ink",
-                          isArrival && "bg-brand-500 text-white",
-                          isDeparture && !isArrival && "bg-brand-500 text-white"
+                          !isPast && !highlighted && !inRange && "text-black hover:bg-surface",
+                          inRange && !highlighted && "bg-[#D6E4FF] text-black",
+                          isArrival && "bg-[#1B63EB] text-white",
+                          isDeparture && !isArrival && "bg-[#1B63EB] text-white"
                         )}
                       >
                         <span className="font-semibold tabular-nums">{date.getDate()}</span>
@@ -142,7 +142,7 @@ export function BookingCalendar({
                                 ? "text-white/90"
                                 : isCheapest
                                   ? "font-bold text-success"
-                                  : "font-medium text-ink"
+                                  : "font-medium text-black"
                             )}
                           >
                             {price} €
@@ -163,8 +163,8 @@ export function BookingCalendar({
   return (
     <div className="min-w-0 w-full max-w-full">
       <h2 className="text-sm font-bold text-ink">{t("booking.calendarTitle")}</h2>
-      <div className="mt-3 min-w-0 max-w-full overflow-hidden rounded-xl border border-cal">
-        <div className="flex items-center gap-2 bg-cal px-2 py-3 sm:px-3">
+      <div className="mt-3 min-w-0 max-w-full overflow-hidden rounded-xl border-2 border-[#FDB919]">
+        <div className="flex items-center gap-2 bg-[#FDB919] px-2 py-2 sm:px-3 sm:py-2.5">
           <button
             type="button"
             onClick={() => goToMonth(-1)}
@@ -200,11 +200,11 @@ export function BookingCalendar({
         <div className="flex flex-col gap-3 border-t border-line bg-white p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
           <div className="hidden flex-wrap items-center gap-x-4 gap-y-2 text-xs text-body md:flex">
             <span className="flex items-center gap-1.5">
-              <span className="h-4 w-4 rounded-sm bg-brand-500" aria-hidden="true" />
+              <span className="h-4 w-4 rounded-sm bg-[#1B63EB]" aria-hidden="true" />
               {t("booking.selected")}
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-4 w-4 rounded-sm bg-brand-100" aria-hidden="true" />
+              <span className="h-4 w-4 rounded-sm bg-[#D6E4FF]" aria-hidden="true" />
               {t("booking.departure")}
             </span>
             <span className="flex items-center gap-1.5">
@@ -214,15 +214,15 @@ export function BookingCalendar({
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-body md:hidden">
             <span className="flex items-center gap-1.5">
-              <span className="h-4 w-4 rounded-sm bg-brand-500" aria-hidden="true" />
+              <span className="h-4 w-4 rounded-sm bg-[#1B63EB]" aria-hidden="true" />
               {t("booking.arrival")}
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-4 w-4 rounded-sm bg-brand-100" aria-hidden="true" />
+              <span className="h-4 w-4 rounded-sm bg-[#D6E4FF]" aria-hidden="true" />
               {t("booking.stopovers")}
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-4 w-4 rounded-sm bg-brand-500" aria-hidden="true" />
+              <span className="h-4 w-4 rounded-sm bg-[#1B63EB]" aria-hidden="true" />
               {t("booking.departure")}
             </span>
             <span className="flex items-center gap-1.5">
@@ -230,18 +230,26 @@ export function BookingCalendar({
               {t("booking.cheapest")}
             </span>
           </div>
-
           <button
             type="button"
             onClick={onContinue}
             disabled={!arrival}
-            className="hidden min-w-[13.5rem] items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-8 py-3 text-sm font-bold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40 md:inline-flex"
+            className="hidden min-w-[13.5rem] items-center justify-center gap-1.5 rounded-lg bg-[#1B63EB] px-8 py-3 text-sm font-bold text-white transition hover:bg-[#0F52D6] disabled:cursor-not-allowed disabled:opacity-40 md:inline-flex"
           >
             {t("booking.selectRoom")}
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={onContinue}
+        disabled={!arrival}
+        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#1B63EB] px-8 py-3.5 text-sm font-bold text-white transition hover:bg-[#0F52D6] disabled:cursor-not-allowed disabled:opacity-40 md:hidden"
+      >
+        {t("booking.selectRoom")}
+        <ChevronRight className="h-4 w-4" aria-hidden="true" />
+      </button>
     </div>
   );
 }

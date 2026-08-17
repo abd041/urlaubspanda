@@ -22,7 +22,7 @@ export function OfferPriceSummary({ deal, size = "default" }: { deal: Deal; size
   return (
     <div>
       {deal.oldPrice > deal.currentPrice && (
-        <p className="text-[13px] text-muted line-through">{formatOfferEuro(deal.oldPrice, locale)}</p>
+        <p className="text-[13px] font-semibold text-danger line-through">{formatOfferEuro(deal.oldPrice, locale)}</p>
       )}
       <p className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
         <span className="text-[13px] text-muted">{t("deal.from")}</span>
@@ -43,6 +43,9 @@ export function OfferPriceSummary({ deal, size = "default" }: { deal: Deal; size
           {deal.discountPercent > 0 ? ` (−${deal.discountPercent}%)` : ""}
         </p>
       )}
+      <p className="mt-2 text-[12px] font-medium text-ink">
+        {t("offer.totalTwoAdults", { price: formatOfferEuro(deal.currentPrice * 2, locale) })}
+      </p>
     </div>
   );
 }

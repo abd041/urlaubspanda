@@ -76,7 +76,7 @@ export default async function OfferPage({ params }: PageProps<"/angebot/[slug]">
   const offerUrl = `${SITE_URL}/angebot/${deal.slug}`;
 
   return (
-    <main className="bg-background pb-10 lg:pb-16">
+    <main className="bg-background pb-36 lg:pb-16">
       <JsonLd data={offerDetailJsonLd(deal, detail)} />
       <JsonLd
         data={breadcrumbJsonLd([
@@ -89,12 +89,7 @@ export default async function OfferPage({ params }: PageProps<"/angebot/[slug]">
         ])}
       />
 
-      <MobileStickyCta
-        slug={deal.slug}
-        ctaMode={detail.ctaMode}
-        bookingUrl={detail.bookingUrl}
-        bookingUrls={detail.bookingUrls}
-      />
+      <MobileStickyCta deal={deal} detail={detail} />
 
       {/* Top: breadcrumb + hero (full width) */}
       <OfferBreadcrumb
@@ -110,9 +105,11 @@ export default async function OfferPage({ params }: PageProps<"/angebot/[slug]">
 
       <Container className="mt-5 sm:mt-6">
         <div className="flex flex-col gap-8 sm:gap-10">
-          <div className="order-1 lg:order-3">
-            <OfferReviewsSection deal={deal} detail={detail} />
-          </div>
+          {deal.reviewEnabled && deal.reviewCount > 0 && (
+            <div className="order-1 lg:order-3">
+              <OfferReviewsSection deal={deal} detail={detail} />
+            </div>
+          )}
 
           <div className="order-2 lg:order-1">
             <OfferGallery

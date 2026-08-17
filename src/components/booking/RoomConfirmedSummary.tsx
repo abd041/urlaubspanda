@@ -5,9 +5,9 @@ import { CheckCircle2 } from "lucide-react";
 import { calculateStayPrice } from "@/lib/pricingEngine";
 import type { BookingOffer, ChildPricingRule, RoomCategoryDetail } from "@/types";
 import type { RoomSelection } from "@/hooks/useBookingState";
-import { localeTag } from "@/i18n/config";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { mealPlanLabel, tx } from "@/i18n/content";
+import { PriceHierarchy } from "@/components/booking/PriceHierarchy";
 
 interface RoomConfirmedSummaryProps {
   roomIndex: number;
@@ -35,10 +35,6 @@ export function RoomConfirmedSummary({
 }: RoomConfirmedSummaryProps) {
   const t = useT();
   const { locale } = useLocale();
-  const priceFormatter = new Intl.NumberFormat(localeTag(locale), {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
   const mealPlan = offer.mealPlans.find((plan) => plan.id === occupancy.mealPlanId) ?? offer.mealPlans[0];
   const baseStay = calculateStayPrice({
     room,
@@ -52,6 +48,7 @@ export function RoomConfirmedSummary({
     baseStay.total +
     (mealPlan?.supplementTotal ?? 0) +
     (occupancy.cancellationSelected ? offer.cancellation?.supplementTotal ?? 0 : 0);
+  const perPerson = total / Math.max(baseStay.travelerCount, 1);
 
   const occupancyLine = [
     t("booking.adultsCount", { count: occupancy.adults }),
@@ -77,8 +74,8 @@ export function RoomConfirmedSummary({
         <p className="truncate text-xs text-muted">{occupancyLine}</p>
       </div>
       <div className="text-right">
-        <p className="text-sm font-bold text-ink">{priceFormatter.format(total)} €</p>
-        <button type="button" onClick={onEdit} className="text-xs font-semibold text-brand-500 hover:underline">
+        <PriceHierarchy perPerson={perPerson} total={total} size="sm" className="text-right" />
+        <button type="button" onClick={onEdit} className="mt-1 text-xs font-semibold text-brand-500 hover:underline">
           {t("booking.edit")}
         </button>
       </div>

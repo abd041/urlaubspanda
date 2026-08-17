@@ -18,8 +18,8 @@ interface OfferGalleryProps {
 const SWIPE_THRESHOLD_PX = 40;
 
 /**
- * urlaubshamster-style gallery:
- * Mobile slider · Desktop large left image + 2×2 thumbs, “Alle X Fotos” CTA.
+ * Gallery: mobile matches the live site (full-bleed slider, rectangular
+ * arrows, 1/12 counter). Desktop keeps the mosaic + “Alle X Fotos” CTA.
  */
 export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: OfferGalleryProps) {
   const t = useT();
@@ -56,9 +56,9 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
 
   return (
     <>
-      {/* Mobile */}
+      {/* Mobile — live site: full-bleed, rectangular arrows, 1/12 counter */}
       <div
-        className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.25rem] bg-surface lg:hidden"
+        className="relative -mx-4 aspect-[16/10] w-[calc(100%+2rem)] overflow-hidden bg-surface sm:-mx-6 sm:w-[calc(100%+3rem)] lg:hidden"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         role="group"
@@ -87,37 +87,30 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
           </button>
         ))}
 
-        {discountPercent > 0 && (
-          <span className="absolute left-3 top-3 z-10 rounded-full bg-white px-3 py-1 text-[15px] font-extrabold tracking-tight text-danger shadow-sm">
-            −{discountPercent}%
-          </span>
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={() => goTo(index - 1)}
+              aria-label={t("offer.prevImage")}
+              className="absolute left-0 top-1/2 z-10 flex h-14 w-8 -translate-y-1/2 items-center justify-center bg-white/70 text-[#3d3d3d] transition hover:bg-white/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500"
+            >
+              <ChevronLeft className="h-6 w-6" strokeWidth={2.25} />
+            </button>
+            <button
+              type="button"
+              onClick={() => goTo(index + 1)}
+              aria-label={t("offer.nextImage")}
+              className="absolute right-0 top-1/2 z-10 flex h-14 w-8 -translate-y-1/2 items-center justify-center bg-white/70 text-[#3d3d3d] transition hover:bg-white/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500"
+            >
+              <ChevronRight className="h-6 w-6" strokeWidth={2.25} />
+            </button>
+          </>
         )}
 
-        <button
-          type="button"
-          onClick={() => goTo(index - 1)}
-          aria-label={t("offer.prevImage")}
-          className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          type="button"
-          onClick={() => goTo(index + 1)}
-          aria-label={t("offer.nextImage")}
-          className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => openLightboxAt(index)}
-          className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-ink shadow-md"
-        >
-          <Expand className="h-3.5 w-3.5" aria-hidden="true" />
-          {t("offer.allPhotos", { count: totalPhotoCount })}
-        </button>
+        <span className="absolute bottom-2.5 right-2.5 z-10 rounded-[4px] bg-white px-2 py-[3px] text-[13px] font-medium tabular-nums leading-none text-ink">
+          {index + 1}/{totalPhotoCount}
+        </span>
       </div>
 
       {/* Desktop — mosaic: large left (~65%) + 2×2 right, clipped outer radius */}
