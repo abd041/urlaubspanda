@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { BedDouble, ChevronDown, Info, Plus, Trash2, User, Users } from "lucide-react";
+import { BedDouble, Plus, Trash2, User, Users } from "lucide-react";
 import type { RoomSelection } from "@/hooks/useBookingState";
 import { CounterStepper } from "@/components/booking/CounterStepper";
 import { ChildAgeSelect } from "@/components/booking/ChildAgeSelect";
-import { cn } from "@/lib/utils";
 import { useT } from "@/i18n/LocaleProvider";
 
 const MAX_ROOMS = 6;
@@ -22,9 +20,9 @@ export function TravelerRoomSelector({
   onRoomsCountChange,
 }: TravelerRoomSelectorProps) {
   const t = useT();
-  const [panelOpen, setPanelOpen] = useState(false);
   const firstRoom = rooms[0];
   const extraRooms = rooms.slice(1);
+  const canAddRoom = rooms.length < MAX_ROOMS;
 
   const updateChildAge = (roomIndex: number, childIndex: number, age: number) => {
     const room = rooms[roomIndex];
@@ -67,23 +65,30 @@ export function TravelerRoomSelector({
           />
           <button
             type="button"
-            onClick={() => setPanelOpen((v) => !v)}
-            aria-expanded={panelOpen}
-            className="flex min-h-11 w-full items-center justify-between gap-2 rounded-lg border border-line px-3 py-2.5 text-left text-sm font-medium text-ink transition hover:border-brand-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:col-span-2 lg:col-span-1"
+            onClick={() => {
+              if (canAddRoom) onRoomsCountChange(rooms.length + 1);
+            }}
+            disabled={!canAddRoom}
+            className="flex min-h-11 w-full items-center justify-between gap-2 rounded-lg border border-line px-3 py-2.5 text-left text-sm font-medium text-ink transition hover:border-brand-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-40 sm:col-span-2 lg:col-span-1"
           >
             <span className="flex items-center gap-2">
               <BedDouble className="h-4 w-4 text-brand-500" aria-hidden="true" />
-              {rooms.length > 1 ? t("booking.roomsCount", { count: rooms.length }) : t("booking.addRoom")}
+              {t("booking.addRoom")}
             </span>
-            <ChevronDown
-              className={cn("h-4 w-4 text-muted transition-transform", panelOpen && "rotate-180")}
-              aria-hidden="true"
-            />
+            <Plus className="h-4 w-4 text-ink" aria-hidden="true" />
           </button>
         </div>
 
-        {panelOpen && (
-          <div className="mt-3 space-y-3 rounded-xl border border-line bg-white p-4 shadow-sm">
+        {firstRoom.childAges.length > 0 && (
+          <div className="mt-3 space-y-1.5">
+            {firstRoom.childAges.map((age, i) => (
+              <ChildAgeSelect key={i} index={i} age={age} onChange={(next) => updateChildAge(0, i, next)} />
+            ))}
+          </div>
+        )}
+
+        {extraRooms.length > 0 && (
+          <div className="mt-3 space-y-3">
             {extraRooms.map((room, extraIndex) => {
               const roomIndex = extraIndex + 1;
               return (
@@ -132,42 +137,9 @@ export function TravelerRoomSelector({
                 </div>
               );
             })}
-
-            {rooms.length < MAX_ROOMS && (
-              <button
-                type="button"
-                onClick={() => onRoomsCountChange(rooms.length + 1)}
-                className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-line py-2.5 text-sm font-semibold text-brand-500 transition hover:bg-brand-50"
-              >
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                {t("booking.addAnotherRoom")}
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setPanelOpen(false)}
-              className="flex w-full items-center justify-center rounded-lg bg-ink py-2.5 text-sm font-semibold text-white transition hover:bg-ink/90"
-            >
-              {t("booking.done")}
-            </button>
-          </div>
-        )}
-
-        {firstRoom.childAges.length === 0 ? (
-          <div className="mt-3 flex items-start gap-2 rounded-lg bg-[#FFF6D8] px-3 py-2.5 text-sm leading-relaxed text-[#8A6A00]">
-            <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            <p>{t("booking.childAgeHint")}</p>
-          </div>
-        ) : (
-          <div className="mt-3 space-y-1.5">
-            {firstRoom.childAges.map((age, i) => (
-              <ChildAgeSelect key={i} index={i} age={age} onChange={(next) => updateChildAge(0, i, next)} />
-            ))}
           </div>
         )}
       </div>
     </div>
   );
 }
-

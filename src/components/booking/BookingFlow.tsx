@@ -33,7 +33,7 @@ export function BookingFlow({ deal, config }: BookingFlowProps) {
 
   return (
     <main className="w-full min-w-0 overflow-x-clip bg-surface pb-24 lg:pb-16">
-      <Container className="pt-4 sm:pt-6">
+      <Container className="max-w-[1180px] pt-4 sm:pt-6">
         <Link
           href={`/angebot/${deal.slug}`}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-body transition hover:text-brand-500"
@@ -43,8 +43,8 @@ export function BookingFlow({ deal, config }: BookingFlowProps) {
         </Link>
       </Container>
 
-      <Container className="mt-5 max-w-full">
-        <div className="flex w-full min-w-0 max-w-full flex-col lg:flex-row lg:items-start lg:gap-8">
+      <Container className="mt-5 max-w-[1180px]">
+        <div className="flex w-full min-w-0 flex-col lg:flex-row lg:items-start lg:gap-8">
           <div className="order-last w-full min-w-0 max-w-full flex-1 space-y-6 lg:order-none">
             <section className="w-full min-w-0 max-w-full [contain:inline-size] lg:rounded-2xl lg:border lg:border-[#eeeef2] lg:bg-white lg:p-7 lg:shadow-[0_8px_24px_rgba(15,26,43,0.08)]">
               <h1 className="text-[1.35rem] font-extrabold leading-snug tracking-tight text-ink sm:text-2xl">{t("booking.step1")}</h1>

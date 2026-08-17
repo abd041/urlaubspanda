@@ -157,12 +157,20 @@ export function HomeHero({ deals }: { deals: Deal[] }) {
             </RevealItem>
 
             <RevealItem>
-              <a
-                href="#deals"
-                className="mt-4 flex w-full items-center justify-center rounded-2xl border border-line bg-white px-4 py-3.5 text-sm font-semibold text-ink transition hover:border-brand-200 hover:bg-brand-50/60"
-              >
-                {t("home.heroLatest")}
-              </a>
+              <div className="mt-4 flex flex-col gap-2">
+                <a
+                  href="#deals"
+                  className="flex w-full items-center justify-center rounded-2xl border border-line bg-white px-4 py-3.5 text-sm font-semibold text-ink transition hover:border-brand-200 hover:bg-brand-50/60"
+                >
+                  {t("home.heroLatest")}
+                </a>
+                <a
+                  href="#filters"
+                  className="flex w-full items-center justify-center rounded-2xl border border-line bg-white px-4 py-3.5 text-sm font-semibold text-ink transition hover:border-brand-200 hover:bg-brand-50/60"
+                >
+                  {t("home.heroAllOffers")}
+                </a>
+              </div>
             </RevealItem>
           </RevealMountGroup>
 

@@ -36,7 +36,7 @@ export async function generateMetadata({
 function BookingFlowFallback() {
   return (
     <main className="min-h-screen bg-surface">
-      <div className="mx-auto w-full max-w-[1320px] animate-pulse px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1180px] animate-pulse px-4 py-10 sm:px-6 lg:px-8">
         <div className="h-64 rounded-2xl bg-white shadow-sm" />
       </div>
     </main>

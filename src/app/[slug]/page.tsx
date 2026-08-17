@@ -3,9 +3,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DealsExplorer, DealsExplorerFallback } from "@/components/home/DealsExplorer";
 import { TrustStrip } from "@/components/home/TrustStrip";
-import { CountryHero } from "@/components/country/CountryHero";
+import { CountryLandingStart } from "@/components/country/CountryLandingStart";
 import { CountrySeoContent } from "@/components/country/CountrySeoContent";
-import { CountryIntro } from "@/components/country/CountryIntro";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbJsonLd, dealsItemListJsonLd } from "@/lib/structuredData";
 import { destinationPath } from "@/lib/destinationPaths";
@@ -79,14 +78,7 @@ export default async function CountryPage({ params }: PageProps<"/[slug]">) {
       />
       {!hasNoDealsAtAll && <JsonLd data={dealsItemListJsonLd(countryDeals)} />}
 
-      <CountryHero
-        slug={destination.slug}
-        image={destination.image}
-        intro={destination.intro}
-        deals={countryDeals}
-      />
-
-      <CountryIntro kurzgesagt={destination.kurzgesagt} />
+      <CountryLandingStart slug={destination.slug} />
 
       <Suspense
         fallback={

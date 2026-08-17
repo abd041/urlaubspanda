@@ -3,9 +3,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DealsExplorer, DealsExplorerFallback } from "@/components/home/DealsExplorer";
 import { TrustStrip } from "@/components/home/TrustStrip";
-import { CountryHero } from "@/components/country/CountryHero";
+import { CountryLandingStart } from "@/components/country/CountryLandingStart";
 import { CountrySeoContent } from "@/components/country/CountrySeoContent";
-import { CountryIntro } from "@/components/country/CountryIntro";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbJsonLd, dealsItemListJsonLd } from "@/lib/structuredData";
 import { destinationFilterPath, destinationPath } from "@/lib/destinationPaths";
@@ -56,8 +55,9 @@ export async function generateMetadata({
 }
 
 /**
- * SEO filter landing — same country chrome as `/{slug}` (full-bleed hero +
- * intro) so the layout never “breaks” vs the base country page.
+ * SEO filter landing — same country chrome as `/{slug}` (no hero; page
+ * starts at top destinations / filters) so the layout never “breaks”
+ * vs the base country page.
  */
 export default async function CountryFilterPage({
   params,
@@ -102,15 +102,7 @@ export default async function CountryFilterPage({
       />
       {filteredDeals.length > 0 && <JsonLd data={dealsItemListJsonLd(filteredDeals)} />}
 
-      <CountryHero
-        slug={destination.slug}
-        image={destination.image}
-        intro={destination.intro}
-        deals={filteredDeals}
-        filterKey={filterKey}
-      />
-
-      <CountryIntro kurzgesagt={destination.kurzgesagt} />
+      <CountryLandingStart slug={destination.slug} filterKey={filterKey} />
 
       <Suspense
         fallback={

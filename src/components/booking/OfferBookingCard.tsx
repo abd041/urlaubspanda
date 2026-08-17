@@ -161,7 +161,7 @@ export function OfferBookingCard({
   );
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-[#eeeef2] bg-white shadow-[0_8px_24px_rgba(15,26,43,0.08)]">
+    <article className="overflow-hidden rounded-2xl border border-cal bg-white shadow-[0_8px_24px_rgba(15,26,43,0.08)]">
       <div className="flex items-center justify-between gap-3 bg-[#EAF8F0] px-4 py-2.5 lg:hidden">
         <span className="flex items-center gap-1.5 text-xs font-semibold text-success">
           <span className="h-2 w-2 rounded-full bg-success" aria-hidden="true" />

@@ -125,8 +125,8 @@ export function BookingCalendar({
                         aria-pressed={Boolean(isArrival)}
                         aria-label={`${date.getDate()}. ${monthLabel.format(date)}${price !== null ? `, ${t("booking.calendarPrice", { price })}` : ""}`}
                         className={cn(
-                          "flex min-h-12 w-full min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-md px-0 py-1 text-[11px] leading-none transition disabled:cursor-not-allowed sm:min-h-[3.25rem] sm:text-xs",
-                          isPast && "text-line",
+                          "flex min-h-11 w-full min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-md px-0 py-1 text-[11px] leading-none transition disabled:cursor-not-allowed sm:min-h-12 sm:text-xs",
+                          isPast && "text-muted",
                           !isPast && !highlighted && !inRange && "text-ink hover:bg-surface",
                           inRange && !highlighted && "bg-brand-100 text-ink",
                           isArrival && "bg-brand-500 text-white",
@@ -142,7 +142,7 @@ export function BookingCalendar({
                                 ? "text-white/90"
                                 : isCheapest
                                   ? "font-bold text-success"
-                                  : "text-muted"
+                                  : "font-medium text-ink"
                             )}
                           >
                             {price} €
@@ -163,8 +163,8 @@ export function BookingCalendar({
   return (
     <div className="min-w-0 w-full max-w-full">
       <h2 className="text-sm font-bold text-ink">{t("booking.calendarTitle")}</h2>
-      <div className="mt-3 min-w-0 max-w-full overflow-hidden rounded-xl border border-line">
-        <div className="flex items-center gap-2 bg-cal px-2 py-3 max-md:bg-cal-orange sm:px-3">
+      <div className="mt-3 min-w-0 max-w-full overflow-hidden rounded-xl border border-cal">
+        <div className="flex items-center gap-2 bg-cal px-2 py-3 sm:px-3">
           <button
             type="button"
             onClick={() => goToMonth(-1)}
@@ -175,7 +175,7 @@ export function BookingCalendar({
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
           </button>
           <div className="grid min-w-0 flex-1 grid-cols-1 md:grid-cols-2">
-            <p className="text-center text-sm font-bold capitalize text-ink max-md:text-white">
+            <p className="text-center text-sm font-bold capitalize text-ink">
               {monthLabel.format(new Date(months[0].year, months[0].month, 1))}
             </p>
             <p className="hidden text-center text-sm font-bold capitalize text-ink md:block">

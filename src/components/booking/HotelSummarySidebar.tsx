@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { CalendarRange, Check, Lock, MapPin, Plane, Star, ThumbsUp, Users } from "lucide-react";
+import { CalendarRange, Check, Lock, MapPin, Plane, Star, Users } from "lucide-react";
 import type { ComponentType } from "react";
 import type { Deal, HotelBookingConfig } from "@/types";
 import type { RoomSelection } from "@/hooks/useBookingState";
 import { FavoriteButton } from "@/components/offer/FavoriteButton";
+import { ReviewBadge } from "@/components/home/ReviewBadge";
 import { localeTag } from "@/i18n/config";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { countryDisplayName, nightLabel, tx } from "@/i18n/content";
@@ -35,16 +36,10 @@ export function HotelSummarySidebar({
 }: HotelSummarySidebarProps) {
   const t = useT();
   const { locale } = useLocale();
-
   const totalAdults = rooms.reduce((sum, room) => sum + room.adults, 0);
   const totalChildren = rooms.reduce((sum, room) => sum + room.childAges.length, 0);
   const region = tx(deal.destinationRegion.split(" · ")[0] ?? deal.destinationRegion, locale);
   const country = countryDisplayName(deal.destinationCountry, locale);
-  const countFormatter = new Intl.NumberFormat(localeTag(locale));
-  const scoreFormatter = new Intl.NumberFormat(localeTag(locale), {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
 
   const facts: { icon: ComponentType<{ className?: string }>; label: string; value: string }[] = [
     { icon: MapPin, label: t("booking.destinationHotel"), value: `${region}, ${country}` },
@@ -82,23 +77,19 @@ export function HotelSummarySidebar({
 
         <div className="min-w-0 flex-1 lg:p-4">
           <h2 className="text-sm font-bold leading-snug text-ink lg:text-base">{deal.name}</h2>
-          <span className="mt-1 flex items-center gap-0.5 text-star" aria-label={t("deal.stars", { count: deal.stars })}>
+          <span className="mt-1 flex items-center gap-0.5 text-cal" aria-label={t("deal.stars", { count: deal.stars })}>
             {Array.from({ length: deal.stars }).map((_, i) => (
-              <Star key={i} className="h-3.5 w-3.5 fill-star" aria-hidden="true" />
+              <Star key={i} className="h-3.5 w-3.5 fill-cal" aria-hidden="true" />
             ))}
           </span>
           {deal.reviewEnabled && (
-            <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 rounded bg-brand-500 px-1.5 py-0.5 text-[11px] font-bold text-white">
-                <ThumbsUp className="h-3 w-3 fill-white" aria-hidden="true" />
-                {deal.reviewPercent}%
-              </span>
-              <span className="inline-flex items-center rounded bg-cal px-1.5 py-0.5 text-[11px] font-bold text-ink">
-                {scoreFormatter.format(deal.reviewScore)} / {deal.reviewMaxScore}
-              </span>
-              <span className="text-xs font-medium text-brand-500">
-                {t("deal.reviews", { count: countFormatter.format(deal.reviewCount) })}
-              </span>
+            <div className="mt-2">
+              <ReviewBadge
+                reviewPercent={deal.reviewPercent}
+                reviewScore={deal.reviewScore}
+                reviewMaxScore={deal.reviewMaxScore}
+                reviewCount={deal.reviewCount}
+              />
             </div>
           )}
           <div className="mt-2 space-y-1 lg:hidden">

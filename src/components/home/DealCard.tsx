@@ -5,11 +5,9 @@ import Link from "next/link";
 import {
   ArrowRight,
   Calendar,
-  LockKeyhole,
   MapPin,
   Moon,
   Plane,
-  ShieldCheck,
   Star,
   Utensils,
 } from "lucide-react";
@@ -18,7 +16,6 @@ import { DealImageSlider } from "@/components/home/DealImageSlider";
 import { ReviewBadge } from "@/components/home/ReviewBadge";
 import { PriceBlock } from "@/components/home/PriceBlock";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
-import { localeTag } from "@/i18n/config";
 import { mealPlanLabel, nightLabel, regionDisplay, tx } from "@/i18n/content";
 
 const chipClass =
@@ -29,7 +26,6 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
   const detailHref = `/angebot/${deal.slug}`;
   const { locale } = useLocale();
   const t = useT();
-  const bookingCountFormatter = new Intl.NumberFormat(localeTag(locale));
 
   return (
     <article
@@ -45,7 +41,7 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
         priority={priority}
       />
 
-      <div className="flex flex-1 flex-col px-5 pt-5 sm:px-6">
+      <div className="flex flex-1 flex-col px-5 py-5 sm:px-6">
         <h3 className="text-[1.35rem] font-extrabold leading-[1.15] tracking-[-0.03em] text-ink">
           <Link
             href={detailHref}
@@ -106,38 +102,23 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
           {deal.dateRange}
         </p>
 
-        <div className="mt-auto border-t border-[rgba(15,23,42,0.06)] pt-5">
+        <div className="mt-auto border-t border-[rgba(15,23,42,0.06)] pt-4">
           <PriceBlock
             oldPrice={deal.oldPrice}
             currentPrice={deal.currentPrice}
             discountPercent={deal.discountPercent}
+            action={
+              <Link
+                href={detailHref}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex h-9 shrink-0 items-center gap-1 rounded-lg bg-brand-500 px-3 text-[13px] font-semibold text-white shadow-sm transition hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+              >
+                {t("deal.viewOffer")}
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            }
           />
-
-          <Link
-            href={detailHref}
-            onClick={(e) => e.stopPropagation()}
-            className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-ink text-sm font-bold text-white transition hover:bg-[#1a2740] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
-          >
-            {t("deal.viewOffer")}
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
         </div>
-      </div>
-
-      <div className="mt-5 bg-surface px-5 py-3.5 sm:px-6">
-        <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] font-medium text-body">
-          <span className="inline-flex items-center gap-1.5">
-            <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-brand-500" aria-hidden="true" strokeWidth={1.7} />
-            {t("deal.bestPrice")}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <LockKeyhole className="h-3.5 w-3.5 shrink-0 text-brand-500" aria-hidden="true" strokeWidth={1.7} />
-            {t("deal.secure")}
-          </span>
-        </p>
-        <p className="mt-1.5 text-[11px] text-muted">
-          {t("deal.booked", { count: bookingCountFormatter.format(deal.bookingCount) })}
-        </p>
       </div>
     </article>
   );

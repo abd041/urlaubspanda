@@ -41,7 +41,11 @@ export function FilterSection({
   const collapseOnMobile = visibleOptions.length > 8;
 
   return (
-    <section aria-labelledby="reisearten-heading" className="py-12 sm:py-14 lg:py-16">
+    <section
+      id="filters"
+      aria-labelledby="reisearten-heading"
+      className="scroll-mt-24 py-12 sm:py-14 lg:py-16"
+    >
       <Container>
         <Reveal className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
           <div className="min-w-0 max-w-2xl">

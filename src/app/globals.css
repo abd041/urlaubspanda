@@ -20,9 +20,9 @@
   --color-danger: #e11d3f;
   --color-success: #17915a;
   --color-star: #f5a623;
-  --color-cal: #f5c518;
-  --color-cal-600: #e0b00c;
-  --color-cal-orange: #e39412;
+  --color-cal: #FDB919;
+  --color-cal-600: #e5a410;
+  --color-cal-orange: #FDB919;
 }
 
 @theme inline {
@@ -30,24 +30,24 @@
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
 
-  --color-brand-50: var(--color-brand-50);
-  --color-brand-100: var(--color-brand-100);
-  --color-brand-400: var(--color-brand-400);
-  --color-brand-500: var(--color-brand-500);
-  --color-brand-600: var(--color-brand-600);
-  --color-brand-700: var(--color-brand-700);
+  --color-brand-50: #eaf1ff;
+  --color-brand-100: #d6e4ff;
+  --color-brand-400: #3f7ff2;
+  --color-brand-500: #1b63eb;
+  --color-brand-600: #0f52d6;
+  --color-brand-700: #0d43ac;
 
-  --color-ink: var(--color-ink);
-  --color-body: var(--color-body);
-  --color-muted: var(--color-muted);
-  --color-line: var(--color-line);
+  --color-ink: #0f1a2b;
+  --color-body: #5b6779;
+  --color-muted: #8a93a3;
+  --color-line: #e7eaf0;
 
-  --color-danger: var(--color-danger);
-  --color-success: var(--color-success);
-  --color-star: var(--color-star);
-  --color-cal: var(--color-cal);
-  --color-cal-600: var(--color-cal-600);
-  --color-cal-orange: var(--color-cal-orange);
+  --color-danger: #e11d3f;
+  --color-success: #17915a;
+  --color-star: #f5a623;
+  --color-cal: #FDB919;
+  --color-cal-600: #e5a410;
+  --color-cal-orange: #FDB919;
 
   --font-sans: var(--font-bricolage);
   --font-mono: var(--font-bricolage);

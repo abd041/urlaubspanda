@@ -88,7 +88,7 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
         ))}
 
         {discountPercent > 0 && (
-          <span className="absolute left-3 top-3 z-10 rounded-full bg-[#E8F6EE] px-2.5 py-0.5 text-[11px] font-semibold tracking-tight text-success">
+          <span className="absolute left-3 top-3 z-10 rounded-full bg-white px-3 py-1 text-[15px] font-extrabold tracking-tight text-danger shadow-sm">
             −{discountPercent}%
           </span>
         )}
@@ -141,7 +141,7 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
             className="object-cover"
           />
           {discountPercent > 0 && (
-            <span className="absolute left-4 top-4 z-10 rounded-full bg-[#E8F6EE] px-2.5 py-0.5 text-[11px] font-semibold tracking-tight text-success">
+            <span className="absolute left-4 top-4 z-10 rounded-full bg-white px-3 py-1 text-[15px] font-extrabold tracking-tight text-danger shadow-sm">
               −{discountPercent}%
             </span>
           )}

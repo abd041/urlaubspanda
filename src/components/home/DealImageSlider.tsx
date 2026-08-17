@@ -108,7 +108,7 @@ export function DealImageSlider({
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent" />
 
       {discountPercent > 0 && (
-        <span className="absolute left-3 top-3 z-20 rounded-full bg-[#E8F6EE] px-2.5 py-0.5 text-[11px] font-semibold tracking-tight text-success">
+        <span className="absolute left-3 top-3 z-20 rounded-full bg-white px-3 py-1 text-[15px] font-extrabold tracking-tight text-danger shadow-sm">
           −{discountPercent}%
         </span>
       )}
