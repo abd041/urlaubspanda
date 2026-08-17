@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { Bricolage_Grotesque } from "next/font/google";
+import { Bricolage_Grotesque, Playfair_Display } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -13,6 +13,14 @@ import "./globals.css";
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin", "latin-ext"],
   variable: "--font-bricolage",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin", "latin-ext"],
+  style: "italic",
+  weight: ["500", "600", "700"],
+  variable: "--font-playfair",
   display: "swap",
 });
 
@@ -55,7 +63,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       lang={locale}
       translate="no"
       suppressHydrationWarning
-      className={`${bricolage.variable} ${bricolage.className} h-full antialiased`}
+      className={`${bricolage.variable} ${playfair.variable} ${bricolage.className} h-full antialiased`}
     >
       <body className="flex min-h-full min-w-0 flex-col overflow-x-clip bg-background text-foreground">
         <LocaleProvider initialLocale={locale}>

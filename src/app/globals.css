@@ -50,6 +50,7 @@
   --color-cal-orange: #FDB919;
 
   --font-sans: var(--font-bricolage);
+  --font-accent: var(--font-playfair), ui-serif, Georgia, serif;
   --font-mono: var(--font-bricolage);
 }
 

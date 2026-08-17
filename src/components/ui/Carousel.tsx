@@ -22,6 +22,12 @@ interface CarouselProps {
   overlayArrows?: boolean;
   /** Show overlay arrows on small screens too (homepage keeps desktop-only arrows). */
   overlayArrowsOnMobile?: boolean;
+  /** Extra classes for overlay prev/next buttons. */
+  overlayArrowClassName?: string;
+  overlayPrevClassName?: string;
+  overlayNextClassName?: string;
+  /** Keep both overlay arrows visible even at the start/end of the track. */
+  alwaysShowOverlayArrows?: boolean;
   /** Optional heading/toolbar rendered above the track, with scroll controls. */
   header?: (controls: CarouselControls) => ReactNode;
   trackClassName?: string;
@@ -40,6 +46,10 @@ export function Carousel({
   showDots = true,
   overlayArrows = true,
   overlayArrowsOnMobile = false,
+  overlayArrowClassName,
+  overlayPrevClassName,
+  overlayNextClassName,
+  alwaysShowOverlayArrows = false,
   header,
   trackClassName,
   className,
@@ -122,27 +132,33 @@ export function Carousel({
         {children}
       </div>
 
-      {overlayArrows && canScrollPrev && (
+      {overlayArrows && (alwaysShowOverlayArrows || canScrollPrev) && (
         <button
           type="button"
           onClick={scrollPrev}
+          disabled={!canScrollPrev}
           aria-label={t("carousel.prev")}
           className={cn(
-            "absolute left-2 top-[calc(50%-1.25rem)] h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-white/95 text-ink transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500",
-            overlayArrowsOnMobile ? "flex" : "hidden lg:flex"
+            "absolute left-2 top-[calc(50%-1.25rem)] z-10 h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-white/95 text-ink shadow-[0_8px_24px_rgba(15,26,43,0.10)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-35",
+            overlayArrowsOnMobile ? "flex" : "hidden lg:flex",
+            overlayArrowClassName,
+            overlayPrevClassName
           )}
         >
           <ChevronLeft className="h-5 w-5" aria-hidden="true" />
         </button>
       )}
-      {overlayArrows && canScrollNext && (
+      {overlayArrows && (alwaysShowOverlayArrows || canScrollNext) && (
         <button
           type="button"
           onClick={scrollNext}
+          disabled={!canScrollNext}
           aria-label={t("carousel.next")}
           className={cn(
-            "absolute right-2 top-[calc(50%-1.25rem)] h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-white/95 text-ink transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500",
-            overlayArrowsOnMobile ? "flex" : "hidden lg:flex"
+            "absolute right-2 top-[calc(50%-1.25rem)] z-10 h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-white/95 text-ink shadow-[0_8px_24px_rgba(15,26,43,0.10)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-35",
+            overlayArrowsOnMobile ? "flex" : "hidden lg:flex",
+            overlayArrowClassName,
+            overlayNextClassName
           )}
         >
           <ChevronRight className="h-5 w-5" aria-hidden="true" />

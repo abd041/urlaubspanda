@@ -23,6 +23,10 @@ export function destinationSubtitle(slug: string, locale: Locale) {
   return translate(locale, `dest.${slug}.sub`);
 }
 
+export function destinationTagline(slug: string, locale: Locale) {
+  return translate(locale, `dest.${slug}.tagline`);
+}
+
 export function countryDisplayName(germanName: string, locale: Locale) {
   const slug = GERMAN_COUNTRY_TO_SLUG[germanName];
   return slug ? destinationName(slug, locale) : tx(germanName, locale);

@@ -8,7 +8,8 @@ import { destinationPath } from "@/lib/destinationPaths";
 import { cn } from "@/lib/utils";
 import { localeTag } from "@/i18n/config";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
-import { destinationName, destinationSubtitle } from "@/i18n/content";
+import { destinationName, destinationSubtitle, destinationTagline } from "@/i18n/content";
+import { CountryFlag } from "@/components/home/CountryFlag";
 
 /** Crop so the subject sits below the top type and pale sky is minimised where possible. */
 export const destinationImagePosition: Record<string, string> = {
@@ -39,7 +40,7 @@ export function DestinationCard({
   priority?: boolean;
   /** Overrides the default carousel-slide sizing, e.g. for a full-width grid layout on the "Alle Reiseziele" overview page. */
   className?: string;
-  variant?: "carousel" | "grid";
+  variant?: "carousel" | "grid" | "catalog";
   offerCount?: number;
   fromPrice?: number | null;
 }) {
@@ -47,8 +48,45 @@ export function DestinationCard({
   const t = useT();
   const name = destinationName(destination.slug, locale);
   const subtitle = destinationSubtitle(destination.slug, locale);
+  const tagline = destinationTagline(destination.slug, locale);
   const isGrid = variant === "grid";
+  const isCatalog = variant === "catalog";
   const showMeta = isGrid && offerCount !== undefined;
+
+  if (isCatalog) {
+    return (
+      <Link
+        href={destinationPath(destination.slug)}
+        data-carousel-item
+        className={cn(
+          "group flex w-[min(72vw,240px)] shrink-0 snap-start flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_8px_24px_rgba(15,26,43,0.06)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,26,43,0.10)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 sm:w-[240px]",
+          className
+        )}
+      >
+        <span className="relative block h-[248px] w-full shrink-0 overflow-hidden">
+          <Image
+            src={destination.image}
+            alt={`${name} – ${tagline}`}
+            fill
+            quality={92}
+            sizes="240px"
+            priority={priority}
+            className={cn(
+              "destination-photo object-cover transition-transform duration-700 ease-in-out group-hover:scale-[1.03]",
+              destinationImagePosition[destination.slug] ?? "object-center"
+            )}
+          />
+        </span>
+        <span className="flex flex-col px-5 pb-3.5 pt-4">
+          <span className="flex items-center gap-2">
+            <CountryFlag slug={destination.slug} name={name} />
+            <h3 className="text-[18px] font-bold leading-none tracking-tight text-ink">{name}</h3>
+          </span>
+          <span className="mt-2.5 text-[16px] font-normal leading-[1.45] text-[#6B7280]">{tagline}</span>
+        </span>
+      </Link>
+    );
+  }
 
   return (
     <Link

@@ -9,9 +9,9 @@ import { deals } from "@/data/deals";
 
 export default function Home() {
   return (
-    <main className="pb-10 sm:pb-16">
+    <main className="bg-surface pb-10 sm:pb-16">
       <JsonLd data={dealsItemListJsonLd(deals)} />
-      <HomeHero deals={deals} />
+      <HomeHero />
       <PopularDestinations />
       <Suspense fallback={<DealsExplorerFallback deals={deals} />}>
         <DealsExplorer deals={deals} />
