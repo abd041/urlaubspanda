@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { CalendarRange, Check, Lock, MapPin, Plane, Star, Users } from "lucide-react";
+import { CalendarRange, Car, Check, Lock, MapPin, Plane, Star, Users } from "lucide-react";
 import type { ComponentType } from "react";
 import type { Deal, HotelBookingConfig } from "@/types";
 import type { RoomSelection } from "@/hooks/useBookingState";
@@ -40,13 +40,16 @@ export function HotelSummarySidebar({
   const totalChildren = rooms.reduce((sum, room) => sum + room.childAges.length, 0);
   const region = tx(deal.destinationRegion.split(" · ")[0] ?? deal.destinationRegion, locale);
   const country = countryDisplayName(deal.destinationCountry, locale);
+  const ArrivalIcon = deal.flightIncluded ? Plane : Car;
+  const arrivalLabel = deal.flightIncluded ? t("booking.fromAirport") : t("booking.arrival");
+  const arrivalValue = deal.flightIncluded ? t("booking.fromAirports") : t("deal.ownArrival");
 
   const facts: { icon: ComponentType<{ className?: string }>; label: string; value: string }[] = [
     { icon: MapPin, label: t("booking.destinationHotel"), value: `${region}, ${country}` },
     {
-      icon: Plane,
-      label: t("booking.fromAirport"),
-      value: deal.flightIncluded ? t("booking.fromAirports") : t("deal.ownArrival"),
+      icon: ArrivalIcon,
+      label: arrivalLabel,
+      value: arrivalValue,
     },
     { icon: CalendarRange, label: t("booking.duration"), value: nightLabel(nights, locale) },
   ];
@@ -79,7 +82,7 @@ export function HotelSummarySidebar({
           <h2 className="text-sm font-bold leading-snug text-ink lg:text-base">{deal.name}</h2>
           <span className="mt-1 flex items-center gap-0.5 text-[#FDB919]" aria-label={t("deal.stars", { count: deal.stars })}>
             {Array.from({ length: deal.stars }).map((_, i) => (
-              <Star key={i} className="h-3.5 w-3.5 fill-[#FDB919]" aria-hidden="true" />
+              <Star key={i} className="h-3.5 w-3.5 fill-[#FDB919] text-[#FDB919]" aria-hidden="true" />
             ))}
           </span>
           {deal.reviewEnabled && (
@@ -89,17 +92,18 @@ export function HotelSummarySidebar({
                 reviewScore={deal.reviewScore}
                 reviewMaxScore={deal.reviewMaxScore}
                 reviewCount={deal.reviewCount}
+                countClassName="text-black"
               />
             </div>
           )}
           <div className="mt-2 space-y-1 lg:hidden">
             <p className="flex items-center gap-1.5 text-xs text-body">
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-brand-500" aria-hidden="true" />
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-black" aria-hidden="true" />
               {region}, {country}
             </p>
             <p className="flex items-center gap-1.5 text-xs text-body">
-              <Plane className="h-3.5 w-3.5 shrink-0 text-brand-500" aria-hidden="true" />
-              {deal.flightIncluded ? t("booking.fromAirports") : t("deal.ownArrival")}
+              <ArrivalIcon className="h-3.5 w-3.5 shrink-0 text-black" aria-hidden="true" />
+              {arrivalValue}
             </p>
           </div>
         </div>
@@ -109,7 +113,7 @@ export function HotelSummarySidebar({
         <ul className="divide-y divide-line">
           {facts.map((fact) => (
             <li key={fact.label} className="flex items-start gap-2.5 py-2.5">
-              <fact.icon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
+              <fact.icon className="mt-0.5 h-4 w-4 shrink-0 text-black" aria-hidden="true" />
               <div className="min-w-0">
                 <p className="text-xs font-medium text-muted">{fact.label}</p>
                 <p className="text-sm font-semibold leading-snug text-ink">{fact.value}</p>
@@ -120,11 +124,11 @@ export function HotelSummarySidebar({
 
         <div className="space-y-2 border-t border-line pt-3">
           <p className="flex items-start gap-2 text-xs font-medium leading-snug text-body">
-            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />
+            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-black" aria-hidden="true" />
             {t("booking.lockPrices")}
           </p>
           <p className="flex items-start gap-2 rounded-lg bg-[#EAF8F0] px-2.5 py-2 text-xs leading-snug text-success">
-            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" strokeWidth={2.4} />
+            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" aria-hidden="true" strokeWidth={2.4} />
             <span>
               <span className="font-bold">{t("booking.cancelFree")}</span> {t("booking.cancelFreeUntil")}
             </span>

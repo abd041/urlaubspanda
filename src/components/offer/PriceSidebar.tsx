@@ -95,8 +95,15 @@ export function PriceSidebar({ deal, detail }: { deal: Deal; detail: OfferDetail
               ctaMode={detail.ctaMode}
               bookingUrl={detail.bookingUrl}
               bookingUrls={detail.bookingUrls}
+              ctaOptions={detail.ctaOptions}
             />
           </div>
+
+          {detail.importantNotice && (
+            <div className="mt-4 rounded-xl border border-cal/40 bg-[#FFF8E8] px-3.5 py-2.5 text-sm font-medium text-ink">
+              {tx(detail.importantNotice, locale)}
+            </div>
+          )}
 
           <p className="mt-3 text-center text-xs leading-relaxed text-muted">
             {internal ? t("offer.ctaHint") : t("offer.affiliateHint")}

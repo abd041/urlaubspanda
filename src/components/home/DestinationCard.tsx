@@ -59,11 +59,11 @@ export function DestinationCard({
         href={destinationPath(destination.slug)}
         data-carousel-item
         className={cn(
-          "group flex w-[min(72vw,240px)] shrink-0 snap-start flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_8px_24px_rgba(15,26,43,0.06)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,26,43,0.10)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 sm:w-[240px]",
+          "group flex w-[min(72vw,200px)] shrink-0 snap-start flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_8px_24px_rgba(15,26,43,0.06)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,26,43,0.10)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 sm:w-[200px]",
           className
         )}
       >
-        <span className="relative block h-[248px] w-full shrink-0 overflow-hidden">
+        <span className="relative block h-[220px] w-full shrink-0 overflow-hidden">
           <Image
             src={destination.image}
             alt={`${name} – ${tagline}`}

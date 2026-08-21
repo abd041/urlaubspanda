@@ -53,14 +53,16 @@ export function NightsSelector({
               onClick={() => onChange(n)}
               aria-pressed={selected}
               className={cn(
-                "flex min-h-11 min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-lg border px-1.5 py-2.5 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:px-2 sm:py-3",
+                "flex min-h-11 min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-lg px-1.5 py-2.5 text-center transition duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:px-2 sm:py-3",
                 selected
-                  ? "border-[#FDB919] bg-[#FDB919] text-ink shadow-sm"
-                  : "border-line bg-white text-body hover:border-[#FDB919]/60"
+                  ? "z-[1] border-[2.5px] border-[#F5A623] bg-[#FDB919] text-black shadow-[0_4px_14px_rgba(253,185,25,0.45),0_2px_4px_rgba(15,26,43,0.12)] ring-2 ring-[#FDB919]/55"
+                  : "border border-line bg-white text-black shadow-none hover:border-[#FDB919] hover:shadow-sm"
               )}
             >
-              <span className="text-xs font-bold leading-snug sm:text-sm">{nightLabel(n, locale)}</span>
-              <span className={cn("text-xs leading-snug", selected ? "text-ink/70" : "text-muted")}>
+              <span className="text-xs font-bold leading-snug text-black sm:text-sm">
+                {nightLabel(n, locale)}
+              </span>
+              <span className="text-xs font-semibold leading-snug text-black sm:text-[13px]">
                 {t("booking.fromPrice", {
                   price: Math.round(perPerson).toLocaleString(localeTag(locale)),
                 })}

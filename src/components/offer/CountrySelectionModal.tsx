@@ -1,52 +1,78 @@
 "use client";
 
-import type { OfferBookingUrls } from "@/types";
+import { X } from "lucide-react";
+import type { OfferBookingUrls, OfferCtaOption } from "@/types";
 import { Modal } from "@/components/ui/Modal";
 import { useT } from "@/i18n/LocaleProvider";
 
 interface CountrySelectionModalProps {
   open: boolean;
   onClose: () => void;
-  bookingUrls: OfferBookingUrls;
+  bookingUrls?: OfferBookingUrls;
+  ctaOptions?: OfferCtaOption[];
 }
 
 /**
- * "Wo wohnst du?" step shown before redirecting, for offers whose booking
- * link differs by the customer's country of residence.
+ * Filter-style popup before redirect — custom options (emoji/flags) or default AT/DE/CH.
+ * Configured per deal in offerDetails (frontend stand-in for admin).
  */
-export function CountrySelectionModal({ open, onClose, bookingUrls }: CountrySelectionModalProps) {
+export function CountrySelectionModal({
+  open,
+  onClose,
+  bookingUrls,
+  ctaOptions,
+}: CountrySelectionModalProps) {
   const t = useT();
-  const countries = [
-    { code: "AT" as const, flag: "🇦🇹", label: t("dest.oesterreich.name") },
-    { code: "DE" as const, flag: "🇩🇪", label: t("dest.deutschland.name") },
-    { code: "CH" as const, flag: "🇨🇭", label: t("offer.switzerland") },
-  ];
 
-  const handleSelect = (code: keyof OfferBookingUrls) => {
+  const options: OfferCtaOption[] =
+    ctaOptions && ctaOptions.length > 0
+      ? ctaOptions
+      : bookingUrls
+        ? [
+            { id: "AT", label: t("dest.oesterreich.name"), url: bookingUrls.AT, emoji: "🇦🇹" },
+            { id: "DE", label: t("dest.deutschland.name"), url: bookingUrls.DE, emoji: "🇩🇪" },
+            { id: "CH", label: t("offer.switzerland"), url: bookingUrls.CH, emoji: "🇨🇭" },
+          ]
+        : [];
+
+  const handleSelect = (url: string) => {
     onClose();
-    window.open(bookingUrls[code], "_blank", "noopener,noreferrer");
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
     <Modal open={open} onClose={onClose} ariaLabelledBy="country-modal-heading">
-      <div className="px-6 pt-6 text-center sm:px-8">
-        <h2 id="country-modal-heading" className="text-lg font-bold text-ink">
-          {t("offer.whereLive")}
-        </h2>
-        <p className="mt-1.5 text-sm text-body">{t("offer.chooseCountry")}</p>
+      <div className="flex items-center justify-between border-b border-line px-5 py-4 sm:px-6">
+        <div className="min-w-0 pr-3">
+          <h2 id="country-modal-heading" className="text-lg font-bold text-ink">
+            {t("offer.whereLive")}
+          </h2>
+          <p className="mt-0.5 text-sm text-body">{t("offer.chooseCountry")}</p>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t("offer.close")}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+        >
+          <X className="h-5 w-5" aria-hidden="true" />
+        </button>
       </div>
-      <div className="space-y-2.5 px-5 py-6 sm:px-6">
-        {countries.map((country) => (
+
+      <div className="space-y-2.5 overflow-y-auto px-5 py-5 sm:px-6">
+        {options.map((option) => (
           <button
-            key={country.code}
+            key={option.id}
             type="button"
-            onClick={() => handleSelect(country.code)}
-            className="flex w-full items-center gap-3 rounded-xl border border-line px-4 py-4 text-left transition hover:border-brand-500 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+            onClick={() => handleSelect(option.url)}
+            className="flex w-full items-center gap-3 rounded-xl border border-line bg-white px-4 py-3.5 text-left transition hover:border-brand-500 hover:bg-[#F4F8FF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           >
-            <span className="text-2xl" aria-hidden="true">
-              {country.flag}
-            </span>
-            <span className="text-base font-semibold text-ink">{country.label}</span>
+            {option.emoji ? (
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-2xl leading-none" aria-hidden="true">
+                {option.emoji}
+              </span>
+            ) : null}
+            <span className="text-base font-semibold text-ink">{option.label}</span>
           </button>
         ))}
       </div>

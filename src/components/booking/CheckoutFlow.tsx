@@ -38,7 +38,7 @@ export function CheckoutFlow({ deal, config }: CheckoutFlowProps) {
   }
 
   return (
-    <main className="w-full min-w-0 overflow-x-clip bg-surface pb-16">
+    <main className="w-full min-w-0 overflow-x-clip bg-surface pb-8 lg:pb-16">
       <div className="mx-auto w-[calc(100%-2rem)] max-w-[1240px] pt-4 sm:w-[calc(100%-3rem)] sm:pt-6 lg:w-[calc(100%-4rem)]">
         <Link
           href={hotelHref}

@@ -3,43 +3,67 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import type { CtaMode, OfferBookingUrls } from "@/types";
+import type { CtaMode, OfferBookingUrls, OfferCtaOption } from "@/types";
 import { cn } from "@/lib/utils";
 import { hasInternalBooking, internalBookingPath } from "@/lib/bookingRoute";
 import { CountrySelectionModal } from "@/components/offer/CountrySelectionModal";
 import { useT } from "@/i18n/LocaleProvider";
 
 interface OfferCtaButtonProps {
-  /** Offer slug — used to open the existing /hotel/[slug] booking UI when available. */
   slug: string;
   ctaMode: CtaMode;
   bookingUrl?: string;
   bookingUrls?: OfferBookingUrls;
+  /** Custom popup choices with optional emoji/flags (admin/data configurable). */
+  ctaOptions?: OfferCtaOption[];
   className?: string;
-  /** Defaults to Homepage-details CTA copy. */
   label?: string;
-  /** Primary = sticky/mobile booking CTA. Quiet = compare-row partner link. */
   variant?: "primary" | "quiet";
+  /**
+   * When true, skip the internal /hotel booking route and always use
+   * affiliate direct/popup behaviour from offerDetails.
+   */
+  forceExternal?: boolean;
+}
+
+function hasExternalCtaConfig(
+  ctaMode: CtaMode,
+  bookingUrl?: string,
+  bookingUrls?: OfferBookingUrls,
+  ctaOptions?: OfferCtaOption[]
+) {
+  if (ctaMode === "direct") return Boolean(bookingUrl);
+  if (ctaMode === "country_selection") {
+    return Boolean(bookingUrls) || (ctaOptions?.length ?? 0) > 0;
+  }
+  return false;
 }
 
 /**
- * Main booking CTA. Prefers the existing internal booking page when a mock
- * booking config exists for this slug. Otherwise keeps affiliate redirect /
- * country-selection behaviour. Does not change booking-flow logic.
+ * “Termine & Preise anzeigen” — behaviour comes from offerDetails (frontend stand-in for admin):
+ * - `direct`: open `bookingUrl` immediately
+ * - `country_selection`: popup with flag/emoji choices, then redirect
+ * Falls back to the internal booking flow only when no external CTA is configured.
  */
 export function OfferCtaButton({
   slug,
   ctaMode,
   bookingUrl,
   bookingUrls,
+  ctaOptions,
   className,
   label,
   variant = "primary",
+  forceExternal = false,
 }: OfferCtaButtonProps) {
   const [countryModalOpen, setCountryModalOpen] = useState(false);
-  const bookingPath = hasInternalBooking(slug) ? internalBookingPath(slug) : null;
   const t = useT();
   const ctaLabel = label ?? t("offer.showDates");
+
+  const externalConfigured = hasExternalCtaConfig(ctaMode, bookingUrl, bookingUrls, ctaOptions);
+  const useExternal = forceExternal || externalConfigured;
+  const bookingPath =
+    !useExternal && hasInternalBooking(slug) ? internalBookingPath(slug) : null;
 
   const classNames = cn(
     "group/cta inline-flex w-full items-center justify-center gap-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600",
@@ -67,6 +91,10 @@ export function OfferCtaButton({
     setCountryModalOpen(true);
   };
 
+  const showModal =
+    ctaMode === "country_selection" &&
+    (Boolean(bookingUrls) || (ctaOptions?.length ?? 0) > 0);
+
   return (
     <>
       <button type="button" onClick={handleClick} className={classNames}>
@@ -74,11 +102,12 @@ export function OfferCtaButton({
         <ArrowRight className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/cta:translate-x-0.5" aria-hidden="true" />
       </button>
 
-      {ctaMode === "country_selection" && bookingUrls && (
+      {showModal && (
         <CountrySelectionModal
           open={countryModalOpen}
           onClose={() => setCountryModalOpen(false)}
           bookingUrls={bookingUrls}
+          ctaOptions={ctaOptions}
         />
       )}
     </>

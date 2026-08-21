@@ -10,7 +10,7 @@ interface OfferReviewRowProps {
   reviewSource?: string;
 }
 
-/** Offer-detail review summary — same badge as deal cards, linking to reviews. */
+/** Offer-detail review summary — same badge as deal cards (no separate reviews section). */
 export function OfferReviewRow({
   reviewPercent,
   reviewScore,
@@ -25,7 +25,6 @@ export function OfferReviewRow({
         reviewScore={reviewScore}
         reviewMaxScore={reviewMaxScore}
         reviewCount={reviewCount}
-        href="#bewertungen"
         size="md"
       />
       {reviewSource ? <span className="text-sm text-body">{reviewSource}</span> : null}

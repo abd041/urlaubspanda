@@ -36,8 +36,8 @@ interface CarouselProps {
 
 /**
  * Lightweight, dependency-free horizontal carousel built on native CSS
- * scroll-snap. Works with touch swipe out of the box and stays keyboard
- * accessible since it's a real scroll container, not a JS-transform slider.
+ * scroll-snap. Edge padding keeps first/last cards fully visible (no clipped
+ * borders/rings) while remaining swipeable on mobile.
  */
 export function Carousel({
   children,
@@ -117,7 +117,7 @@ export function Carousel({
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative min-w-0", className)}>
       {header?.(controls)}
 
       <div
@@ -125,7 +125,9 @@ export function Carousel({
         role="group"
         aria-label={ariaLabel}
         className={cn(
-          "no-scrollbar snap-x-mandatory -mx-4 flex gap-4 overflow-x-auto scroll-pl-4 px-4 pb-1 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0",
+          // Equal edge insets + vertical room so borders/rings are never clipped.
+          "no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain scroll-smooth",
+          "px-0.5 py-2.5 scroll-px-0.5",
           trackClassName
         )}
       >
@@ -139,7 +141,7 @@ export function Carousel({
           disabled={!canScrollPrev}
           aria-label={t("carousel.prev")}
           className={cn(
-            "absolute left-2 top-[calc(50%-1.25rem)] z-10 h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-white/95 text-ink shadow-[0_8px_24px_rgba(15,26,43,0.10)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-35",
+            "absolute left-0 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-white/95 text-ink shadow-[0_8px_24px_rgba(15,26,43,0.10)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-35",
             overlayArrowsOnMobile ? "flex" : "hidden lg:flex",
             overlayArrowClassName,
             overlayPrevClassName
@@ -155,7 +157,7 @@ export function Carousel({
           disabled={!canScrollNext}
           aria-label={t("carousel.next")}
           className={cn(
-            "absolute right-2 top-[calc(50%-1.25rem)] z-10 h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-white/95 text-ink shadow-[0_8px_24px_rgba(15,26,43,0.10)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-35",
+            "absolute right-0 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-white/95 text-ink shadow-[0_8px_24px_rgba(15,26,43,0.10)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-35",
             overlayArrowsOnMobile ? "flex" : "hidden lg:flex",
             overlayArrowClassName,
             overlayNextClassName
@@ -166,7 +168,7 @@ export function Carousel({
       )}
 
       {showDots && dotCount > 1 && (
-        <div className="mt-5 flex items-center justify-center gap-1.5">
+        <div className="mt-4 flex items-center justify-center gap-1.5">
           {Array.from({ length: dotCount }).map((_, i) => (
             <button
               key={i}

@@ -120,12 +120,10 @@ export interface Deal {
 }
 
 /**
- * Per-offer CTA behaviour, configurable in the backend/admin later (see
- * Homepage-details spec, "CTA Destination Behaviour"). `direct` sends the
- * visitor straight to the single booking link; `country_selection` first
- * asks which country the visitor lives in and redirects to the matching
- * affiliate link, since some providers use different booking links per
- * market.
+ * Per-offer CTA behaviour for “Termine & Preise anzeigen”, configurable in
+ * admin later (frontend stand-in: `offerDetails`). `direct` opens `bookingUrl`
+ * immediately; `country_selection` opens a filter-style popup (“Wo wohnst du?”)
+ * with optional emoji/flag buttons, then redirects to the matching partner URL.
  */
 export type CtaMode = "direct" | "country_selection";
 
@@ -210,6 +208,24 @@ export interface OfferDetail {
    * sticky CTA shows a countdown. Omit to hide the timer.
    */
   countdownEndsAt?: string;
+  /**
+   * Optional notice box on the mobile price card (and desktop sidebar when set).
+   * Shown only when configured — not on every deal.
+   */
+  importantNotice?: string;
+  /**
+   * Optional custom CTA popup choices (emoji/icon + label + url).
+   * When set with `ctaMode: "country_selection"`, these replace the default AT/DE/CH list.
+   */
+  ctaOptions?: OfferCtaOption[];
+}
+
+export interface OfferCtaOption {
+  id: string;
+  label: string;
+  url: string;
+  /** Emoji or short icon text shown on the button, e.g. country flag. */
+  emoji?: string;
 }
 
 /**

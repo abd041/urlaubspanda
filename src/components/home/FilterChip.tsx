@@ -28,7 +28,7 @@ export function FilterChip({ label, icon, selected, onToggle, className }: Filte
       className={cn(
         "flex size-[5.75rem] shrink-0 flex-col items-center justify-center gap-1.5 rounded-xl border border-[#eeeef2] bg-white px-1.5 text-center shadow-[0_2px_10px_rgba(15,26,43,0.06)] transition-[box-shadow,border-color,background-color,color] duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:size-24",
         selected
-          ? "border-brand-500 bg-brand-500 text-white shadow-[0_2px_10px_rgba(27,99,235,0.18)]"
+          ? "border-2 border-brand-500 bg-white text-ink shadow-[0_2px_10px_rgba(27,99,235,0.08)]"
           : "hover:shadow-[0_6px_16px_rgba(15,26,43,0.1)]",
         className
       )}
@@ -36,17 +36,12 @@ export function FilterChip({ label, icon, selected, onToggle, className }: Filte
       <Icon
         className={cn(
           "h-[22px] w-[22px] shrink-0 sm:h-6 sm:w-6",
-          selected ? "text-white" : filterIconColor[icon]
+          selected ? "text-brand-500" : filterIconColor[icon]
         )}
         strokeWidth={1.6}
         aria-hidden="true"
       />
-      <span
-        className={cn(
-          "line-clamp-2 max-w-full text-[11px] font-medium leading-tight tracking-tight",
-          selected ? "text-white" : "text-ink"
-        )}
-      >
+      <span className="line-clamp-2 max-w-full text-[11px] font-medium leading-tight tracking-tight text-ink">
         {label}
       </span>
     </motion.button>

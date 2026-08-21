@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Check, ChevronRight, Grid2x2, Info, Maximize, Users } from "lucide-react";
+import { Check, Info, Maximize, Users } from "lucide-react";
+import type { KeyboardEvent } from "react";
 import type { RoomCategoryDetail } from "@/types";
 import { cn } from "@/lib/utils";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
@@ -19,6 +20,10 @@ interface RoomCategoryCardProps {
   onShowDetails: () => void;
 }
 
+/**
+ * Whole card is the hit target (except the details button).
+ * Selected border uses box-shadow so it is never clipped (req 14 + 18).
+ */
 export function RoomCategoryCard({
   room,
   selected,
@@ -33,128 +38,117 @@ export function RoomCategoryCard({
   const { locale } = useLocale();
   const priceFormatter = new Intl.NumberFormat(localeTag(locale), { maximumFractionDigits: 0 });
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (unavailable) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onSelect();
+    }
+  };
+
   return (
     <div
-      data-carousel-item
+      role="button"
+      tabIndex={unavailable ? -1 : 0}
+      aria-pressed={selected}
+      aria-disabled={unavailable || undefined}
+      onClick={unavailable ? undefined : onSelect}
+      onKeyDown={handleKeyDown}
       className={cn(
-        "relative flex shrink-0 snap-start overflow-hidden rounded-xl border bg-white transition",
-        "w-[92%] min-w-[18rem] flex-row sm:w-[24rem] lg:w-auto lg:min-w-0 lg:flex-col",
-        selected ? "border-brand-500 shadow-sm ring-1 ring-brand-500" : "border-line",
-        unavailable && "opacity-60"
+        "group/room relative flex w-full min-w-0 flex-col rounded-2xl bg-white transition duration-150",
+        unavailable ? "cursor-not-allowed opacity-60" : "cursor-pointer",
+        selected
+          ? "border-2 border-brand-500 shadow-[0_0_0_2px_rgba(27,99,235,0.2),0_8px_24px_rgba(27,99,235,0.16)]"
+          : "border border-line shadow-sm hover:border-brand-400 hover:shadow-[0_12px_28px_rgba(15,26,43,0.1)] lg:hover:-translate-y-0.5",
+        !unavailable && "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
       )}
     >
-      <button
-        type="button"
-        onClick={unavailable ? undefined : onSelect}
-        disabled={unavailable}
-        aria-pressed={selected}
-        className="relative h-[5.75rem] w-[6.5rem] shrink-0 disabled:cursor-not-allowed sm:h-[6.5rem] sm:w-[7.25rem] lg:h-36 lg:w-full lg:self-auto"
-      >
+      <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-t-[0.9rem] sm:h-44 lg:h-48">
         <Image
           src={room.images[0]}
           alt={tx(room.name, locale)}
           fill
-          sizes="(min-width: 1024px) 240px, 128px"
-          className={cn("object-cover", unavailable && "grayscale")}
+          sizes="(min-width: 1280px) 420px, (min-width: 1024px) 360px, 100vw"
+          className={cn(
+            "object-cover transition duration-200",
+            unavailable && "grayscale",
+            !unavailable && "lg:group-hover/room:scale-[1.02]"
+          )}
         />
         {selected && (
-          <span className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-500 text-white shadow-sm lg:h-7 lg:w-7">
-            <Check className="h-3.5 w-3.5 lg:h-4 lg:w-4" aria-hidden="true" strokeWidth={2.6} />
+          <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-white shadow-md">
+            <Check className="h-4 w-4" aria-hidden="true" strokeWidth={2.6} />
           </span>
         )}
-      </button>
+        {room.badge && !unavailable && (
+          <span className="absolute left-3 top-3 inline-flex max-w-[85%] truncate rounded-md bg-success/95 px-2 py-1 text-[11px] font-semibold text-white shadow-sm">
+            {tx(room.badge, locale)}
+          </span>
+        )}
+      </div>
 
-      <div className="flex min-w-0 flex-1 flex-col justify-between gap-1 p-2.5 sm:p-3 lg:gap-1.5 lg:p-3.5">
+      <div className="flex min-h-44 flex-1 flex-col gap-3 p-4 sm:p-5 lg:min-h-50">
         <div className="min-w-0">
-          <h4 className="truncate text-sm font-bold leading-snug text-ink">{tx(room.name, locale)}</h4>
-          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted lg:text-xs">
-            <span className="inline-flex items-center gap-1">
-              <Users className="h-3.5 w-3.5" aria-hidden="true" />
+          <h4 className="text-base font-bold leading-snug text-ink lg:text-lg">{tx(room.name, locale)}</h4>
+          <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-body sm:text-sm">
+            <span className="inline-flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5 shrink-0 text-ink" aria-hidden="true" />
               {tx(room.occupancyLabel, locale)}
             </span>
-            <span aria-hidden="true">·</span>
-            <span className="inline-flex items-center gap-1">
-              <Maximize className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5">
+              <Maximize className="h-3.5 w-3.5 shrink-0 text-ink" aria-hidden="true" />
               {tx(room.sizeLabel, locale)}
             </span>
           </p>
-          {room.badge && !unavailable && (
-            <span className="mt-1 inline-flex w-fit items-center rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-semibold text-success lg:text-[11px]">
-              {tx(room.badge, locale)}
-            </span>
-          )}
+          <div className="mt-3 space-y-1.5 border-t border-[rgba(15,23,42,0.06)] pt-3">
+            {room.view && (
+              <p className="text-xs leading-snug text-body sm:text-[13px]">{tx(room.view, locale)}</p>
+            )}
+            {room.amenities.slice(0, 3).length > 0 && (
+              <p className="text-xs leading-snug text-muted sm:text-[13px]">
+                {room.amenities.slice(0, 3).map((item) => tx(item, locale)).join(" · ")}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-end justify-between gap-2">
+        <div className="mt-auto flex items-end justify-between gap-3 border-t border-[rgba(15,23,42,0.06)] pt-3">
           {unavailable ? (
             <div className="min-w-0">
               <p className="text-sm font-bold text-danger">{t("booking.unavailable")}</p>
-              {unavailableReason && <p className="mt-0.5 text-[11px] text-muted">{unavailableReason}</p>}
+              {unavailableReason && <p className="mt-0.5 text-xs text-muted">{unavailableReason}</p>}
             </div>
           ) : (
             <div className="min-w-0">
-              <p className="text-sm font-bold leading-tight text-ink">
+              <p className="text-base font-extrabold leading-tight text-ink lg:text-lg">
                 {t("booking.ppAmount", { price: priceFormatter.format(Math.round(pricePerPerson)) })}
               </p>
-              <p className="text-[11px] text-muted">
+              <p className="mt-0.5 text-xs text-muted sm:text-[13px]">
                 {t("booking.gesamtpreisLine", { price: priceFormatter.format(Math.round(pricePerRoom)) })}
+              </p>
+              <p
+                className={cn(
+                  "mt-2 text-xs font-semibold sm:text-sm",
+                  selected ? "text-brand-600" : "text-brand-500 group-hover/room:text-brand-600"
+                )}
+              >
+                {selected ? t("booking.roomSelected") : t("booking.selectRoom")}
               </p>
             </div>
           )}
           <button
             type="button"
-            onClick={onShowDetails}
+            onClick={(event) => {
+              event.stopPropagation();
+              onShowDetails();
+            }}
             aria-label={t("booking.roomDetailsNamed", { name: tx(room.name, locale) })}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line text-muted transition hover:border-brand-400 hover:text-brand-500"
+            className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line text-ink transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-600"
           >
-            <Info className="h-3.5 w-3.5" aria-hidden="true" />
+            <Info className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>
     </div>
-  );
-}
-
-interface ShowAllRoomsCardProps {
-  onClick: () => void;
-  layout?: "tile" | "row";
-}
-
-/** The trailing "Weitere Zimmer anzeigen" control — clearing the room-category filter shows offers from every category again. */
-export function ShowAllRoomsCard({ onClick, layout = "tile" }: ShowAllRoomsCardProps) {
-  const t = useT();
-
-  if (layout === "row") {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        className="mt-3 flex w-full items-center gap-3 rounded-2xl border border-line bg-white px-4 py-3.5 text-left transition hover:border-brand-400 hover:bg-brand-50"
-      >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-500">
-          <Grid2x2 className="h-5 w-5" aria-hidden="true" />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold text-ink">{t("booking.showMoreRooms")}</span>
-          <span className="block text-xs text-muted">{t("booking.allRooms")}</span>
-        </span>
-        <ChevronRight className="h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
-      </button>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      data-carousel-item
-      onClick={onClick}
-      className="flex w-[38%] min-w-[150px] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-line bg-white p-6 text-center transition hover:border-brand-400 hover:bg-brand-50 sm:w-[240px] lg:w-auto"
-    >
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-brand-500">
-        <Grid2x2 className="h-5 w-5" aria-hidden="true" />
-      </span>
-      <span className="text-sm font-semibold text-ink">{t("booking.showMoreRooms")}</span>
-      <span className="text-xs text-muted">{t("booking.allRooms")}</span>
-    </button>
   );
 }

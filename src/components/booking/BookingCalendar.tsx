@@ -125,7 +125,7 @@ export function BookingCalendar({
                         aria-pressed={Boolean(isArrival)}
                         aria-label={`${date.getDate()}. ${monthLabel.format(date)}${price !== null ? `, ${t("booking.calendarPrice", { price })}` : ""}`}
                         className={cn(
-                          "flex min-h-9 w-full min-w-0 flex-col items-center justify-center gap-px overflow-hidden rounded-md px-0 py-0.5 text-[11px] leading-none transition disabled:cursor-not-allowed sm:min-h-10 sm:text-xs",
+                          "flex min-h-11 w-full min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-md px-0 py-1 text-sm leading-none transition disabled:cursor-not-allowed sm:min-h-12 sm:gap-1 sm:text-base",
                           isPast && "text-muted",
                           !isPast && !highlighted && !inRange && "text-black hover:bg-surface",
                           inRange && !highlighted && "bg-[#D6E4FF] text-black",
@@ -137,12 +137,12 @@ export function BookingCalendar({
                         {price !== null && (
                           <span
                             className={cn(
-                              "block w-full truncate text-[9px] tabular-nums sm:text-[10px]",
+                              "block w-full truncate text-xs font-medium tabular-nums sm:text-sm",
                               highlighted
                                 ? "text-white/90"
                                 : isCheapest
                                   ? "font-bold text-success"
-                                  : "font-medium text-black"
+                                  : "text-black"
                             )}
                           >
                             {price} €
@@ -163,7 +163,7 @@ export function BookingCalendar({
   return (
     <div className="min-w-0 w-full max-w-full">
       <h2 className="text-sm font-bold text-ink">{t("booking.calendarTitle")}</h2>
-      <div className="mt-3 min-w-0 max-w-full overflow-hidden rounded-xl border-2 border-[#FDB919]">
+      <div className="mt-3 min-w-0 max-w-full overflow-hidden rounded-xl border-4 border-[#FDB919]">
         <div className="flex items-center gap-2 bg-[#FDB919] px-2 py-2 sm:px-3 sm:py-2.5">
           <button
             type="button"

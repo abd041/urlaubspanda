@@ -17,7 +17,11 @@ function resolveBadge(deal: Deal, detail: OfferDetail, t: ReturnType<typeof useT
 }
 
 /**
- * Offer page top header — meta + H1/summary + share/merken near title.
+ * Deal page header (desktop + mobile):
+ * 1) Hotel name + Share / Merken
+ * 2) Stars + location (+ badge)
+ * 3) Customer ratings / review count
+ * 4) Deal summary line
  */
 export function OfferHeroHeader({
   deal,
@@ -35,7 +39,17 @@ export function OfferHeroHeader({
 
   return (
     <header className="mt-5 sm:mt-6">
-      <div className="flex min-w-0 flex-wrap items-start gap-x-3 gap-y-2">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <h1 className="min-w-0 text-[1.75rem] font-extrabold leading-[1.12] tracking-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.08]">
+          {deal.name}
+        </h1>
+        <div className="flex shrink-0 items-center gap-2">
+          <ShareButton url={offerUrl} title={deal.name} alwaysShowLabel />
+          <FavoriteButton dealId={deal.id} alwaysShowLabel />
+        </div>
+      </div>
+
+      <div className="mt-3 flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
         <span
           className="inline-flex items-center gap-0.5 text-star"
           aria-label={`${t("deal.stars", { count: deal.stars })}${superior ? ", Superior" : ""}`}
@@ -50,9 +64,9 @@ export function OfferHeroHeader({
           )}
         </span>
 
-        <span className="inline-flex min-w-0 max-w-full items-start gap-1 text-sm leading-snug text-ink">
+        <span className="inline-flex min-w-0 max-w-full items-center gap-1 text-sm leading-snug text-ink">
           <MapPin
-            className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted"
+            className="h-3.5 w-3.5 shrink-0 text-muted"
             aria-hidden="true"
             fill="currentColor"
           />
@@ -73,22 +87,12 @@ export function OfferHeroHeader({
           reviewScore={deal.reviewScore}
           reviewMaxScore={deal.reviewMaxScore}
           reviewCount={deal.reviewCount}
-          href="#bewertungen"
           size="md"
           className="mt-3"
         />
       )}
 
-      <div className="mt-4 flex flex-wrap items-start justify-between gap-3 sm:mt-5">
-        <h1 className="min-w-0 flex-1 text-[1.75rem] font-extrabold leading-[1.12] tracking-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.08]">
-          {deal.name}
-        </h1>
-        <div className="flex shrink-0 items-center gap-2">
-          <ShareButton url={offerUrl} title={deal.name} />
-          <FavoriteButton dealId={deal.id} />
-        </div>
-      </div>
-      <p className="mt-2 max-w-3xl text-base leading-relaxed text-body sm:text-lg">
+      <p className="mt-3 max-w-3xl text-base leading-relaxed text-body sm:mt-4 sm:text-lg">
         {tx(deal.summary, locale)}
       </p>
     </header>

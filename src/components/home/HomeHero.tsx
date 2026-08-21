@@ -27,7 +27,7 @@ export function HomeHero() {
         aria-hidden="true"
       />
 
-      <Container className="relative pt-12 pb-8 sm:pt-16 sm:pb-10 lg:pt-[4.5rem] lg:pb-12">
+      <Container className="relative pt-8 pb-2 sm:pt-10 sm:pb-3 lg:pt-12 lg:pb-3">
         <RevealMountGroup className="max-w-[40rem]">
           <RevealItem
             as="p"
@@ -39,7 +39,7 @@ export function HomeHero() {
           <RevealItem>
             <h1
               id="home-hero-heading"
-              className="mt-5 text-[2.25rem] font-extrabold leading-[1.15] tracking-tight text-ink sm:text-[2.75rem] lg:text-[3.35rem] lg:leading-[1.12]"
+              className="mt-4 text-[2.25rem] font-extrabold leading-[1.15] tracking-tight text-ink sm:text-[2.75rem] lg:text-[3.35rem] lg:leading-[1.12]"
             >
               {t("home.heroTitleBefore")}{" "}
               <span className="text-brand-500">{t("home.heroTitleHighlight")}</span>{" "}
@@ -48,7 +48,7 @@ export function HomeHero() {
           </RevealItem>
           <RevealItem
             as="p"
-            className="mt-5 max-w-[34rem] text-[15px] leading-[1.65] text-body sm:text-base"
+            className="mt-3 max-w-[34rem] text-[15px] leading-[1.65] text-body sm:text-base"
           >
             {t("home.heroSub")}
           </RevealItem>

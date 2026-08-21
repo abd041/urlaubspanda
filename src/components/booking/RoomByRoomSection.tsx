@@ -60,7 +60,7 @@ export function RoomByRoomSection({ deal, config, booking }: RoomByRoomSectionPr
         const ctaLabel = rooms.length > 1 ? t("booking.selectRoomN", { n: index + 1 }) : t("booking.toBooking");
 
         return (
-          <div key={index} className="space-y-6 rounded-2xl border border-[#eeeef2] bg-white p-4 shadow-[0_8px_24px_rgba(15,26,43,0.08)] sm:p-6">
+          <div key={index} className="w-full space-y-6 rounded-2xl border border-[#eeeef2] bg-white p-4 shadow-[0_8px_24px_rgba(15,26,43,0.08)] sm:p-6 lg:p-8">
             {rooms.length > 1 && (
               <div className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-600">
                 {t("booking.roomOf", { n: index + 1, total: rooms.length })}

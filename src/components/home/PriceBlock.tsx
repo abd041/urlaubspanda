@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Diamond } from "lucide-react";
 import { formatEuro } from "@/lib/utils";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { localeTag } from "@/i18n/config";
@@ -27,31 +26,26 @@ export function PriceBlock({ oldPrice, currentPrice, discountPercent, action }: 
   const t = useT();
 
   return (
-    <div>
-      {(oldPrice > currentPrice || savings > 0) && (
-        <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[13px]">
-          {oldPrice > currentPrice && (
-            <span className="font-semibold text-danger line-through">{formatEuro(oldPrice, locale)}</span>
-          )}
-          {savings > 0 && (
-            <span className="font-semibold text-danger">
-              {t("deal.youSave", { amount: formatSavingsEuro(savings, locale) })}
-              {discountPercent > 0 ? ` (−${discountPercent}%)` : ""}
-            </span>
-          )}
+    <div className="flex flex-col items-center text-center">
+      {savings > 0 && (
+        <p className="text-[13px] font-semibold text-success">
+          {t("deal.youSave", { amount: formatSavingsEuro(savings, locale) })}
+          {discountPercent > 0 ? ` (−${discountPercent}%)` : ""}
         </p>
       )}
-      <div className="mt-1 flex items-end justify-between gap-3">
-        <p className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
-          <span className="text-[13px] text-muted">{t("deal.from")}</span>
-          <Diamond className="mb-0.5 h-2 w-2 shrink-0 fill-ink text-ink" aria-hidden="true" />
-          <span className="text-[1.75rem] font-extrabold leading-none tracking-tight text-ink">
-            {formatEuro(currentPrice, locale)}
-          </span>
-          <span className="text-[12px] text-muted">{t("deal.perPerson")}</span>
+      {oldPrice > currentPrice && (
+        <p className="mt-0.5 text-[13px] font-semibold text-danger line-through">
+          {formatEuro(oldPrice, locale)}
         </p>
-        {action}
-      </div>
+      )}
+      <p className="mt-1 flex flex-wrap items-baseline justify-center gap-x-1.5 gap-y-0.5">
+        <span className="text-[13px] text-muted">{t("deal.from")}</span>
+        <span className="text-[1.75rem] font-extrabold leading-none tracking-tight text-ink">
+          {formatEuro(currentPrice, locale)}
+        </span>
+        <span className="text-[12px] text-muted">{t("deal.perPerson")}</span>
+      </p>
+      {action ? <div className="mt-3 flex w-full justify-center">{action}</div> : null}
     </div>
   );
 }

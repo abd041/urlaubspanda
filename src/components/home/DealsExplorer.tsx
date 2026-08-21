@@ -79,6 +79,7 @@ export function DealsExplorer({
     useFilterSelection({ destinationSlug });
   const { selectedOrt, toggleOrt, clearOrt } = useOrtFilter();
   const { locale } = useLocale();
+  const t = useT();
   const localizedCountry = destinationSlug
     ? destinationName(destinationSlug, locale)
     : "";
@@ -102,7 +103,7 @@ export function DealsExplorer({
   return (
     <>
       <NoIndexMeta active={isMultiFilterQuery || Boolean(selectedOrt)} />
-      {popularSpots && popularSpots.length > 0 && localizedCountry && (
+      {popularSpots && popularSpots.length > 0 && localizedCountry ? (
         <CountryTopDestinations
           countryName={localizedCountry}
           spots={popularSpots}
@@ -110,7 +111,26 @@ export function DealsExplorer({
           onSelectOrt={toggleOrt}
           onClearOrt={clearOrt}
         />
-      )}
+      ) : destinationSlug ? (
+        <div className="bg-surface px-4 pb-2 pt-4 sm:px-6 sm:pt-5">
+          <div className="mx-auto flex max-w-7xl justify-center">
+            <button
+              type="button"
+              onClick={() => {
+                clearOrt();
+                window.requestAnimationFrame(() => {
+                  document
+                    .getElementById("filters")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+              }}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 text-sm font-bold text-white shadow-[0_8px_20px_rgba(27,99,235,0.18)] transition hover:bg-brand-600"
+            >
+              {t("country.viewAllDeals")}
+            </button>
+          </div>
+        </div>
+      ) : null}
       <FilterSection
         selected={selected}
         isSelected={isSelected}

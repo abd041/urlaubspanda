@@ -14,6 +14,8 @@ interface ReviewBadgeProps {
   href?: string;
   size?: "sm" | "md";
   className?: string;
+  /** Override for the review-count link/text (e.g. sidebar uses ink instead of brand blue). */
+  countClassName?: string;
 }
 
 /**
@@ -28,6 +30,7 @@ export function ReviewBadge({
   href,
   size = "sm",
   className,
+  countClassName,
 }: ReviewBadgeProps) {
   const { locale } = useLocale();
   const t = useT();
@@ -41,9 +44,10 @@ export function ReviewBadge({
   const score = scoreFormatter.format(reviewScore);
 
   const countClass = cn(
-    "font-medium text-brand-500",
+    "font-medium",
+    countClassName ?? "text-brand-500",
     compact ? "text-[13px]" : "text-sm",
-    href && "transition hover:text-brand-600 hover:underline"
+    href && (countClassName ? "transition hover:underline" : "transition hover:text-brand-600 hover:underline")
   );
 
   return (

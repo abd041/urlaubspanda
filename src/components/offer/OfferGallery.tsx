@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { TouchEvent } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GalleryLightbox } from "@/components/offer/GalleryLightbox";
 import { useT } from "@/i18n/LocaleProvider";
@@ -18,19 +18,26 @@ interface OfferGalleryProps {
 const SWIPE_THRESHOLD_PX = 40;
 
 /**
- * Gallery: mobile matches the live site (full-bleed slider, rectangular
- * arrows, 1/12 counter). Desktop keeps the mosaic + “Alle X Fotos” CTA.
+ * Desktop: mosaic with clearly visible prev/next on the main image — browse
+ * in place (no “Alle X Fotos” CTA). Mobile keeps a taller slider (req 10).
  */
 export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: OfferGalleryProps) {
   const t = useT();
   const [index, setIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
+  const desktopMainRef = useRef<HTMLDivElement>(null);
 
-  const goTo = (next: number) => {
-    const total = images.length;
-    setIndex(((next % total) + total) % total);
-  };
+  const photoCount = images.length;
+  const displayTotal = Math.max(photoCount, totalPhotoCount);
+
+  const goTo = useCallback(
+    (next: number) => {
+      if (photoCount < 1) return;
+      setIndex(((next % photoCount) + photoCount) % photoCount);
+    },
+    [photoCount]
+  );
 
   const handleTouchStart = (event: TouchEvent) => {
     touchStartX.current = event.touches[0].clientX;
@@ -50,15 +57,33 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
     setLightboxOpen(true);
   };
 
+  useEffect(() => {
+    const node = desktopMainRef.current;
+    if (!node || photoCount < 2) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        goTo(index - 1);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        goTo(index + 1);
+      }
+    };
+
+    node.addEventListener("keydown", onKeyDown);
+    return () => node.removeEventListener("keydown", onKeyDown);
+  }, [goTo, index, photoCount]);
+
   const mainSrc = images[index] ?? images[0];
   const thumbnails = images.slice(0, 4);
-  const activeThumb = index < 4 ? index : 0;
+  const activeThumb = index < 4 ? index : -1;
 
   return (
     <>
-      {/* Mobile — live site: full-bleed, rectangular arrows, 1/12 counter */}
+      {/* Mobile — Booking-style taller crop + slim, low-contrast arrows */}
       <div
-        className="relative -mx-4 aspect-[16/10] w-[calc(100%+2rem)] overflow-hidden bg-surface sm:-mx-6 sm:w-[calc(100%+3rem)] lg:hidden"
+        className="relative -mx-4 aspect-[4/5] min-h-[280px] w-[calc(100%+2rem)] overflow-hidden bg-surface font-sans sm:-mx-6 sm:aspect-[5/6] sm:min-h-[320px] sm:w-[calc(100%+3rem)] lg:hidden"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         role="group"
@@ -70,7 +95,7 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
             key={src}
             type="button"
             onClick={() => openLightboxAt(i)}
-            aria-label={t("offer.enlarge", { n: i + 1, total: totalPhotoCount })}
+            aria-label={t("offer.enlarge", { n: i + 1, total: displayTotal })}
             className={cn(
               "absolute inset-0",
               i === index ? "opacity-100" : "pointer-events-none opacity-0"
@@ -78,7 +103,7 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
           >
             <Image
               src={src}
-              alt={`${alt} – ${t("offer.imageNof", { n: i + 1, total: totalPhotoCount })}`}
+              alt={`${alt} – ${t("offer.imageNof", { n: i + 1, total: displayTotal })}`}
               fill
               sizes="100vw"
               priority={i === 0}
@@ -87,43 +112,54 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
           </button>
         ))}
 
-        {images.length > 1 && (
+        {discountPercent > 0 && (
+          <span className="absolute left-3 top-3 z-10 rounded-full bg-white px-3 py-1 font-sans text-[14px] font-extrabold tracking-tight text-success shadow-sm">
+            {t("deal.upToDiscount", { percent: discountPercent })}
+          </span>
+        )}
+
+        {photoCount > 1 && (
           <>
             <button
               type="button"
-              onClick={() => goTo(index - 1)}
+              onClick={(event) => {
+                event.stopPropagation();
+                goTo(index - 1);
+              }}
               aria-label={t("offer.prevImage")}
-              className="absolute left-0 top-1/2 z-10 flex h-14 w-8 -translate-y-1/2 items-center justify-center bg-white/70 text-[#3d3d3d] transition hover:bg-white/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500"
+              className="absolute left-1.5 top-1/2 z-20 flex h-14 w-7 -translate-y-1/2 items-center justify-center rounded-md bg-white/70 text-ink shadow-sm backdrop-blur-[2px] transition hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500"
             >
-              <ChevronLeft className="h-6 w-6" strokeWidth={2.25} />
+              <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
             </button>
             <button
               type="button"
-              onClick={() => goTo(index + 1)}
+              onClick={(event) => {
+                event.stopPropagation();
+                goTo(index + 1);
+              }}
               aria-label={t("offer.nextImage")}
-              className="absolute right-0 top-1/2 z-10 flex h-14 w-8 -translate-y-1/2 items-center justify-center bg-white/70 text-[#3d3d3d] transition hover:bg-white/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500"
+              className="absolute right-1.5 top-1/2 z-20 flex h-14 w-7 -translate-y-1/2 items-center justify-center rounded-md bg-white/70 text-ink shadow-sm backdrop-blur-[2px] transition hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500"
             >
-              <ChevronRight className="h-6 w-6" strokeWidth={2.25} />
+              <ChevronRight className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
             </button>
           </>
         )}
 
-        <span className="absolute bottom-2.5 right-2.5 z-10 rounded-[4px] bg-white px-2 py-[3px] text-[13px] font-medium tabular-nums leading-none text-ink">
-          {index + 1}/{totalPhotoCount}
+        <span className="absolute bottom-2.5 right-2.5 z-20 rounded-sm bg-black/45 px-2 py-0.75 font-sans text-[12px] font-medium tabular-nums leading-none text-white">
+          {index + 1}/{photoCount}
         </span>
       </div>
 
-      {/* Desktop — mosaic: large left (~65%) + 2×2 right, clipped outer radius */}
+      {/* Desktop — mosaic; arrows browse all photos in place */}
       <div
         className="hidden overflow-hidden rounded-[1.25rem] lg:grid lg:h-[420px] lg:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] lg:gap-2 xl:h-[480px]"
         role="group"
         aria-label={t("offer.imagesOf", { name: alt })}
       >
-        <button
-          type="button"
-          onClick={() => openLightboxAt(index)}
-          aria-label={t("offer.allPhotos", { count: totalPhotoCount })}
-          className="relative overflow-hidden bg-surface"
+        <div
+          ref={desktopMainRef}
+          tabIndex={0}
+          className="relative overflow-hidden bg-surface outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500"
         >
           <Image
             src={mainSrc}
@@ -131,18 +167,37 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
             fill
             sizes="(min-width: 1280px) 55vw, 60vw"
             priority
-            className="object-cover"
+            className="object-cover transition-opacity duration-200"
           />
           {discountPercent > 0 && (
-            <span className="absolute left-4 top-4 z-10 rounded-full bg-white px-3 py-1 text-[15px] font-extrabold tracking-tight text-danger shadow-sm">
-              −{discountPercent}%
+            <span className="absolute left-4 top-4 z-10 rounded-full bg-white px-3 py-1 text-[15px] font-extrabold tracking-tight text-success shadow-sm">
+              {t("deal.upToDiscount", { percent: discountPercent })}
             </span>
           )}
-          <span className="absolute bottom-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2.5 text-sm font-semibold text-ink shadow-md">
-            <Expand className="h-3.5 w-3.5" aria-hidden="true" />
-            {t("offer.allPhotos", { count: totalPhotoCount })}
+          {photoCount > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => goTo(index - 1)}
+                aria-label={t("offer.prevImage")}
+                className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink shadow-[0_4px_16px_rgba(15,26,43,0.22)] transition hover:scale-105 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+              >
+                <ChevronLeft className="h-6 w-6" strokeWidth={2.25} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => goTo(index + 1)}
+                aria-label={t("offer.nextImage")}
+                className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink shadow-[0_4px_16px_rgba(15,26,43,0.22)] transition hover:scale-105 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+              >
+                <ChevronRight className="h-6 w-6" strokeWidth={2.25} aria-hidden="true" />
+              </button>
+            </>
+          )}
+          <span className="absolute bottom-4 left-4 z-10 rounded-full bg-white px-3 py-1.5 text-sm font-semibold tabular-nums text-ink shadow-md">
+            {index + 1}/{photoCount}
           </span>
-        </button>
+        </div>
 
         <div className="grid grid-cols-2 grid-rows-2 gap-2">
           {thumbnails.map((src, i) => (
@@ -150,8 +205,7 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
               key={src}
               type="button"
               onClick={() => setIndex(i)}
-              onDoubleClick={() => openLightboxAt(i)}
-              aria-label={t("offer.imageNof", { n: i + 1, total: totalPhotoCount })}
+              aria-label={t("offer.imageNof", { n: i + 1, total: photoCount })}
               aria-pressed={activeThumb === i}
               className={cn(
                 "relative overflow-hidden bg-surface transition",
@@ -160,7 +214,7 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
             >
               <Image
                 src={src}
-                alt={`${alt} – ${t("offer.imageNof", { n: i + 1, total: totalPhotoCount })}`}
+                alt={`${alt} – ${t("offer.imageNof", { n: i + 1, total: photoCount })}`}
                 fill
                 sizes="20vw"
                 className="object-cover"
@@ -175,7 +229,7 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
           images={images}
           alt={alt}
           index={index}
-          totalPhotoCount={totalPhotoCount}
+          totalPhotoCount={displayTotal}
           onIndexChange={setIndex}
           onClose={() => setLightboxOpen(false)}
         />

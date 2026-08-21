@@ -5,7 +5,6 @@ import { SlidersHorizontal, X } from "lucide-react";
 import {
   filterOptions,
   HOMEPAGE_FILTER_KEYS,
-  HOMEPAGE_MOBILE_PREVIEW_KEYS,
 } from "@/data/filters";
 import { Container } from "@/components/layout/Container";
 import { FilterChip } from "@/components/home/FilterChip";
@@ -14,7 +13,7 @@ import { cn } from "@/lib/utils";
 import type { FilterKey } from "@/types";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { filterLabel } from "@/i18n/content";
-import { AnimatePresence, Reveal, easePremium, motion } from "@/components/motion/Reveal";
+import { AnimatePresence, easePremium, motion } from "@/components/motion/Reveal";
 
 interface FilterSectionProps {
   selected: FilterKey[];
@@ -38,16 +37,16 @@ export function FilterSection({
   const visibleOptions = filterOptions.filter((option) => filterKeys.includes(option.key));
   const t = useT();
   const { locale } = useLocale();
-  const collapseOnMobile = visibleOptions.length > 8;
+  const showMobileAllButton = visibleOptions.length > 0;
 
   return (
     <section
       id="filters"
       aria-labelledby="reisearten-heading"
-      className="scroll-mt-24 py-12 sm:py-14 lg:py-16"
+      className="scroll-mt-24 py-3 sm:py-4 lg:py-5"
     >
       <Container>
-        <Reveal className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
           <div className="min-w-0 max-w-2xl">
             <h2
               id="reisearten-heading"
@@ -68,28 +67,25 @@ export function FilterSection({
               {t("filter.reset")}
             </button>
           )}
-        </Reveal>
+        </div>
 
-        <Reveal className="mt-8 sm:mt-9">
+        {/* Mobile: full horizontal carousel of all filters. Desktop: wrap grid. */}
+        <div className="mt-4 sm:mt-5">
           <div className="no-scrollbar flex snap-x-mandatory gap-3 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
-            {visibleOptions.map((option) => {
-              const mobileHidden =
-                collapseOnMobile && !HOMEPAGE_MOBILE_PREVIEW_KEYS.includes(option.key);
-              return (
-                <FilterChip
-                  key={option.key}
-                  label={filterLabel(option.key, locale)}
-                  icon={option.icon}
-                  selected={isSelected(option.key)}
-                  onToggle={() => toggle(option.key)}
-                  className={cn("snap-start", mobileHidden && "max-md:hidden")}
-                />
-              );
-            })}
+            {visibleOptions.map((option) => (
+              <FilterChip
+                key={option.key}
+                label={filterLabel(option.key, locale)}
+                icon={option.icon}
+                selected={isSelected(option.key)}
+                onToggle={() => toggle(option.key)}
+                className="snap-start"
+              />
+            ))}
           </div>
-        </Reveal>
+        </div>
 
-        {collapseOnMobile && (
+        {showMobileAllButton && (
           <button
             type="button"
             onClick={() => setModalOpen(true)}
@@ -110,7 +106,7 @@ export function FilterSection({
               transition={{ duration: 0.28, ease: easePremium }}
               className="overflow-hidden"
             >
-              <div className="mt-6 flex flex-wrap items-center gap-2">
+              <div className="mt-4 flex flex-wrap items-center gap-2">
                 <AnimatePresence initial={false} mode="popLayout">
                   {selected.map((key) => {
                     const option = filterOptions.find((item) => item.key === key);
@@ -123,7 +119,7 @@ export function FilterSection({
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.94 }}
                         transition={{ duration: 0.22, ease: easePremium }}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 py-1 pl-3 pr-1 text-xs font-semibold text-brand-700"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-white py-1 pl-3 pr-1 text-xs font-semibold text-brand-700"
                       >
                         {filterLabel(key, locale)}
                         <button
@@ -131,7 +127,7 @@ export function FilterSection({
                           onClick={() => remove(key)}
                           aria-label={t("filter.remove", { label: filterLabel(key, locale) })}
                           className={cn(
-                            "flex h-6 w-6 items-center justify-center rounded-full text-brand-500 transition hover:bg-white hover:text-ink"
+                            "flex h-6 w-6 items-center justify-center rounded-full text-brand-500 transition hover:bg-brand-50 hover:text-ink"
                           )}
                         >
                           <X className="h-3.5 w-3.5" />

@@ -7,6 +7,7 @@ import { Heart, Menu, X } from "lucide-react";
 import { PandaLogo } from "@/components/icons/PandaLogo";
 import { Container } from "@/components/layout/Container";
 import { LanguageToggle } from "@/components/layout/LanguageToggle";
+import { HeaderSearch } from "@/components/layout/HeaderSearch";
 import { filterOptions, HEADER_FILTER_KEYS } from "@/data/filters";
 import { cn } from "@/lib/utils";
 import { useT, useLocale } from "@/i18n/LocaleProvider";
@@ -190,7 +191,11 @@ export function Header() {
             <HeaderNav className="flex items-center gap-1" />
           </nav>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="mx-2 hidden min-w-0 flex-1 justify-center sm:flex lg:mx-4 lg:max-w-sm lg:flex-none lg:justify-end">
+            <HeaderSearch className="w-full max-w-md" />
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <LanguageToggle />
             <Link
               href="/merkliste"
@@ -240,6 +245,9 @@ export function Header() {
           >
             <Container>
               <nav aria-label={t("nav.mobile")} className="py-3">
+                <div className="mb-3 px-1">
+                  <HeaderSearch compact onNavigate={() => setMobileOpen(false)} />
+                </div>
                 <HeaderNav
                   onNavigate={() => setMobileOpen(false)}
                   className="flex flex-col gap-1"

@@ -12,7 +12,6 @@ import { destinations, destinationsInDisplayOrder } from "@/data/destinations";
 import { destinationPath } from "@/lib/destinationPaths";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { countryDisplayName, destinationName, destinationSubtitle } from "@/i18n/content";
-import { RevealGroup, RevealItem } from "@/components/motion/Reveal";
 
 interface DealGridProps {
   deals: Deal[];
@@ -48,11 +47,11 @@ export function DealGrid({
       .slice(0, 2);
 
     return (
-      <RevealGroup fast className={cn("grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-6", className)}>
-        <RevealItem className="h-full min-w-0">
+      <div className={cn("grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-6", className)}>
+        <div className="h-full min-w-0">
           <DealCard deal={deal} priority />
-        </RevealItem>
-        <RevealItem className="h-full min-w-0 lg:col-span-2">
+        </div>
+        <div className="h-full min-w-0 lg:col-span-2">
           {destination ? (
             <MoreDealsPanel
               country={country}
@@ -78,19 +77,19 @@ export function DealGrid({
               </div>
             </aside>
           )}
-        </RevealItem>
-      </RevealGroup>
+        </div>
+      </div>
     );
   }
 
   return (
-    <RevealGroup fast className={cn("grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6", className)}>
+    <div className={cn("grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6", className)}>
       {deals.map((deal, index) => (
-        <RevealItem key={deal.id} className="h-full min-w-0">
+        <div key={deal.id} className="h-full min-w-0">
           <DealCard deal={deal} priority={index < 3} />
-        </RevealItem>
+        </div>
       ))}
-    </RevealGroup>
+    </div>
   );
 }
 

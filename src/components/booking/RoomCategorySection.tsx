@@ -4,9 +4,8 @@ import { useState } from "react";
 import { calculateStayPrice } from "@/lib/pricingEngine";
 import type { ChildPricingRule, RoomCategoryDetail } from "@/types";
 import type { RoomSelection } from "@/hooks/useBookingState";
-import { RoomCategoryCard, ShowAllRoomsCard } from "@/components/booking/RoomCategoryCard";
+import { RoomCategoryCard } from "@/components/booking/RoomCategoryCard";
 import { RoomDetailsModal } from "@/components/booking/RoomDetailsModal";
-import { Carousel } from "@/components/ui/Carousel";
 import { useT } from "@/i18n/LocaleProvider";
 
 interface RoomCategorySectionProps {
@@ -19,6 +18,10 @@ interface RoomCategorySectionProps {
   onSelect: (roomCategoryId: string | null) => void;
 }
 
+/**
+ * Room category picker. Mobile lists every room (no “Show more”); desktop grid.
+ * Cards are fully tappable; selected border stays fully visible (req 14 + 18).
+ */
 export function RoomCategorySection({
   roomCategories,
   occupancy,
@@ -71,22 +74,11 @@ export function RoomCategorySection({
       <h3 className="text-lg font-bold text-ink">{t("booking.step3")}</h3>
       <p className="mt-1 text-sm text-muted">{t("booking.step3Text")}</p>
 
-      <div className="mt-4 lg:hidden">
-        <Carousel
-          ariaLabel={t("booking.step3")}
-          itemsPerPageDesktop={1}
-          overlayArrows
-          overlayArrowsOnMobile
-          trackClassName="gap-3"
-        >
-          {renderCards()}
-        </Carousel>
-        <ShowAllRoomsCard layout="row" onClick={() => onSelect(null)} />
-      </div>
+      {/* Mobile: all rooms in a vertical list — no carousel / “show more” */}
+      <div className="mt-4 space-y-4 px-0.5 py-1 lg:hidden">{renderCards()}</div>
 
-      <div className="mt-4 hidden gap-4 lg:grid lg:grid-cols-4">
+      <div className="mt-5 hidden gap-5 overflow-visible py-1.5 lg:grid lg:grid-cols-2 xl:grid-cols-3 xl:gap-6">
         {renderCards()}
-        <ShowAllRoomsCard onClick={() => onSelect(null)} />
       </div>
 
       <RoomDetailsModal room={detailsRoom} onClose={() => setDetailsRoom(null)} />

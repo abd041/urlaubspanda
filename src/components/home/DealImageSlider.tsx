@@ -81,7 +81,7 @@ export function DealImageSlider({
 
   return (
     <div
-      className="group relative aspect-4/3 w-full overflow-hidden bg-surface"
+      className="group relative aspect-[16/10] w-full overflow-hidden bg-surface sm:aspect-[5/3]"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onKeyDown={handleKeyDown}
@@ -108,8 +108,8 @@ export function DealImageSlider({
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent" />
 
       {discountPercent > 0 && (
-        <span className="absolute left-3 top-3 z-20 rounded-full bg-white px-3 py-1 text-[15px] font-extrabold tracking-tight text-danger shadow-sm">
-          −{discountPercent}%
+        <span className="absolute left-3 top-3 z-20 inline-flex items-center rounded-full border border-[#0F9F6E]/18 bg-[#E8F6EE]/95 px-2.5 py-1 text-[12px] font-bold tracking-tight text-[#0B7A54] shadow-[0_4px_14px_rgba(15,26,43,0.10)] backdrop-blur-sm sm:px-3 sm:text-[13px]">
+          {t("deal.upToDiscount", { percent: discountPercent })}
         </span>
       )}
 

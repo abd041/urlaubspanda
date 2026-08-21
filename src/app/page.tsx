@@ -9,7 +9,7 @@ import { deals } from "@/data/deals";
 
 export default function Home() {
   return (
-    <main className="bg-surface pb-10 sm:pb-16">
+    <main className="bg-surface pb-8 sm:pb-12">
       <JsonLd data={dealsItemListJsonLd(deals)} />
       <HomeHero />
       <PopularDestinations />

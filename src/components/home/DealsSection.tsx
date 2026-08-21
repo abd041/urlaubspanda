@@ -1,20 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronDown, Loader2 } from "lucide-react";
 import type { Deal } from "@/types";
 import { Container } from "@/components/layout/Container";
 import { DealGrid } from "@/components/home/DealGrid";
 import { useT } from "@/i18n/LocaleProvider";
-import { Reveal, easePremium, motion, useReducedMotion } from "@/components/motion/Reveal";
+import { easePremium, motion, useReducedMotion } from "@/components/motion/Reveal";
+import { getAllDealClickCounts, getServerDealClickCounts } from "@/lib/dealClicks";
 
-/**
- * Deals render in batches instead of all at once, so a large future result
- * set never dumps hundreds of cards (and their images) into the DOM on
- * first load. Matches the "no loading of hundreds of deals at once" note in
- * the client's homepage spec.
- */
 const PAGE_SIZE = 6;
 
 type SortOption = "beliebtheit" | "rabatt" | "preis" | "bewertung";
@@ -26,7 +21,7 @@ const sortOptionKeys: { value: SortOption; labelKey: string }[] = [
   { value: "bewertung", labelKey: "deals.sortRating" },
 ];
 
-function sortDeals(deals: Deal[], sort: SortOption): Deal[] {
+function sortDeals(deals: Deal[], sort: SortOption, clicks: Record<string, number>): Deal[] {
   const sorted = [...deals];
   switch (sort) {
     case "rabatt":
@@ -35,16 +30,29 @@ function sortDeals(deals: Deal[], sort: SortOption): Deal[] {
       return sorted.sort((a, b) => a.currentPrice - b.currentPrice);
     case "bewertung":
       return sorted.sort((a, b) => b.reviewScore - a.reviewScore);
+    case "beliebtheit":
     default:
-      return sorted;
+      return sorted.sort((a, b) => {
+        const clickDiff = (clicks[b.id] ?? 0) - (clicks[a.id] ?? 0);
+        if (clickDiff !== 0) return clickDiff;
+        return (b.bookingCount ?? 0) - (a.bookingCount ?? 0);
+      });
   }
+}
+
+function subscribeClicks(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("urlaubspanda:deal-click", onStoreChange);
+  window.addEventListener("storage", onStoreChange);
+  return () => {
+    window.removeEventListener("urlaubspanda:deal-click", onStoreChange);
+    window.removeEventListener("storage", onStoreChange);
+  };
 }
 
 interface DealsSectionProps {
   deals: Deal[];
-  /** Section heading. Defaults to the homepage copy. */
   title?: string;
-  /** "Alle anzeigen" link target; omit to hide the link entirely (e.g. on a country page that has no separate all-deals page). */
   allDealsHref?: string;
   emptyTitle?: string;
   emptyDescription?: string;
@@ -61,20 +69,14 @@ export function DealsSection({
   const reduce = useReducedMotion();
   const heading = title ?? t("home.dealsTitle");
   const [sort, setSort] = useState<SortOption>("beliebtheit");
-  const sortedDeals = useMemo(() => sortDeals(deals, sort), [deals, sort]);
+  const clicks = useSyncExternalStore(subscribeClicks, getAllDealClickCounts, getServerDealClickCounts);
+  const sortedDeals = useMemo(() => sortDeals(deals, sort, clicks), [deals, sort, clicks]);
 
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  // Stable identity for the current result set so we can reset pagination
-  // after filters/sort change without setState-during-render (which can
-  // cascade into hydration / DOM insertBefore errors).
   const dealsKey = useMemo(() => deals.map((deal) => deal.id).join(","), [deals]);
-
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
-    setIsLoadingMore(false);
-  }, [dealsKey, sort]);
+  const pageKey = `${dealsKey}:${sort}`;
+  const [visibleByKey, setVisibleByKey] = useState<Record<string, number>>({});
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const visibleCount = visibleByKey[pageKey] ?? PAGE_SIZE;
 
   const visibleDeals = sortedDeals.slice(0, visibleCount);
   const remainingCount = sortedDeals.length - visibleDeals.length;
@@ -82,15 +84,18 @@ export function DealsSection({
   function handleLoadMore() {
     setIsLoadingMore(true);
     window.setTimeout(() => {
-      setVisibleCount((count) => count + PAGE_SIZE);
+      setVisibleByKey((prev) => ({
+        ...prev,
+        [pageKey]: (prev[pageKey] ?? PAGE_SIZE) + PAGE_SIZE,
+      }));
       setIsLoadingMore(false);
-    }, 350);
+    }, 50);
   }
 
   return (
-    <section id="deals" aria-labelledby="top-angebote-heading" className="mt-8 scroll-mt-24 pb-4 sm:mt-10 sm:pb-6">
+    <section id="deals" aria-labelledby="top-angebote-heading" className="mt-1 scroll-mt-24 pb-4 sm:mt-2 sm:pb-6">
       <Container>
-        <Reveal className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
           <div className="min-w-0">
             <div className="flex items-center justify-between gap-3 sm:block">
               <h2
@@ -118,20 +123,26 @@ export function DealsSection({
             </p>
           </div>
 
-          <div className="flex items-center justify-between gap-3 sm:justify-end sm:pb-0.5">
-            <label className="hidden items-center gap-2.5 text-sm text-body sm:flex">
-              {t("deals.sort")}
-              <select
-                value={sort}
-                onChange={(event) => setSort(event.target.value as SortOption)}
-                className="rounded-lg border border-[rgba(15,23,42,0.08)] bg-white px-3 py-2 text-sm font-medium text-ink transition focus:border-brand-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-brand-500"
-              >
-                {sortOptionKeys.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {t(option.labelKey)}
-                  </option>
-                ))}
-              </select>
+          <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end sm:pb-0.5">
+            <label className="flex min-w-0 flex-1 items-center gap-2.5 text-sm text-body sm:flex-none">
+              <span className="shrink-0">{t("deals.sort")}</span>
+              <span className="relative min-w-0 flex-1 sm:min-w-44">
+                <select
+                  value={sort}
+                  onChange={(event) => setSort(event.target.value as SortOption)}
+                  className="h-10 w-full appearance-none rounded-lg border border-[rgba(15,23,42,0.08)] bg-white py-2 pl-3 pr-9 text-sm font-medium text-ink transition focus:border-brand-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-brand-500"
+                >
+                  {sortOptionKeys.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {t(option.labelKey)}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink"
+                  aria-hidden="true"
+                />
+              </span>
             </label>
 
             {allDealsHref && (
@@ -144,14 +155,14 @@ export function DealsSection({
               </Link>
             )}
           </div>
-        </Reveal>
+        </div>
 
-        <div className="mt-9 sm:mt-10">
+        <div className="mt-4 sm:mt-5">
           <DealGrid deals={visibleDeals} emptyTitle={emptyTitle} emptyDescription={emptyDescription} />
         </div>
 
         {remainingCount > 0 && (
-          <Reveal className="mt-10 flex justify-center">
+          <div className="mt-10 flex justify-center">
             <motion.button
               type="button"
               onClick={handleLoadMore}
@@ -173,7 +184,7 @@ export function DealsSection({
                 </span>
               )}
             </motion.button>
-          </Reveal>
+          </div>
         )}
       </Container>
     </section>

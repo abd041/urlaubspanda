@@ -1,12 +1,12 @@
 import type { OfferDetail } from "@/types";
 
 /**
- * Additional detail-page content for each offer, keyed by `Deal.slug`. Kept
- * separate from `Deal` (used by the compact deal cards) since the offer
- * detail page needs a lot more manually-authored content: inclusions,
- * highlights, a longer description, amenities and the CTA/booking link
- * configuration. Mirrors the "Offer Detail Page" spec from the client's
- * Homepage-details document.
+ * Additional detail-page content for each offer, keyed by `Deal.slug`.
+ *
+ * CTA redirection (req 12) — set per deal, stand-in for future admin UI:
+ * - `ctaMode: "direct"` + `bookingUrl` → open partner site immediately
+ * - `ctaMode: "country_selection"` + `bookingUrls` and/or `ctaOptions`
+ *   → popup with choices (emoji/flags supported on each option)
  */
 export const offerDetails: Record<string, OfferDetail> = {
   "apollo-beach-rhodos": {
@@ -158,7 +158,7 @@ export const offerDetails: Record<string, OfferDetail> = {
     totalPhotoCount: 18,
     ctaMode: "direct",
     bookingUrl: "https://www.expedia.at/City-Hotel-Bellevue-Paris",
-    countdownEndsAt: "2026-08-21T21:59:59+02:00",
+    countdownEndsAt: "2026-09-30T21:59:59+02:00",
   },
 
   "costa-blanca-beach-hotel": {
@@ -218,7 +218,28 @@ export const offerDetails: Record<string, OfferDetail> = {
       DE: "https://www.tui.de/hotel/costa-blanca-beach-hotel",
       CH: "https://www.tui.ch/hotel/costa-blanca-beach-hotel",
     },
-    countdownEndsAt: "2026-08-21T21:59:59+02:00",
+    ctaOptions: [
+      {
+        id: "AT",
+        label: "Österreich",
+        url: "https://www.tui.at/hotel/costa-blanca-beach-hotel",
+        emoji: "🇦🇹",
+      },
+      {
+        id: "DE",
+        label: "Deutschland",
+        url: "https://www.tui.de/hotel/costa-blanca-beach-hotel",
+        emoji: "🇩🇪",
+      },
+      {
+        id: "CH",
+        label: "Schweiz",
+        url: "https://www.tui.ch/hotel/costa-blanca-beach-hotel",
+        emoji: "🇨🇭",
+      },
+    ],
+    countdownEndsAt: "2026-12-31T21:59:59+01:00",
+    importantNotice: "Nur noch wenige Zimmer zu diesem Preis verfügbar.",
   },
 
   "rewaya-luxury-resort": {
@@ -291,6 +312,32 @@ export const offerDetails: Record<string, OfferDetail> = {
       DE: "https://www.tui.de/hotel/rewaya-luxury-resort",
       CH: "https://www.tui.ch/hotel/rewaya-luxury-resort",
     },
+    ctaOptions: [
+      {
+        id: "AT",
+        label: "Österreich",
+        url: "https://www.tui.at/hotel/rewaya-luxury-resort",
+        emoji: "🇦🇹",
+      },
+      {
+        id: "DE",
+        label: "Deutschland",
+        url: "https://www.tui.de/hotel/rewaya-luxury-resort",
+        emoji: "🇩🇪",
+      },
+      {
+        id: "CH",
+        label: "Schweiz",
+        url: "https://www.tui.ch/hotel/rewaya-luxury-resort",
+        emoji: "🇨🇭",
+      },
+      {
+        id: "partner",
+        label: "HolidayCheck Angebot",
+        url: "https://www.holidaycheck.at/betterAngebote/rewaya-luxury-resort",
+        emoji: "✅",
+      },
+    ],
   },
 
   "kreta-sun-village": {
@@ -347,7 +394,7 @@ export const offerDetails: Record<string, OfferDetail> = {
     totalPhotoCount: 38,
     ctaMode: "direct",
     bookingUrl: "https://www.tui.at/hotel/kreta-sun-village",
-    countdownEndsAt: "2026-08-21T21:59:59+02:00",
+    countdownEndsAt: "2026-10-15T21:59:59+02:00",
   },
 
   "falkenstein-resort-punta-skala": {
