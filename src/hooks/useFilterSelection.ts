@@ -114,10 +114,11 @@ export function useFilterSelection(options: UseFilterSelectionOptions = {}) {
       toggle,
       remove,
       reset,
+      apply: applySelection,
       isSelected,
       /** True when 2+ filters are active (should be noindex). */
       isMultiFilterQuery: selected.length > 1,
     }),
-    [selected, toggle, remove, reset, isSelected]
+    [selected, toggle, remove, reset, applySelection, isSelected]
   );
 }

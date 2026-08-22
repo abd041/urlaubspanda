@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, SlidersHorizontal } from "lucide-react";
 import { filterOptions, HOMEPAGE_FILTER_KEYS } from "@/data/filters";
 import { FilterChip } from "@/components/home/FilterChip";
@@ -12,20 +12,22 @@ import { AnimatePresence, easePremium, motion, useReducedMotion } from "@/compon
 interface FilterModalProps {
   open: boolean;
   onClose: () => void;
-  isSelected: (key: FilterKey) => boolean;
-  toggle: (key: FilterKey) => void;
-  reset: () => void;
-  selectedCount: number;
+  /** Currently applied filters (from URL). Copied into draft when the modal opens. */
+  selected: FilterKey[];
+  /** Apply draft selection and close — only called from “Anzeigen”. */
+  onApply: (next: FilterKey[]) => void;
   filterKeys?: FilterKey[];
 }
 
+/**
+ * Mobile “Alle Filter” sheet. Chip taps only update a local draft so the
+ * modal stays open for multi-select; URL updates when the user confirms.
+ */
 export function FilterModal({
   open,
   onClose,
-  isSelected,
-  toggle,
-  reset,
-  selectedCount,
+  selected,
+  onApply,
   filterKeys = HOMEPAGE_FILTER_KEYS,
 }: FilterModalProps) {
   const visibleOptions = filterOptions.filter((option) => filterKeys.includes(option.key));
@@ -33,6 +35,11 @@ export function FilterModal({
   const t = useT();
   const { locale } = useLocale();
   const reduce = useReducedMotion();
+  const [draft, setDraft] = useState<FilterKey[]>(selected);
+
+  useEffect(() => {
+    if (open) setDraft(selected);
+  }, [open, selected]);
 
   useEffect(() => {
     if (!open) return;
@@ -47,6 +54,15 @@ export function FilterModal({
       document.body.style.overflow = "";
     };
   }, [open, onClose]);
+
+  const toggleDraft = (key: FilterKey) => {
+    setDraft((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+  };
+
+  const handleApply = () => {
+    onApply(draft);
+    onClose();
+  };
 
   return (
     <AnimatePresence>
@@ -100,8 +116,8 @@ export function FilterModal({
                   key={option.key}
                   label={filterLabel(option.key, locale)}
                   icon={option.icon}
-                  selected={isSelected(option.key)}
-                  onToggle={() => toggle(option.key)}
+                  selected={draft.includes(option.key)}
+                  onToggle={() => toggleDraft(option.key)}
                 />
               ))}
             </div>
@@ -109,18 +125,20 @@ export function FilterModal({
             <div className="flex items-center justify-between gap-3 border-t border-line px-5 py-4 sm:px-6">
               <button
                 type="button"
-                onClick={reset}
-                disabled={selectedCount === 0}
+                onClick={() => setDraft([])}
+                disabled={draft.length === 0}
                 className="text-sm font-semibold text-body underline-offset-2 transition hover:text-ink hover:underline disabled:pointer-events-none disabled:opacity-40"
               >
                 {t("filter.reset")}
               </button>
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleApply}
                 className="rounded-full bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
               >
-                {selectedCount > 0 ? t("filter.applyCount", { count: selectedCount }) : t("filter.apply")}
+                {draft.length > 0
+                  ? t("filter.applyCount", { count: draft.length })
+                  : t("filter.apply")}
               </button>
             </div>
           </motion.div>

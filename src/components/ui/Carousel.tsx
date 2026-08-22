@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/i18n/LocaleProvider";
@@ -24,6 +24,8 @@ interface CarouselProps {
   overlayArrowsOnMobile?: boolean;
   /** Extra classes for overlay prev/next buttons. */
   overlayArrowClassName?: string;
+  /** Inline styles for overlay arrows (e.g. measured vertical center). */
+  overlayArrowStyle?: CSSProperties;
   overlayPrevClassName?: string;
   overlayNextClassName?: string;
   /** Keep both overlay arrows visible even at the start/end of the track. */
@@ -47,6 +49,7 @@ export function Carousel({
   overlayArrows = true,
   overlayArrowsOnMobile = false,
   overlayArrowClassName,
+  overlayArrowStyle,
   overlayPrevClassName,
   overlayNextClassName,
   alwaysShowOverlayArrows = false,
@@ -117,7 +120,7 @@ export function Carousel({
   };
 
   return (
-    <div className={cn("relative min-w-0", className)}>
+    <div data-carousel-root className={cn("relative min-w-0", className)}>
       {header?.(controls)}
 
       <div
@@ -140,6 +143,7 @@ export function Carousel({
           onClick={scrollPrev}
           disabled={!canScrollPrev}
           aria-label={t("carousel.prev")}
+          style={overlayArrowStyle}
           className={cn(
             "absolute left-0 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-white/95 text-ink shadow-[0_8px_24px_rgba(15,26,43,0.10)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-35",
             overlayArrowsOnMobile ? "flex" : "hidden lg:flex",
@@ -156,6 +160,7 @@ export function Carousel({
           onClick={scrollNext}
           disabled={!canScrollNext}
           aria-label={t("carousel.next")}
+          style={overlayArrowStyle}
           className={cn(
             "absolute right-0 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-white/95 text-ink shadow-[0_8px_24px_rgba(15,26,43,0.10)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-35",
             overlayArrowsOnMobile ? "flex" : "hidden lg:flex",

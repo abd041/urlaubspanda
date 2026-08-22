@@ -38,7 +38,7 @@ export function OfferHeroHeader({
   const superior = detail.starsSuperior === true;
 
   return (
-    <header className="mt-5 sm:mt-6">
+    <header id="offer-start" className="mt-5 scroll-mt-24 sm:mt-6">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <h1 className="min-w-0 text-[1.75rem] font-extrabold leading-[1.12] tracking-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.08]">
           {deal.name}

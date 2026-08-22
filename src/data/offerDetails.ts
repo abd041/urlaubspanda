@@ -626,3 +626,272 @@ export const offerDetails: Record<string, OfferDetail> = {
     },
   },
 };
+
+/** Compact detail stub so new homepage deals open without a full CMS write-up. */
+function stubDetail(
+  slug: string,
+  tagline: string,
+  nights: number,
+  meal: string,
+  location: string
+): OfferDetail {
+  return {
+    slug,
+    tagline,
+    reviewSource: "HolidayCheck",
+    transferIncluded: false,
+    inclusions: [
+      `${nights} Nächte im Hotel`,
+      meal,
+      "Steuern & Gebühren inklusive",
+    ],
+    highlights: [
+      `Schöne Lage in ${location}`,
+      "Geprüftes Urlaubspanda-Angebot",
+      "Flexible Buchungsoptionen",
+      "Ideal für den nächsten Kurzurlaub",
+    ],
+    descriptionHeading: tagline,
+    descriptionParagraphs: [
+      `Entdecke ${tagline} Mit diesem Angebot genießt du ${nights} Nächte inklusive ${meal} – ehrlich verglichen und transparent bepreist.`,
+    ],
+    contentSections: [
+      {
+        heading: "Über dieses Angebot",
+        paragraphs: [
+          `Dieses Angebot umfasst ${nights} Nächte mit ${meal} in ${location}.`,
+        ],
+      },
+      {
+        heading: "Lage",
+        paragraphs: [`Zentrale bzw. ruhige Lage in ${location} – ideal für Erholung und Ausflüge.`],
+      },
+    ],
+    amenities: ["Restaurant", "WLAN inklusive", "Pool oder Wellness", "Rezeption 24h"],
+    totalPhotoCount: 12,
+    ctaMode: "direct",
+    bookingUrl: `https://www.holidaycheck.de/hotels/${slug}`,
+  };
+}
+
+const EXTRA_OFFER_DETAILS: Record<string, OfferDetail> = {
+  "santorini-blue-domes": stubDetail(
+    "santorini-blue-domes",
+    "Caldera-Blick und Frühstück auf Santorini.",
+    5,
+    "Frühstück",
+    "Santorini"
+  ),
+  "mallorca-palma-bay": stubDetail(
+    "mallorca-palma-bay",
+    "Strandnaher All-Inclusive-Urlaub auf Mallorca.",
+    7,
+    "All Inclusive",
+    "Palma"
+  ),
+  "lago-di-como-villa": stubDetail(
+    "lago-di-como-villa",
+    "Halbpension am Comer See.",
+    4,
+    "Halbpension",
+    "Comer See"
+  ),
+  "prague-old-town-hotel": stubDetail(
+    "prague-old-town-hotel",
+    "Städtetrip nach Prag mit Frühstück.",
+    3,
+    "Frühstück",
+    "Prag"
+  ),
+  "salzburg-city-spa": stubDetail(
+    "salzburg-city-spa",
+    "Kurzurlaub mit Spa in Salzburg.",
+    3,
+    "Frühstück",
+    "Salzburg"
+  ),
+  "titisee-black-forest": stubDetail(
+    "titisee-black-forest",
+    "Schwarzwald-Auszeit mit Halbpension.",
+    4,
+    "Halbpension",
+    "Titisee"
+  ),
+  "split-adriatic-hotel": stubDetail(
+    "split-adriatic-hotel",
+    "Adria-Urlaub in Split mit Flug.",
+    6,
+    "Halbpension",
+    "Split"
+  ),
+  "mykonos-windmill-inn": stubDetail(
+    "mykonos-windmill-inn",
+    "Adults Only All Inclusive auf Mykonos.",
+    5,
+    "All Inclusive",
+    "Mykonos"
+  ),
+  "barcelona-ramblas-suites": stubDetail(
+    "barcelona-ramblas-suites",
+    "Zentrumsnah in Barcelona mit Frühstück.",
+    3,
+    "Frühstück",
+    "Barcelona"
+  ),
+  "rome-trastevere-boutique": stubDetail(
+    "rome-trastevere-boutique",
+    "Boutique-Hotel nahe der Altstadt von Rom.",
+    4,
+    "Frühstück",
+    "Rom"
+  ),
+  "tirol-ski-chalet": stubDetail(
+    "tirol-ski-chalet",
+    "Skiurlaub in Tirol mit Halbpension.",
+    5,
+    "Halbpension",
+    "Innsbruck"
+  ),
+  "usedom-beach-hotel": stubDetail(
+    "usedom-beach-hotel",
+    "Ostsee-Urlaub auf Usedom.",
+    4,
+    "Halbpension",
+    "Usedom"
+  ),
+  "korfu-olive-grove": stubDetail(
+    "korfu-olive-grove",
+    "All Inclusive unter Olivenbäumen auf Korfu.",
+    7,
+    "All Inclusive",
+    "Korfu"
+  ),
+  "ibiza-sunset-resort": stubDetail(
+    "ibiza-sunset-resort",
+    "Adults Only Sunset-Resort auf Ibiza.",
+    6,
+    "All Inclusive",
+    "Ibiza"
+  ),
+  "vienna-ringstrasse-hotel": stubDetail(
+    "vienna-ringstrasse-hotel",
+    "Stadt-Hotel an der Wiener Ringstraße.",
+    3,
+    "Frühstück",
+    "Wien"
+  ),
+  "naples-vesuvius-view": stubDetail(
+    "naples-vesuvius-view",
+    "Neapel mit Blick Richtung Vesuv.",
+    5,
+    "Halbpension",
+    "Neapel"
+  ),
+  "amsterdam-canal-house": stubDetail(
+    "amsterdam-canal-house",
+    "Canal-Haus-Feeling in Amsterdam.",
+    3,
+    "Frühstück",
+    "Amsterdam"
+  ),
+  "berlin-mitte-design": stubDetail(
+    "berlin-mitte-design",
+    "Design-Hotel in Berlin-Mitte.",
+    3,
+    "Frühstück",
+    "Berlin"
+  ),
+  "hurghada-coral-bay": stubDetail(
+    "hurghada-coral-bay",
+    "Korallenbucht All Inclusive in Hurghada.",
+    7,
+    "All Inclusive",
+    "Hurghada"
+  ),
+  "suedtirol-dolomiten-lodge": stubDetail(
+    "suedtirol-dolomiten-lodge",
+    "Dolomiten-Lodge mit Wellness.",
+    5,
+    "Halbpension",
+    "Seiser Alm"
+  ),
+  "dubrovnik-cliffside": stubDetail(
+    "dubrovnik-cliffside",
+    "Cliffside Resort über Dubrovnik.",
+    5,
+    "All Inclusive",
+    "Dubrovnik"
+  ),
+  "zakynthos-lagoon-resort": stubDetail(
+    "zakynthos-lagoon-resort",
+    "Lagunen-Resort auf Zakynthos.",
+    7,
+    "All Inclusive",
+    "Zakynthos"
+  ),
+  "tenerife-costa-adeje": stubDetail(
+    "tenerife-costa-adeje",
+    "Costa Adeje All Inclusive auf Teneriffa.",
+    7,
+    "All Inclusive",
+    "Teneriffa"
+  ),
+  "gardasee-limone-hotel": stubDetail(
+    "gardasee-limone-hotel",
+    "Halbpension in Limone am Gardasee.",
+    5,
+    "Halbpension",
+    "Limone"
+  ),
+  "marsa-alam-red-sea": stubDetail(
+    "marsa-alam-red-sea",
+    "Rotes Meer All Inclusive in Marsa Alam.",
+    7,
+    "All Inclusive",
+    "Marsa Alam"
+  ),
+  "kitzbuehel-alpin-spa": stubDetail(
+    "kitzbuehel-alpin-spa",
+    "Ski & Spa in Kitzbühel.",
+    4,
+    "Halbpension",
+    "Kitzbühel"
+  ),
+  "makarska-riviera-hotel": stubDetail(
+    "makarska-riviera-hotel",
+    "Riviera-Hotel in Makarska.",
+    6,
+    "Halbpension",
+    "Makarska"
+  ),
+  "munich-altstadt-suites": stubDetail(
+    "munich-altstadt-suites",
+    "Suiten in der Münchner Altstadt.",
+    3,
+    "Frühstück",
+    "München"
+  ),
+  "lisbon-alfama-boutique": stubDetail(
+    "lisbon-alfama-boutique",
+    "Boutique-Hotel in Lissabon-Alfama.",
+    4,
+    "Frühstück",
+    "Lissabon"
+  ),
+  "rhodos-faliraki-beach": stubDetail(
+    "rhodos-faliraki-beach",
+    "Strandhotel in Faliraki auf Rhodos.",
+    7,
+    "Halbpension",
+    "Faliraki"
+  ),
+  "meran-therme-palace": stubDetail(
+    "meran-therme-palace",
+    "Therme & Palace in Meran.",
+    4,
+    "Halbpension",
+    "Meran"
+  ),
+};
+
+Object.assign(offerDetails, EXTRA_OFFER_DETAILS);

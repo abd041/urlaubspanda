@@ -25,6 +25,7 @@ import { OfferClickTracker } from "@/components/offer/OfferClickTracker";
 import { PriceSidebar } from "@/components/offer/PriceSidebar";
 import { SITE_URL } from "@/lib/site";
 import { OfferBreadcrumb } from "@/components/offer/OfferBreadcrumb";
+import { OfferOpenAtTop } from "@/components/offer/OfferOpenAtTop";
 
 function getOffer(slug: string) {
   const deal = deals.find((d) => d.slug === slug);
@@ -91,6 +92,7 @@ export default async function OfferPage({ params }: PageProps<"/angebot/[slug]">
 
       <MobileStickyCta deal={deal} detail={detail} />
       <OfferClickTracker dealId={deal.id} />
+      <OfferOpenAtTop />
 
       <OfferBreadcrumb
         country={deal.destinationCountry}

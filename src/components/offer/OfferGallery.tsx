@@ -74,9 +74,9 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
 
   return (
     <>
-      {/* Mobile — compact crop; swipe or arrow buttons only (no tap-to-enlarge) */}
+      {/* Mobile — Booking-style landscape (~4:3), between old tall crop and 220px */}
       <div
-        className="relative -mx-4 h-[220px] w-[calc(100%+2rem)] touch-pan-y overflow-hidden bg-surface font-sans sm:-mx-6 sm:h-[240px] sm:w-[calc(100%+3rem)] lg:hidden"
+        className="relative -mx-4 aspect-[4/3] min-h-[250px] w-[calc(100%+2rem)] touch-pan-y overflow-hidden bg-surface font-sans sm:-mx-6 sm:aspect-[16/11] sm:min-h-[250px] sm:w-[calc(100%+3rem)] lg:hidden"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         role="group"

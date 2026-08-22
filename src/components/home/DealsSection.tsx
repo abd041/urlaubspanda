@@ -1,16 +1,17 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronDown, Loader2 } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Loader2 } from "lucide-react";
 import type { Deal } from "@/types";
 import { Container } from "@/components/layout/Container";
 import { DealGrid } from "@/components/home/DealGrid";
 import { useT } from "@/i18n/LocaleProvider";
+import { cn } from "@/lib/utils";
 import { easePremium, motion, useReducedMotion } from "@/components/motion/Reveal";
 import { getAllDealClickCounts, getServerDealClickCounts } from "@/lib/dealClicks";
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 30;
 
 type SortOption = "beliebtheit" | "rabatt" | "preis" | "bewertung";
 
@@ -50,6 +51,95 @@ function subscribeClicks(onStoreChange: () => void) {
   };
 }
 
+/** Custom sort menu — avoids native OS select styling / overflow. */
+function SortSelect({
+  value,
+  onChange,
+  options,
+}: {
+  value: SortOption;
+  onChange: (next: SortOption) => void;
+  options: { value: SortOption; label: string }[];
+}) {
+  const t = useT();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const current = options.find((option) => option.value === value) ?? options[0];
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  return (
+    <div ref={rootRef} className="relative min-w-0 flex-1 sm:min-w-[11.5rem] sm:flex-none">
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={t("deals.sort")}
+        onClick={() => setOpen((prev) => !prev)}
+        className={cn(
+          "flex h-10 w-full items-center justify-between gap-2 rounded-lg border bg-white py-2 pl-3 pr-2.5 text-left text-sm font-medium text-ink transition",
+          open
+            ? "border-brand-500 shadow-[0_0_0_3px_rgba(27,99,235,0.12)]"
+            : "border-[rgba(15,23,42,0.08)] hover:border-[rgba(15,23,42,0.16)]",
+          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+        )}
+      >
+        <span className="min-w-0 truncate">{current?.label}</span>
+        <ChevronDown
+          className={cn("h-4 w-4 shrink-0 text-muted transition-transform", open && "rotate-180")}
+          aria-hidden="true"
+        />
+      </button>
+
+      {open && (
+        <ul
+          role="listbox"
+          aria-label={t("deals.sort")}
+          className="absolute right-0 top-[calc(100%+0.35rem)] z-50 w-full min-w-full overflow-hidden rounded-xl border border-[rgba(15,23,42,0.08)] bg-white py-1 shadow-[0_12px_32px_rgba(15,26,43,0.14)]"
+        >
+          {options.map((option) => {
+            const selected = option.value === value;
+            return (
+              <li key={option.value} role="option" aria-selected={selected}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange(option.value);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition",
+                    selected
+                      ? "bg-[#F4F8FF] font-semibold text-brand-600"
+                      : "font-medium text-ink hover:bg-surface"
+                  )}
+                >
+                  <span className="min-w-0 truncate">{option.label}</span>
+                  {selected && <Check className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 interface DealsSectionProps {
   deals: Deal[];
   title?: string;
@@ -80,6 +170,11 @@ export function DealsSection({
 
   const visibleDeals = sortedDeals.slice(0, visibleCount);
   const remainingCount = sortedDeals.length - visibleDeals.length;
+
+  const sortOptions = useMemo(
+    () => sortOptionKeys.map((option) => ({ value: option.value, label: t(option.labelKey) })),
+    [t]
+  );
 
   function handleLoadMore() {
     setIsLoadingMore(true);
@@ -123,27 +218,11 @@ export function DealsSection({
             </p>
           </div>
 
-          <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end sm:pb-0.5">
-            <label className="flex min-w-0 flex-1 items-center gap-2.5 text-sm text-body sm:flex-none">
+          <div className="relative z-40 flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end sm:pb-0.5">
+            <div className="flex min-w-0 flex-1 items-center gap-2.5 text-sm text-body sm:flex-none">
               <span className="shrink-0">{t("deals.sort")}</span>
-              <span className="relative min-w-0 flex-1 sm:min-w-44">
-                <select
-                  value={sort}
-                  onChange={(event) => setSort(event.target.value as SortOption)}
-                  className="h-10 w-full appearance-none rounded-lg border border-[rgba(15,23,42,0.08)] bg-white py-2 pl-3 pr-9 text-sm font-medium text-ink transition focus:border-brand-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-brand-500"
-                >
-                  {sortOptionKeys.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {t(option.labelKey)}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink"
-                  aria-hidden="true"
-                />
-              </span>
-            </label>
+              <SortSelect value={sort} onChange={setSort} options={sortOptions} />
+            </div>
 
             {allDealsHref && (
               <Link
@@ -157,7 +236,7 @@ export function DealsSection({
           </div>
         </div>
 
-        <div className="mt-4 sm:mt-5">
+        <div className="relative z-0 mt-4 sm:mt-5">
           <DealGrid deals={visibleDeals} emptyTitle={emptyTitle} emptyDescription={emptyDescription} />
         </div>
 

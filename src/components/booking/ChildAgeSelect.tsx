@@ -2,7 +2,8 @@
 
 import { useT } from "@/i18n/LocaleProvider";
 
-const AGE_OPTIONS = Array.from({ length: 12 }, (_, age) => age);
+/** Ages 0–17 (under 18). Exact age is confirmed at checkout. */
+const AGE_OPTIONS = Array.from({ length: 18 }, (_, age) => age);
 
 interface ChildAgeSelectProps {
   index: number;

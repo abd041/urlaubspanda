@@ -42,8 +42,8 @@ export function CounterStepper({
           </span>
         )}
         <div className="min-w-0 overflow-hidden">
-          <p className="truncate text-sm font-semibold leading-tight text-ink">{label}</p>
-          {sublabel && <p className="truncate text-xs leading-snug text-muted">{sublabel}</p>}
+          <p className="text-sm font-semibold leading-tight text-ink">{label}</p>
+          {sublabel && <p className="text-xs leading-snug text-muted">{sublabel}</p>}
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">

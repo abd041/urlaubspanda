@@ -10,6 +10,8 @@ const defaultChildPricingRules: ChildPricingRule[] = [
   { id: "infant", minAge: 0, maxAge: 1.9, type: "free" },
   { id: "child", minAge: 2, maxAge: 5.9, type: "percent", value: 50 },
   { id: "junior", minAge: 6, maxAge: 11.9, type: "percent", value: 25 },
+  /** Teens (12–17) priced like an extra adult traveler. */
+  { id: "teen", minAge: 12, maxAge: 17.9, type: "percent", value: 0 },
 ];
 
 /**

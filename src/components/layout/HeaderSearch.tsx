@@ -100,7 +100,7 @@ export function HeaderSearch({
     setOpen(false);
     setQuery("");
     onNavigate?.();
-    router.push(href);
+    router.push(href, { scroll: true });
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

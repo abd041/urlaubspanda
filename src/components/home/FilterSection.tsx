@@ -21,6 +21,7 @@ interface FilterSectionProps {
   toggle: (key: FilterKey) => void;
   remove: (key: FilterKey) => void;
   reset: () => void;
+  apply: (next: FilterKey[]) => void;
   /** Scoped subset of filters to display, e.g. destination-specific filters on country pages. Defaults to the full homepage set. */
   filterKeys?: FilterKey[];
 }
@@ -31,6 +32,7 @@ export function FilterSection({
   toggle,
   remove,
   reset,
+  apply,
   filterKeys = HOMEPAGE_FILTER_KEYS,
 }: FilterSectionProps) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -43,7 +45,7 @@ export function FilterSection({
     <section
       id="filters"
       aria-labelledby="reisearten-heading"
-      className="scroll-mt-24 py-3 sm:py-4 lg:py-5"
+      className="scroll-mt-28 py-3 sm:py-4 lg:py-5 sm:scroll-mt-32"
     >
       <Container>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
@@ -70,7 +72,7 @@ export function FilterSection({
         </div>
 
         {/* Mobile: full horizontal carousel of all filters. Desktop: wrap grid. */}
-        <div className="mt-4 sm:mt-5">
+        <div id="filter-chips" className="mt-4 scroll-mt-24 sm:mt-5 sm:scroll-mt-28">
           <div className="no-scrollbar flex snap-x-mandatory gap-3 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
             {visibleOptions.map((option) => (
               <FilterChip
@@ -145,10 +147,8 @@ export function FilterSection({
       <FilterModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        isSelected={isSelected}
-        toggle={toggle}
-        reset={reset}
-        selectedCount={selected.length}
+        selected={selected}
+        onApply={apply}
         filterKeys={filterKeys}
       />
     </section>

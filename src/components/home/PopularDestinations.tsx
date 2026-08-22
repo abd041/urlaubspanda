@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { destinationsInDisplayOrder } from "@/data/destinations";
 import { Container } from "@/components/layout/Container";
 import { Carousel } from "@/components/ui/Carousel";
@@ -10,6 +11,42 @@ const orderedDestinations = destinationsInDisplayOrder();
 
 export function PopularDestinations() {
   const t = useT();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [arrowTopPx, setArrowTopPx] = useState<number | null>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const measure = () => {
+      const carousel = root.querySelector<HTMLElement>("[data-carousel-root]");
+      const image = root.querySelector<HTMLElement>("[data-carousel-item] > span:first-child");
+      if (!carousel || !image) return;
+      const carouselBox = carousel.getBoundingClientRect();
+      const imageBox = image.getBoundingClientRect();
+      // Midpoint of the photo, relative to the arrow positioning context.
+      setArrowTopPx(imageBox.top - carouselBox.top + imageBox.height / 2);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(root);
+    const image = root.querySelector<HTMLElement>("[data-carousel-item] > span:first-child");
+    if (image) ro.observe(image);
+    window.addEventListener("resize", measure);
+    const t1 = window.setTimeout(measure, 100);
+    const t2 = window.setTimeout(measure, 400);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, []);
+
+  const arrowTopClass =
+    arrowTopPx == null ? "top-[6rem]" : undefined;
+
   return (
     <section
       aria-labelledby="beliebte-reiseziele-heading"
@@ -24,20 +61,20 @@ export function PopularDestinations() {
         </h2>
       </Container>
 
-      {/* Match Container horizontal padding so first/last cards align with page edges. */}
-      <div className="relative mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8">
+      <div ref={rootRef} className="relative mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <Carousel
           className="min-w-0"
           ariaLabel={t("home.popularTitle")}
-          itemsPerPageDesktop={6}
+          itemsPerPageDesktop={5}
           showDots={false}
           overlayArrows
           overlayArrowsOnMobile
           alwaysShowOverlayArrows
-          overlayArrowClassName="top-1/2 h-9 w-9 border-0 bg-white text-brand-500 shadow-[0_6px_18px_rgba(15,26,43,0.12)] hover:bg-white hover:text-brand-600 disabled:opacity-30 [&_svg]:h-4 [&_svg]:w-4"
-          overlayPrevClassName="left-0"
-          overlayNextClassName="right-0"
-          trackClassName="gap-4 px-10 py-3 sm:gap-5 sm:px-11 lg:gap-5"
+          overlayArrowClassName={`${arrowTopClass ?? ""} -translate-y-1/2 h-11 w-11 border border-white/70 bg-white/90 text-ink shadow-[0_10px_30px_rgba(15,26,43,0.16),0_2px_6px_rgba(15,26,43,0.06)] backdrop-blur-md transition-all duration-300 ease-out hover:scale-[1.06] hover:border-white hover:bg-white hover:text-brand-500 hover:shadow-[0_14px_36px_rgba(15,26,43,0.2),0_4px_10px_rgba(15,26,43,0.08)] active:scale-[0.98] disabled:opacity-30 disabled:hover:scale-100 disabled:hover:text-ink [&_svg]:h-[1.15rem] [&_svg]:w-[1.15rem] [&_svg]:stroke-[1.75]`}
+          overlayArrowStyle={arrowTopPx != null ? { top: arrowTopPx } : undefined}
+          overlayPrevClassName="left-1.5 lg:-left-1"
+          overlayNextClassName="right-1.5 lg:-right-1"
+          trackClassName="gap-3 px-0 py-2 sm:gap-4 lg:gap-5"
         >
           {orderedDestinations.map((destination, index) => (
             <DestinationCard

@@ -8,6 +8,8 @@ import { organizationJsonLd, websiteJsonLd } from "@/lib/structuredData";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
 import { LOCALE_COOKIE, parseLocale } from "@/i18n/config";
+import { Suspense } from "react";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -67,6 +69,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full min-w-0 flex-col overflow-x-clip bg-background text-foreground">
         <LocaleProvider initialLocale={locale}>
+          <Suspense fallback={null}>
+            <ScrollToTop />
+          </Suspense>
           <JsonLd data={organizationJsonLd()} />
           <JsonLd data={websiteJsonLd()} />
           <Header />

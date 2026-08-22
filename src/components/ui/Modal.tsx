@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/i18n/LocaleProvider";
@@ -14,9 +15,9 @@ interface ModalProps {
 }
 
 /**
- * Shared bottom-sheet-on-mobile / centered-dialog-on-desktop chrome, reused
- * by the share and country-selection modals so backdrop, escape-key, focus
- * and scroll-lock behaviour only needs to be implemented once.
+ * Shared bottom-sheet-on-mobile / centered-dialog-on-desktop chrome.
+ * Portaled to `document.body` so it still works when opened from sticky /
+ * fixed bars (backdrop-filter / fixed parents otherwise trap `position: fixed`).
  */
 export function Modal({ open, onClose, children, ariaLabelledBy, className }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -36,10 +37,10 @@ export function Modal({ open, onClose, children, ariaLabelledBy, className }: Mo
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center">
       <button
         type="button"
         aria-label={t("offer.close")}
@@ -59,6 +60,7 @@ export function Modal({ open, onClose, children, ariaLabelledBy, className }: Mo
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

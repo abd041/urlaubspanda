@@ -78,7 +78,20 @@ export function MobilePriceSection({ deal, detail }: { deal: Deal; detail: Offer
         </p>
 
         <a
-          href="#beschreibung"
+          href="#was-wir-lieben"
+          onClick={(event) => {
+            event.preventDefault();
+            const el = document.getElementById("was-wir-lieben");
+            if (!el) return;
+            const header = document.querySelector("header");
+            const sticky = document.querySelector("[data-mobile-sticky-cta]");
+            const headerOffset =
+              (header?.getBoundingClientRect().height ?? 72) +
+              (sticky?.getBoundingClientRect().height ?? 0) +
+              8;
+            const top = window.scrollY + el.getBoundingClientRect().top - headerOffset;
+            window.scrollTo({ top: Math.max(0, Math.round(top)), behavior: "smooth" });
+          }}
           className="flex items-center justify-center gap-1 text-center text-sm font-medium text-brand-500 transition hover:text-brand-600"
         >
           {t("offer.moreInfo")}
@@ -88,7 +101,7 @@ export function MobilePriceSection({ deal, detail }: { deal: Deal; detail: Offer
 
       {/* Bullets: What we love + What’s included */}
       {(loveItems.length > 0 || includeItems.length > 0) && (
-        <div className="mt-6 space-y-5">
+        <div id="was-wir-lieben" className="mt-6 scroll-mt-28 space-y-5">
           {loveItems.length > 0 && (
             <div>
               <h3 className="text-base font-bold text-ink">{t("offer.whatWeLove")}</h3>
@@ -148,7 +161,10 @@ export function MobileStickyCta({ deal, detail }: { deal: Deal; detail: OfferDet
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 top-0 z-40 border-b border-line bg-white/95 px-4 py-2.5 shadow-[0_8px_24px_rgba(15,26,43,0.1)] backdrop-blur lg:hidden">
+    <div
+      data-mobile-sticky-cta
+      className="fixed inset-x-0 top-0 z-50 border-b border-line bg-white/95 px-4 py-2.5 shadow-[0_8px_24px_rgba(15,26,43,0.1)] backdrop-blur lg:hidden"
+    >
       <div className="mx-auto flex max-w-lg items-center gap-3">
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-medium text-ink">{deal.name}</p>

@@ -18,9 +18,16 @@ interface CountryTopDestinationsProps {
 }
 
 function scrollToFilters() {
-  window.requestAnimationFrame(() => {
-    document.getElementById("filters")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+  const run = () => {
+    const el = document.getElementById("filter-chips");
+    if (!el) return;
+    const header = document.querySelector("header");
+    const headerOffset = header?.getBoundingClientRect().height ?? 72;
+    const top = window.scrollY + el.getBoundingClientRect().top - headerOffset;
+    window.scrollTo({ top: Math.max(0, Math.round(top)), behavior: "smooth" });
+  };
+  // Clear Ort first (URL update), then scroll after layout settles.
+  window.setTimeout(run, 120);
 }
 
 /** “Top-Destinationen für {country}” — click filters deals by Ort, then scrolls to filters. */
@@ -42,7 +49,7 @@ export function CountryTopDestinations({
 
   return (
     <section
-      className="bg-surface pt-4 pb-1 sm:pt-5"
+      className="bg-surface pt-4 pb-8 sm:pt-5 sm:pb-10"
       aria-labelledby="country-top-destinations-heading"
     >
       <Container>
@@ -113,7 +120,7 @@ export function CountryTopDestinations({
           </Carousel>
         </div>
 
-        <div className="mt-5 flex justify-center sm:mt-6">
+        <div className="mt-6 flex justify-center pb-2 sm:mt-8 sm:pb-3">
           <button
             type="button"
             onClick={handleViewAllDeals}

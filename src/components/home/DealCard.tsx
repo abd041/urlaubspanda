@@ -42,7 +42,7 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
 
   return (
     <article
-      onClick={() => router.push(detailHref)}
+      onClick={() => router.push(detailHref, { scroll: true })}
       className="group/card flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#eeeef2] bg-white shadow-[0_8px_24px_rgba(15,26,43,0.08)] transition-[transform,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,26,43,0.12)]"
     >
       <DealImageSlider

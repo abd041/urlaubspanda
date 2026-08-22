@@ -75,7 +75,7 @@ export function DealsExplorer({
   sectionTitleKey,
   popularSpots,
 }: DealsExplorerProps) {
-  const { selected, isSelected, toggle, remove, reset, isMultiFilterQuery } =
+  const { selected, isSelected, toggle, remove, reset, apply, isMultiFilterQuery } =
     useFilterSelection({ destinationSlug });
   const { selectedOrt, toggleOrt, clearOrt } = useOrtFilter();
   const { locale } = useLocale();
@@ -118,11 +118,14 @@ export function DealsExplorer({
               type="button"
               onClick={() => {
                 clearOrt();
-                window.requestAnimationFrame(() => {
-                  document
-                    .getElementById("filters")
-                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                });
+                window.setTimeout(() => {
+                  const el = document.getElementById("filter-chips");
+                  if (!el) return;
+                  const header = document.querySelector("header");
+                  const headerOffset = header?.getBoundingClientRect().height ?? 72;
+                  const top = window.scrollY + el.getBoundingClientRect().top - headerOffset;
+                  window.scrollTo({ top: Math.max(0, Math.round(top)), behavior: "smooth" });
+                }, 120);
               }}
               className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 text-sm font-bold text-white shadow-[0_8px_20px_rgba(27,99,235,0.18)] transition hover:bg-brand-600"
             >
@@ -137,6 +140,7 @@ export function DealsExplorer({
         toggle={toggle}
         remove={remove}
         reset={reset}
+        apply={apply}
         filterKeys={filterKeys}
       />
       <DealsSection
@@ -151,6 +155,7 @@ export function DealsExplorer({
 }
 
 function noop() {}
+function noopApply(_next: FilterKey[]) {}
 
 export function DealsExplorerFallback({
   deals,
@@ -183,6 +188,7 @@ export function DealsExplorerFallback({
         toggle={noop}
         remove={noop}
         reset={noop}
+        apply={noopApply}
         filterKeys={filterKeys}
       />
       <DealsSection

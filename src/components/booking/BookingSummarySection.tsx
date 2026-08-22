@@ -126,11 +126,21 @@ export function BookingSummarySection({
           childAges: room.childAges,
           childPricingRules,
         });
-        const total =
-          baseStay.total +
-          (mealPlan?.supplementTotal ?? 0) +
-          (room.cancellationSelected ? offer.cancellation?.supplementTotal ?? 0 : 0);
-        return { roomIndex: i, category, offer, mealPlan, total, travelerCount: baseStay.travelerCount };
+        const mealSupplement = mealPlan?.supplementTotal ?? 0;
+        const cancellationSupplement = room.cancellationSelected ? offer.cancellation?.supplementTotal ?? 0 : 0;
+        const total = baseStay.total + mealSupplement + cancellationSupplement;
+        return {
+          roomIndex: i,
+          category,
+          offer,
+          mealPlan,
+          total,
+          travelerCount: baseStay.travelerCount,
+          perPerson: total / Math.max(baseStay.travelerCount, 1),
+          lines: baseStay.lines,
+          mealSupplement,
+          cancellationSupplement,
+        };
       }),
     [rooms, roomCategories, offers, arrival, nights, childPricingRules]
   );
@@ -681,38 +691,90 @@ export function BookingSummarySection({
         {/* Final price + terms + CTA */}
         <section className={cardClass}>
           <h2 className="text-lg font-extrabold tracking-tight text-ink">{t("booking.priceBreakdown")}</h2>
-          <ul className="mt-4 space-y-2.5 text-sm">
-            <li className="flex justify-between gap-3">
-              <span className="text-body">{t("booking.hotelPriceLine")}</span>
-              <span className="font-semibold tabular-nums text-ink">{priceFormatter.format(hotelPrice)} €</span>
-            </li>
-            {protectionFee > 0 && (
-              <li className="flex justify-between gap-3">
-                <span className="text-body">{t("booking.protectionLine")}</span>
-                <span className="font-semibold tabular-nums text-ink">{priceFormatter.format(protectionFee)} €</span>
-              </li>
-            )}
-            {parkingFee > 0 && (
-              <li className="flex justify-between gap-3">
-                <span className="text-body">{t("booking.extraParking")}</span>
-                <span className="font-semibold tabular-nums text-ink">{priceFormatter.format(parkingFee)} €</span>
-              </li>
-            )}
-            {flexFee > 0 && (
-              <li className="flex justify-between gap-3">
-                <span className="text-body">{t("booking.extraFlex")}</span>
-                <span className="font-semibold tabular-nums text-ink">{priceFormatter.format(flexFee)} €</span>
-              </li>
-            )}
+          <div className="mt-4 space-y-4">
             {validRows.map((row) => (
-              <li key={row.roomIndex} className="flex justify-between gap-3 border-t border-dashed border-line pt-2 text-xs text-muted">
-                <span>
+              <div key={row.roomIndex} className="rounded-xl border border-[#e8eaef] bg-[#f7f8fb] p-3.5 sm:p-4">
+                <p className="text-sm font-extrabold text-ink">
                   {t("booking.roomLine", { n: row.roomIndex + 1 })} · {tx(row.category.name, locale)}
-                </span>
-                <span className="tabular-nums">{priceFormatter.format(row.total)} €</span>
-              </li>
+                </p>
+                <ul className="mt-2.5 space-y-1.5 text-sm">
+                  {row.lines.map((line) => (
+                    <li key={`${line.kind}-${line.index}`} className="flex justify-between gap-3">
+                      <span className="text-body">
+                        {line.kind === "adult"
+                          ? t("booking.adultPriceLine", { n: line.index })
+                          : t("booking.childPriceLine", {
+                              n: line.index,
+                              age:
+                                line.age === 0
+                                  ? t("booking.underOne")
+                                  : t("booking.years", { n: line.age ?? 0 }),
+                            })}
+                      </span>
+                      <span className="shrink-0 font-semibold tabular-nums text-ink">
+                        {priceFormatter.format(line.amount)} €
+                      </span>
+                    </li>
+                  ))}
+                  {row.mealSupplement > 0 && row.mealPlan && (
+                    <li className="flex justify-between gap-3">
+                      <span className="text-body">{mealPlanLabel(row.mealPlan.label, locale)}</span>
+                      <span className="shrink-0 font-semibold tabular-nums text-ink">
+                        +{priceFormatter.format(row.mealSupplement)} €
+                      </span>
+                    </li>
+                  )}
+                  {row.cancellationSupplement > 0 && row.offer.cancellation && (
+                    <li className="flex justify-between gap-3">
+                      <span className="text-body">{tx(row.offer.cancellation.label, locale)}</span>
+                      <span className="shrink-0 font-semibold tabular-nums text-ink">
+                        +{priceFormatter.format(row.cancellationSupplement)} €
+                      </span>
+                    </li>
+                  )}
+                </ul>
+                <div className="mt-2.5 space-y-1 border-t border-dashed border-line pt-2.5 text-sm">
+                  <div className="flex justify-between gap-3">
+                    <span className="text-muted">{t("booking.roomPpLine")}</span>
+                    <span className="font-semibold tabular-nums text-ink">
+                      {priceFormatter.format(row.perPerson)} €
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <span className="font-bold text-ink">{t("booking.roomTotalLine")}</span>
+                    <span className="font-extrabold tabular-nums text-ink">
+                      {priceFormatter.format(row.total)} €
+                    </span>
+                  </div>
+                </div>
+              </div>
             ))}
-          </ul>
+
+            <ul className="space-y-2.5 text-sm">
+              {protectionFee > 0 && (
+                <li className="flex justify-between gap-3">
+                  <span className="text-body">{t("booking.protectionLine")}</span>
+                  <span className="font-semibold tabular-nums text-ink">
+                    {priceFormatter.format(protectionFee)} €
+                  </span>
+                </li>
+              )}
+              {parkingFee > 0 && (
+                <li className="flex justify-between gap-3">
+                  <span className="text-body">{t("booking.extraParking")}</span>
+                  <span className="font-semibold tabular-nums text-ink">
+                    {priceFormatter.format(parkingFee)} €
+                  </span>
+                </li>
+              )}
+              {flexFee > 0 && (
+                <li className="flex justify-between gap-3">
+                  <span className="text-body">{t("booking.extraFlex")}</span>
+                  <span className="font-semibold tabular-nums text-ink">{priceFormatter.format(flexFee)} €</span>
+                </li>
+              )}
+            </ul>
+          </div>
           <div className="mt-4 flex items-end justify-between gap-3 border-t border-line pt-4">
             <span className="text-base font-extrabold text-ink">{t("booking.totalPriceLabel")}</span>
             <span className="text-2xl font-extrabold tabular-nums text-ink">{formatEuro(totalPrice, locale)}</span>

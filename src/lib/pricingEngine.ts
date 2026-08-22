@@ -85,10 +85,41 @@ export interface StayPriceInput {
   childPricingRules: ChildPricingRule[];
 }
 
+export interface TravelerPriceLine {
+  kind: "adult" | "child";
+  /** 1-based index within that traveler kind (1. Adult, 2. Adult, 1. Child…). */
+  index: number;
+  /** Child age when `kind` is `"child"`. */
+  age?: number;
+  amount: number;
+}
+
 export interface StayPrice {
   total: number;
   perPerson: number;
   travelerCount: number;
+  /** Per-adult / per-child share of the room stay (before meal/cancellation supplements). */
+  lines: TravelerPriceLine[];
+}
+
+function averageNightRate(arrival: Date, nights: number, room: Pick<RoomCategoryDetail, "weekdayRate" | "weekendRate">) {
+  return calculateBaseRoomTotal(arrival, nights, room) / Math.max(nights, 1);
+}
+
+/** Adult cost pool (base room + extra-adult supplements), split evenly across adults. */
+function adultUnitPrice(
+  room: Pick<RoomCategoryDetail, "weekdayRate" | "weekendRate">,
+  arrival: Date,
+  nights: number,
+  adults: number
+): number {
+  const safeAdults = Math.max(adults, 1);
+  let adultPool = calculateBaseRoomTotal(arrival, nights, room);
+  const extraAdults = Math.max(adults - BASE_OCCUPANCY_ADULTS, 0);
+  if (extraAdults > 0) {
+    adultPool += extraAdults * nights * EXTRA_ADULT_FACTOR * averageNightRate(arrival, nights, room);
+  }
+  return adultPool / safeAdults;
 }
 
 /** Total + average-per-person price for one room's stay, given its current occupancy. */
@@ -100,24 +131,28 @@ export function calculateStayPrice({
   childAges,
   childPricingRules,
 }: StayPriceInput): StayPrice {
-  let total = calculateBaseRoomTotal(arrival, nights, room);
+  const adultPrice = adultUnitPrice(room, arrival, nights, adults);
+  const lines: TravelerPriceLine[] = [];
 
-  const extraAdults = Math.max(adults - BASE_OCCUPANCY_ADULTS, 0);
-  if (extraAdults > 0) {
-    total += extraAdults * nights * EXTRA_ADULT_FACTOR * averageNightRate(arrival, nights, room);
+  for (let i = 0; i < adults; i++) {
+    lines.push({ kind: "adult", index: i + 1, amount: adultPrice });
   }
 
-  for (const age of childAges) {
-    total += calculateChildTotal(age, arrival, nights, room, childPricingRules);
+  for (let i = 0; i < childAges.length; i++) {
+    const age = childAges[i];
+    lines.push({
+      kind: "child",
+      index: i + 1,
+      age,
+      amount: calculateChildTotal(age, arrival, nights, room, childPricingRules),
+    });
   }
 
+  const total = lines.reduce((sum, line) => sum + line.amount, 0);
   const travelerCount = Math.max(adults + childAges.length, 1);
-  return { total, perPerson: total / travelerCount, travelerCount };
+  return { total, perPerson: total / travelerCount, travelerCount, lines };
 }
 
-function averageNightRate(arrival: Date, nights: number, room: Pick<RoomCategoryDetail, "weekdayRate" | "weekendRate">) {
-  return calculateBaseRoomTotal(arrival, nights, room) / Math.max(nights, 1);
-}
 
 /**
  * "Ab X € p.P." starting price for a given stay length, shown on the nights
@@ -186,6 +221,7 @@ export function calculateAggregateStayPrice(
 ): StayPrice {
   let total = 0;
   let travelerCount = 0;
+  const lines: TravelerPriceLine[] = [];
   for (const occupancy of rooms) {
     const stay = calculateStayPrice({
       room,
@@ -197,9 +233,10 @@ export function calculateAggregateStayPrice(
     });
     total += stay.total;
     travelerCount += occupancy.adults + occupancy.childAges.length;
+    lines.push(...stay.lines);
   }
   travelerCount = Math.max(travelerCount, 1);
-  return { total, perPerson: total / travelerCount, travelerCount };
+  return { total, perPerson: total / travelerCount, travelerCount, lines };
 }
 
 export function getCheapestRoom<T extends Pick<RoomCategoryDetail, "weekdayRate" | "weekendRate">>(

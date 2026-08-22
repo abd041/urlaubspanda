@@ -59,17 +59,18 @@ export function DestinationCard({
         href={destinationPath(destination.slug)}
         data-carousel-item
         className={cn(
-          "group flex w-[min(72vw,200px)] shrink-0 snap-start flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_8px_24px_rgba(15,26,43,0.06)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,26,43,0.10)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 sm:w-[200px]",
+          // Mobile/tablet ~1.5 cards (peek = swipe cue); desktop exactly 5.
+          "group flex w-[calc((100%-0.375rem)/1.5)] shrink-0 snap-start flex-col overflow-hidden rounded-[14px] bg-white shadow-[0_8px_24px_rgba(15,26,43,0.06)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,26,43,0.10)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 sm:w-[calc((100%-0.5rem)/1.5)] lg:w-[calc((100%-4*1.25rem)/5)]",
           className
         )}
       >
-        <span className="relative block h-[220px] w-full shrink-0 overflow-hidden">
+        <span className="relative block aspect-4/3 w-full shrink-0 overflow-hidden">
           <Image
             src={destination.image}
             alt={`${name} – ${tagline}`}
             fill
             quality={92}
-            sizes="240px"
+            sizes="(min-width: 1024px) 20vw, 68vw"
             priority={priority}
             className={cn(
               "destination-photo object-cover transition-transform duration-700 ease-in-out group-hover:scale-[1.03]",
@@ -77,12 +78,14 @@ export function DestinationCard({
             )}
           />
         </span>
-        <span className="flex flex-col px-5 pb-3.5 pt-4">
-          <span className="flex items-center gap-2">
+        <span className="flex flex-col px-3.5 pb-3 pt-2.5 sm:px-4 sm:pb-3.5 sm:pt-3">
+          <span className="flex items-center gap-1.5 sm:gap-2">
             <CountryFlag slug={destination.slug} name={name} />
-            <h3 className="text-[18px] font-bold leading-none tracking-tight text-ink">{name}</h3>
+            <h3 className="text-[15px] font-bold leading-none tracking-tight text-ink sm:text-[16px]">{name}</h3>
           </span>
-          <span className="mt-2.5 text-[16px] font-normal leading-[1.45] text-[#6B7280]">{tagline}</span>
+          <span className="mt-1.5 line-clamp-2 text-[13px] font-normal leading-snug text-[#6B7280] sm:mt-2 sm:text-[14px]">
+            {tagline}
+          </span>
         </span>
       </Link>
     );

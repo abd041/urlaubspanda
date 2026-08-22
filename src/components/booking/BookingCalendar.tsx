@@ -163,6 +163,7 @@ export function BookingCalendar({
   return (
     <div className="min-w-0 w-full max-w-full">
       <h2 className="text-sm font-bold text-ink">{t("booking.calendarTitle")}</h2>
+      <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t("booking.calendarText")}</p>
       <div className="mt-3 min-w-0 max-w-full overflow-hidden rounded-xl border-4 border-[#FDB919]">
         <div className="flex items-center gap-2 bg-[#FDB919] px-2 py-2 sm:px-3 sm:py-2.5">
           <button

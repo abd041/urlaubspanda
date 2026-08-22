@@ -45,21 +45,26 @@ export function OfferListSection({
     ? offers.filter((offer) => offer.roomCategoryId === selectedRoomCategoryId)
     : offers;
 
+  const dateParams = {
+    from: formatDateLocale(arrival, locale),
+    to: formatDateLocale(departure, locale),
+    duration: nightLabel(nights, locale),
+  };
+
   return (
     <div>
-      <h3 className="text-lg font-bold text-ink">{t("booking.step4")}</h3>
-      <p className="mt-1 text-sm text-muted">
-        {t("booking.step4Text", {
-          from: formatDateLocale(arrival, locale),
-          to: formatDateLocale(departure, locale),
-          duration: nightLabel(nights, locale),
-        })}
-      </p>
+      <h3 className="text-lg font-bold text-ink lg:hidden">{t("booking.step4Mobile")}</h3>
+      <h3 className="hidden text-lg font-bold text-ink lg:block">{t("booking.step4")}</h3>
+      <p className="mt-1 text-sm text-muted lg:hidden">{t("booking.step4TextMobile", dateParams)}</p>
+      <p className="mt-1 hidden text-sm text-muted lg:block">{t("booking.step4Text", dateParams)}</p>
 
       <div className="mt-4 space-y-3">
         {visibleOffers.length === 0 && (
           <p className="rounded-xl border border-dashed border-line p-6 text-center text-sm text-muted">
-            {t("booking.noOffer")} {t("booking.noOfferHint")}
+            <span className="lg:hidden">{t("booking.noOfferMobile")}</span>
+            <span className="hidden lg:inline">
+              {t("booking.noOffer")} {t("booking.noOfferHint")}
+            </span>
           </p>
         )}
         {visibleOffers.map((offer) => {

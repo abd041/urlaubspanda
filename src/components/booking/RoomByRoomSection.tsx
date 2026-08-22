@@ -22,6 +22,7 @@ interface RoomByRoomSectionProps {
  * more than one room was requested (spec: "Multiple Rooms"). Earlier rooms
  * collapse into a confirmed summary; only the room currently being
  * configured shows the full room-category + offer selection.
+ * Mobile skips step 3 (room category) and goes straight to offers.
  */
 export function RoomByRoomSection({ deal, config, booking }: RoomByRoomSectionProps) {
   const t = useT();
@@ -66,15 +67,17 @@ export function RoomByRoomSection({ deal, config, booking }: RoomByRoomSectionPr
                 {t("booking.roomOf", { n: index + 1, total: rooms.length })}
               </div>
             )}
-            <RoomCategorySection
-              roomCategories={config.roomCategories}
-              occupancy={room}
-              arrival={arrival}
-              nights={nights}
-              childPricingRules={config.childPricingRules}
-              selectedRoomCategoryId={room.roomCategoryId}
-              onSelect={(roomCategoryId) => setRoomCategory(index, roomCategoryId)}
-            />
+            <div className="hidden lg:block">
+              <RoomCategorySection
+                roomCategories={config.roomCategories}
+                occupancy={room}
+                arrival={arrival}
+                nights={nights}
+                childPricingRules={config.childPricingRules}
+                selectedRoomCategoryId={room.roomCategoryId}
+                onSelect={(roomCategoryId) => setRoomCategory(index, roomCategoryId)}
+              />
+            </div>
             <OfferListSection
               offers={config.offers}
               roomCategories={config.roomCategories}

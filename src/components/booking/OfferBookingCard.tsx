@@ -9,7 +9,7 @@ import type { RoomSelection } from "@/hooks/useBookingState";
 import { FavoriteButton } from "@/components/offer/FavoriteButton";
 import { ShareButton } from "@/components/offer/ShareButton";
 import { ProviderLogo } from "@/components/booking/ProviderLogo";
-import { PriceHierarchy } from "@/components/booking/PriceHierarchy";
+import { PriceBreakdown } from "@/components/booking/PriceBreakdown";
 import { cn } from "@/lib/utils";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { localeTag } from "@/i18n/config";
@@ -220,7 +220,20 @@ export function OfferBookingCard({
               className="h-8 gap-1 rounded-full px-2.5 py-0 text-xs shadow-none [&_svg]:h-3.5 [&_svg]:w-3.5"
             />
           </div>
-          <PriceHierarchy perPerson={perPerson} total={total} size="md" />
+          <PriceBreakdown
+            lines={baseStay.lines}
+            perPerson={perPerson}
+            extras={[
+              ...(mealSupplement > 0 && selectedMealPlan
+                ? [{ label: mealPlanLabel(selectedMealPlan.label, locale), amount: mealSupplement }]
+                : []),
+              ...(cancellationSupplement > 0 && offer.cancellation
+                ? [{ label: tx(offer.cancellation.label, locale), amount: cancellationSupplement }]
+                : []),
+            ]}
+            total={total}
+            size="md"
+          />
           <button
             type="button"
             onClick={() => setPriceDetailsOpen((v) => !v)}
@@ -230,24 +243,9 @@ export function OfferBookingCard({
             <Info className="h-3 w-3" aria-hidden="true" />
           </button>
           {priceDetailsOpen && (
-            <dl className="space-y-1 rounded-lg bg-surface px-3 py-2 text-xs text-body">
-              <div className="flex items-center justify-between gap-2">
-                <dt>{t("booking.nightsPersons", { count: baseStay.travelerCount })}</dt>
-                <dd className="font-semibold text-ink">{priceFormatter.format(baseStay.total)} €</dd>
-              </div>
-              {mealSupplement > 0 && (
-                <div className="flex items-center justify-between gap-2">
-                  <dt>{selectedMealPlan ? mealPlanLabel(selectedMealPlan.label, locale) : ""}</dt>
-                  <dd className="font-semibold text-ink">+{priceFormatter.format(mealSupplement)} €</dd>
-                </div>
-              )}
-              {cancellationSupplement > 0 && (
-                <div className="flex items-center justify-between gap-2">
-                  <dt>{offer.cancellation ? tx(offer.cancellation.label, locale) : ""}</dt>
-                  <dd className="font-semibold text-ink">+{priceFormatter.format(cancellationSupplement)} €</dd>
-                </div>
-              )}
-            </dl>
+            <p className="rounded-lg bg-surface px-3 py-2 text-xs leading-relaxed text-body">
+              {t("booking.calendarText")}
+            </p>
           )}
           <button
             type="button"
