@@ -5,7 +5,6 @@ import type { TouchEvent } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GalleryLightbox } from "@/components/offer/GalleryLightbox";
 import { useT } from "@/i18n/LocaleProvider";
 
 interface OfferGalleryProps {
@@ -18,13 +17,12 @@ interface OfferGalleryProps {
 const SWIPE_THRESHOLD_PX = 40;
 
 /**
- * Desktop: mosaic with clearly visible prev/next on the main image — browse
- * in place (no “Alle X Fotos” CTA). Mobile keeps a taller slider (req 10).
+ * Desktop: mosaic with prev/next on the main image — browse in place.
+ * Mobile: compact Booking-style crop, swipe-only (no tap / lightbox).
  */
 export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: OfferGalleryProps) {
   const t = useT();
   const [index, setIndex] = useState(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const desktopMainRef = useRef<HTMLDivElement>(null);
 
@@ -52,11 +50,6 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
     touchStartX.current = null;
   };
 
-  const openLightboxAt = (i: number) => {
-    setIndex(i);
-    setLightboxOpen(true);
-  };
-
   useEffect(() => {
     const node = desktopMainRef.current;
     if (!node || photoCount < 2) return;
@@ -81,9 +74,9 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
 
   return (
     <>
-      {/* Mobile — Booking-style taller crop + slim, low-contrast arrows */}
+      {/* Mobile — compact crop; swipe or arrow buttons only (no tap-to-enlarge) */}
       <div
-        className="relative -mx-4 aspect-[4/5] min-h-[280px] w-[calc(100%+2rem)] overflow-hidden bg-surface font-sans sm:-mx-6 sm:aspect-[5/6] sm:min-h-[320px] sm:w-[calc(100%+3rem)] lg:hidden"
+        className="relative -mx-4 h-[220px] w-[calc(100%+2rem)] touch-pan-y overflow-hidden bg-surface font-sans sm:-mx-6 sm:h-[240px] sm:w-[calc(100%+3rem)] lg:hidden"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         role="group"
@@ -91,15 +84,10 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
         aria-label={t("offer.imagesOf", { name: alt })}
       >
         {images.map((src, i) => (
-          <button
+          <div
             key={src}
-            type="button"
-            onClick={() => openLightboxAt(i)}
-            aria-label={t("offer.enlarge", { n: i + 1, total: displayTotal })}
-            className={cn(
-              "absolute inset-0",
-              i === index ? "opacity-100" : "pointer-events-none opacity-0"
-            )}
+            aria-hidden={i !== index}
+            className={cn("absolute inset-0 select-none", i === index ? "opacity-100" : "pointer-events-none opacity-0")}
           >
             <Image
               src={src}
@@ -107,9 +95,10 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
               fill
               sizes="100vw"
               priority={i === 0}
-              className="object-cover"
+              draggable={false}
+              className="pointer-events-none object-cover"
             />
-          </button>
+          </div>
         ))}
 
         {discountPercent > 0 && (
@@ -223,17 +212,6 @@ export function OfferGallery({ images, alt, discountPercent, totalPhotoCount }: 
           ))}
         </div>
       </div>
-
-      {lightboxOpen && (
-        <GalleryLightbox
-          images={images}
-          alt={alt}
-          index={index}
-          totalPhotoCount={displayTotal}
-          onIndexChange={setIndex}
-          onClose={() => setLightboxOpen(false)}
-        />
-      )}
     </>
   );
 }

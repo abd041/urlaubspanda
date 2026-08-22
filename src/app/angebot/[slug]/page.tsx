@@ -104,7 +104,7 @@ export default async function OfferPage({ params }: PageProps<"/angebot/[slug]">
       </Container>
 
       <Container className="mt-5 sm:mt-6">
-        <div className="flex flex-col gap-8 sm:gap-10">
+        <div className="flex flex-col gap-5 sm:gap-8 lg:gap-10">
           <OfferGallery
             images={deal.images}
             alt={deal.name}

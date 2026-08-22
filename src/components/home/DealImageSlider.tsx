@@ -146,13 +146,13 @@ export function DealImageSlider({
             <ChevronRight className="h-5 w-5" />
           </button>
 
-          <span className="absolute bottom-3 right-3 z-20 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-medium tabular-nums text-white">
+          <span className="absolute bottom-3 right-3 z-20 rounded-md bg-black/50 px-2 py-0.5 text-[10px] font-medium tabular-nums text-white">
             {index + 1} / {images.length}
           </span>
         </>
       )}
 
-      <span className="absolute bottom-3 left-3 z-20 rounded-full bg-black/55 px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-white">
+      <span className="absolute bottom-3 left-3 z-20 rounded-md bg-black/55 px-2.5 py-1 text-[11px] font-medium tracking-wide text-white">
         {provider}
       </span>
     </div>

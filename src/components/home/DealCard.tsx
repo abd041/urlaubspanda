@@ -13,13 +13,26 @@ import {
 } from "lucide-react";
 import type { Deal } from "@/types";
 import { DealImageSlider } from "@/components/home/DealImageSlider";
-import { ReviewBadge } from "@/components/home/ReviewBadge";
 import { PriceBlock } from "@/components/home/PriceBlock";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { mealPlanLabel, nightLabel, regionDisplay, tx } from "@/i18n/content";
 
 const chipClass =
   "inline-flex items-center gap-1.5 rounded-full bg-[#F1F5F9] px-2.5 py-1 text-[12px] font-medium text-ink";
+
+function FlightChipIcon({ included }: { included: boolean }) {
+  if (included) {
+    return <Plane className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" strokeWidth={1.6} />;
+  }
+  return (
+    <span className="relative inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center" aria-hidden="true">
+      <Plane className="h-3.5 w-3.5 text-muted" strokeWidth={1.6} />
+      <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <span className="h-px w-[120%] rotate-[-45deg] bg-muted" />
+      </span>
+    </span>
+  );
+}
 
 export function DealCard({ deal, priority = false }: { deal: Deal; priority?: boolean }) {
   const router = useRouter();
@@ -66,18 +79,7 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
           ))}
         </span>
 
-        {deal.reviewEnabled && (
-          <div className="mt-2.5">
-            <ReviewBadge
-              reviewPercent={deal.reviewPercent}
-              reviewScore={deal.reviewScore}
-              reviewMaxScore={deal.reviewMaxScore}
-              reviewCount={deal.reviewCount}
-            />
-          </div>
-        )}
-
-        <p className="mt-4 text-[13px] leading-relaxed text-body">{tx(deal.summary, locale)}</p>
+        <p className="mt-3 text-[13px] leading-relaxed text-body">{tx(deal.summary, locale)}</p>
 
         <dl className="mt-3.5 flex flex-wrap gap-1.5">
           <div className={chipClass}>
@@ -91,7 +93,7 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
             <dd>{mealPlanLabel(deal.mealPlan, locale)}</dd>
           </div>
           <div className={chipClass}>
-            <Plane className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" strokeWidth={1.6} />
+            <FlightChipIcon included={deal.flightIncluded} />
             <dt className="sr-only">{t("deal.flight")}</dt>
             <dd>{deal.flightIncluded ? t("deal.flightIncluded") : t("deal.noFlight")}</dd>
           </div>
@@ -102,7 +104,7 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
           {deal.dateRange}
         </p>
 
-        <div className="mt-auto border-t border-[rgba(15,23,42,0.06)] pt-4">
+        <div className="mt-auto border-t border-[rgba(15,23,42,0.08)] pt-4">
           <PriceBlock
             oldPrice={deal.oldPrice}
             currentPrice={deal.currentPrice}
@@ -111,10 +113,10 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
               <Link
                 href={detailHref}
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex h-9 shrink-0 items-center gap-1 rounded-lg bg-brand-500 px-3 text-[13px] font-semibold text-white shadow-sm transition hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+                className="inline-flex h-11 items-center gap-1.5 rounded-xl bg-brand-500 px-4 text-[13px] font-bold text-white shadow-[0_4px_14px_rgba(27,99,235,0.22)] transition hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 sm:px-5"
               >
                 {t("deal.viewOffer")}
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.25} />
               </Link>
             }
           />
