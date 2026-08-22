@@ -257,7 +257,7 @@ export function BookingSummarySection({
   }
 
   return (
-    <div className="pb-28 lg:pb-4">
+    <div className="pb-4">
       {/* Progress */}
       <ol className="mb-5 flex items-center overflow-x-auto rounded-2xl border border-[#e8eaef] bg-white px-4 py-3.5 shadow-[0_4px_16px_rgba(15,26,43,0.06)] sm:px-5">
         {steps.map((step, index) => {
@@ -805,37 +805,17 @@ export function BookingSummarySection({
 
           <button
             type="submit"
-            className="mt-5 hidden h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#1B63EB] text-sm font-bold text-white shadow-[0_8px_20px_rgba(27,99,235,0.22)] transition hover:bg-[#0F52D6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 lg:flex"
+            className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#1B63EB] text-sm font-bold text-white shadow-[0_8px_20px_rgba(27,99,235,0.22)] transition hover:bg-[#0F52D6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           >
             <ShieldCheck className="h-4 w-4" aria-hidden="true" />
             {t("booking.bookNow")}
           </button>
-          <p className="mt-3 hidden items-center justify-center gap-1.5 text-xs text-muted lg:flex">
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted">
             <Lock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             {t("booking.checkoutSecure")}
           </p>
         </section>
       </form>
-
-      {/* Mobile sticky book bar */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 px-4 py-3 shadow-[0_-8px_24px_rgba(15,26,43,0.1)] backdrop-blur lg:hidden pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        <div className="mx-auto flex max-w-lg items-center gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-extrabold tabular-nums text-ink">{formatEuro(totalPrice, locale)}</p>
-            <p className="truncate text-[11px] text-muted">
-              {t("booking.gesamtpreisLine", { price: priceFormatter.format(totalPrice) })}
-            </p>
-          </div>
-          <button
-            type="submit"
-            form="checkout-form"
-            className="inline-flex h-12 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#1B63EB] px-4 text-sm font-bold text-white shadow-[0_8px_20px_rgba(27,99,235,0.22)]"
-          >
-            <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-            {t("booking.bookNow")}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
