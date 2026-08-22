@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { Deal } from "@/types";
 import { DealImageSlider } from "@/components/home/DealImageSlider";
+import { ReviewBadge } from "@/components/home/ReviewBadge";
 import { PriceBlock } from "@/components/home/PriceBlock";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { mealPlanLabel, nightLabel, regionDisplay, tx } from "@/i18n/content";
@@ -78,6 +79,18 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
             <Star key={i} className="h-3.5 w-3.5 fill-star" aria-hidden="true" />
           ))}
         </span>
+
+        {deal.reviewEnabled && (
+          <div className="mt-2.5" onClick={(e) => e.stopPropagation()}>
+            <ReviewBadge
+              reviewPercent={deal.reviewPercent}
+              reviewScore={deal.reviewScore}
+              reviewMaxScore={deal.reviewMaxScore}
+              reviewCount={deal.reviewCount}
+              size="sm"
+            />
+          </div>
+        )}
 
         <p className="mt-3 text-[13px] leading-relaxed text-body">{tx(deal.summary, locale)}</p>
 

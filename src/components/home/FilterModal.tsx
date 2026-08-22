@@ -87,12 +87,12 @@ export function FilterModal({
             aria-modal="true"
             aria-labelledby="filter-modal-heading"
             tabIndex={-1}
-            className="relative flex max-h-[85vh] w-full flex-col rounded-t-3xl bg-white shadow-2xl outline-none sm:max-w-2xl sm:rounded-3xl"
+            className="relative flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl outline-none sm:max-w-2xl sm:rounded-3xl"
             initial={reduce ? { opacity: 1 } : { y: 28, scale: 0.98 }}
             animate={reduce ? { opacity: 1 } : { y: 0, scale: 1 }}
             transition={{ duration: reduce ? 0.15 : 0.4, ease: easePremium }}
           >
-            <div className="flex items-center justify-between border-b border-line px-5 py-4 sm:px-6">
+            <div className="flex shrink-0 items-center justify-between border-b border-line px-5 py-4 sm:px-6">
               <h2
                 id="filter-modal-heading"
                 className="flex items-center gap-2 text-lg font-semibold text-ink"
@@ -110,19 +110,21 @@ export function FilterModal({
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-3 overflow-y-auto px-5 py-5 sm:px-6">
-              {visibleOptions.map((option) => (
-                <FilterChip
-                  key={option.key}
-                  label={filterLabel(option.key, locale)}
-                  icon={option.icon}
-                  selected={draft.includes(option.key)}
-                  onToggle={() => toggleDraft(option.key)}
-                />
-              ))}
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+              <div className="flex flex-wrap gap-3">
+                {visibleOptions.map((option) => (
+                  <FilterChip
+                    key={option.key}
+                    label={filterLabel(option.key, locale)}
+                    icon={option.icon}
+                    selected={draft.includes(option.key)}
+                    onToggle={() => toggleDraft(option.key)}
+                  />
+                ))}
+              </div>
             </div>
 
-            <div className="flex items-center justify-between gap-3 border-t border-line px-5 py-4 sm:px-6">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-t border-line bg-white px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
               <button
                 type="button"
                 onClick={() => setDraft([])}

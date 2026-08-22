@@ -862,7 +862,7 @@ export const messages = {
       showAll: "Show all filters",
       close: "Close filters",
       reset: "Reset all",
-      apply: "Show",
+      apply: "Show results",
       applyCount: "Show results ({count})",
       remove: "Remove filter {label}",
       "mit-flug": "With flight",
