@@ -56,11 +56,11 @@ export function NightsSelector({
                 "flex min-h-11 min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-lg border px-1.5 py-2.5 text-center transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:px-2 sm:py-3",
                 selected
                   ? "border-[#FDB919] bg-[#FDB919] text-ink shadow-sm"
-                  : "border border-line bg-white text-body hover:border-[#FDB919]/60"
+                  : "border border-line bg-white text-ink hover:border-[#FDB919]/60"
               )}
             >
-              <span className="text-xs font-bold leading-snug sm:text-sm">{nightLabel(n, locale)}</span>
-              <span className={cn("text-xs leading-snug", selected ? "text-ink/70" : "text-muted")}>
+              <span className="text-xs font-bold leading-snug text-ink sm:text-sm">{nightLabel(n, locale)}</span>
+              <span className="text-xs leading-snug text-ink">
                 {t("booking.fromPrice", {
                   price: Math.round(perPerson).toLocaleString(localeTag(locale)),
                 })}

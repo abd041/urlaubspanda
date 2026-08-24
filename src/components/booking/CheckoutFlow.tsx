@@ -21,6 +21,7 @@ export function CheckoutFlow({ deal, config }: CheckoutFlowProps) {
   const t = useT();
   const query = searchParams.toString();
   const hotelHref = `/hotel/${deal.slug}${query ? `?${query}` : ""}`;
+  const offerHref = `/angebot/${deal.slug}`;
   const ready = Boolean(booking.arrival) && booking.allRoomsConfirmed;
 
   useEffect(() => {
@@ -30,7 +31,7 @@ export function CheckoutFlow({ deal, config }: CheckoutFlowProps) {
   if (!booking.arrival || !ready) {
     return (
       <main className="min-h-screen bg-surface">
-        <div className="mx-auto w-[calc(100%-2rem)] max-w-[1240px] animate-pulse py-10 sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)]">
+        <div className="mx-auto w-[calc(100%-2rem)] max-w-[840px] animate-pulse py-10 sm:w-[calc(100%-3rem)]">
           <div className="h-64 rounded-2xl bg-white shadow-sm" />
         </div>
       </main>
@@ -38,18 +39,18 @@ export function CheckoutFlow({ deal, config }: CheckoutFlowProps) {
   }
 
   return (
-    <main className="w-full min-w-0 overflow-x-clip bg-surface pb-8 lg:pb-16">
-      <div className="mx-auto w-[calc(100%-2rem)] max-w-[1240px] pt-4 sm:w-[calc(100%-3rem)] sm:pt-6 lg:w-[calc(100%-4rem)]">
+    <main className="w-full min-w-0 overflow-x-clip bg-surface pb-8 lg:pb-12">
+      <div className="mx-auto w-[calc(100%-2rem)] max-w-[840px] pt-4 sm:w-[calc(100%-3rem)] sm:pt-5">
         <Link
-          href={hotelHref}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-body transition hover:text-brand-500"
+          href={offerHref}
+          className="inline-flex items-center gap-1 text-sm font-medium text-brand-500 transition hover:text-brand-600"
         >
           <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
-          {t("booking.backToRooms")}
+          {t("booking.backToOfferList")}
         </Link>
       </div>
 
-      <div className="mx-auto mt-5 w-[calc(100%-2rem)] max-w-[1240px] sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)]">
+      <div className="mx-auto mt-4 w-[calc(100%-2rem)] max-w-[840px] sm:mt-5 sm:w-[calc(100%-3rem)]">
         <BookingSummarySection
           deal={deal}
           rooms={booking.rooms}
@@ -58,6 +59,8 @@ export function CheckoutFlow({ deal, config }: CheckoutFlowProps) {
           arrival={booking.arrival}
           nights={booking.nights}
           childPricingRules={config.childPricingRules}
+          offerHref={offerHref}
+          addons={config.addons ?? []}
         />
       </div>
     </main>

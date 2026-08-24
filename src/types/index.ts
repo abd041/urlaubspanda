@@ -307,6 +307,23 @@ export interface BookingOffer {
 }
 
 /**
+ * Optional paid add-on shown in checkout Part 5.
+ * Configured per offer (frontend stand-in for admin / backend later).
+ */
+export interface CheckoutAddon {
+  id: string;
+  name: string;
+  /** Short helper text under the name. */
+  description?: string;
+  /** Unit price in EUR. */
+  price: number;
+  /** When true, customer can choose a quantity (default 1). */
+  allowQuantity?: boolean;
+  /** Upper bound when `allowQuantity` is true (default 5). */
+  maxQuantity?: number;
+}
+
+/**
  * Full booking-flow configuration for one hotel, keyed by `Deal.slug`. In
  * production this would be assembled by the pricing/availability service
  * described in the booking-flow spec (manual data now, external APIs
@@ -319,4 +336,10 @@ export interface HotelBookingConfig {
   childPricingRules: ChildPricingRule[];
   roomCategories: RoomCategoryDetail[];
   offers: BookingOffer[];
+  /**
+   * Optional checkout add-ons for this offer (“Brauchst du noch etwas?”).
+   * Admin/backend will configure these per deal later. Empty / omitted →
+   * the add-ons section is hidden for that checkout.
+   */
+  addons?: CheckoutAddon[];
 }

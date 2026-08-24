@@ -3,6 +3,18 @@
 import { useLayoutEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
+const FILTER_SEGMENT_RE =
+  /\/(mit-flug|all-inclusive|direkte-strandlage|adults-only|familienhotel|thermenurlaub|wellness|urlaub-am-see|urlaub-am-meer|in-den-bergen|skiurlaub|ab-85-weiterempfehlung|fruehbucher|last-minute|zentrale-lage)$/;
+
+function stripFilterSegment(path: string) {
+  return path.replace(FILTER_SEGMENT_RE, "") || "/";
+}
+
+/** Same country/category landing, only the SEO filter segment changed. */
+function isFilterToggleNavigation(prev: string, next: string) {
+  return stripFilterSegment(prev) === stripFilterSegment(next);
+}
+
 function resetWindowScroll() {
   if (typeof window === "undefined") return;
   // Keep intentional hash / in-page anchors.
@@ -22,6 +34,7 @@ function resetWindowScroll() {
 /**
  * New pages (including offer pages) always start at the top.
  * Query-only updates do not reset scroll.
+ * Country filter path toggles (/kroatien ↔ /kroatien/all-inclusive) keep scroll.
  */
 export function ScrollToTop() {
   const pathname = usePathname();
@@ -32,6 +45,7 @@ export function ScrollToTop() {
     previousPathname.current = pathname;
 
     if (prev === null || prev === pathname) return;
+    if (isFilterToggleNavigation(prev, pathname)) return;
 
     resetWindowScroll();
 

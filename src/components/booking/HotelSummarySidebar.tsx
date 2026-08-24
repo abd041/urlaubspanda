@@ -1,14 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { CalendarRange, Car, Check, Lock, MapPin, Plane, Star, Users } from "lucide-react";
+import { CalendarRange, Car, Lock, MapPin, Plane, Star, Users } from "lucide-react";
 import type { ComponentType } from "react";
 import type { Deal, HotelBookingConfig } from "@/types";
 import type { RoomSelection } from "@/hooks/useBookingState";
 import { FavoriteButton } from "@/components/offer/FavoriteButton";
 import { ReviewBadge } from "@/components/home/ReviewBadge";
-import { localeTag } from "@/i18n/config";
+import { FreeCancellationBadge } from "@/components/booking/FreeCancellationBadge";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
+import { localeTag } from "@/i18n/config";
 import { countryDisplayName, nightLabel, tx } from "@/i18n/content";
 
 interface HotelSummarySidebarProps {
@@ -127,12 +128,7 @@ export function HotelSummarySidebar({
             <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-black" aria-hidden="true" />
             {t("booking.lockPrices")}
           </p>
-          <p className="flex items-start gap-2 rounded-lg bg-[#EAF8F0] px-2.5 py-2 text-xs leading-snug text-success">
-            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" aria-hidden="true" strokeWidth={2.4} />
-            <span>
-              <span className="font-bold">{t("booking.cancelFree")}</span> {t("booking.cancelFreeUntil")}
-            </span>
-          </p>
+          <FreeCancellationBadge arrival={arrival} size="sm" />
         </div>
       </div>
     </div>

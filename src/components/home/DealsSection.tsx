@@ -10,21 +10,30 @@ import { useT } from "@/i18n/LocaleProvider";
 import { cn } from "@/lib/utils";
 import { easePremium, motion, useReducedMotion } from "@/components/motion/Reveal";
 import { getAllDealClickCounts, getServerDealClickCounts } from "@/lib/dealClicks";
+import { deals as catalogDeals } from "@/data/deals";
 
 const PAGE_SIZE = 30;
 
-type SortOption = "beliebtheit" | "rabatt" | "preis" | "bewertung";
+type SortOption = "neueste" | "beliebtheit" | "rabatt" | "preis" | "bewertung";
 
 const sortOptionKeys: { value: SortOption; labelKey: string }[] = [
+  { value: "neueste", labelKey: "deals.sortNewest" },
   { value: "beliebtheit", labelKey: "deals.sortPopularity" },
   { value: "rabatt", labelKey: "deals.sortDiscount" },
   { value: "preis", labelKey: "deals.sortPrice" },
   { value: "bewertung", labelKey: "deals.sortRating" },
 ];
 
+/** Catalog order in `deals.ts` — no createdAt field exists; later entries = newer mock offers. */
+const catalogIndex = new Map(catalogDeals.map((deal, index) => [deal.id, index]));
+
 function sortDeals(deals: Deal[], sort: SortOption, clicks: Record<string, number>): Deal[] {
   const sorted = [...deals];
   switch (sort) {
+    case "neueste":
+      return sorted.sort(
+        (a, b) => (catalogIndex.get(b.id) ?? 0) - (catalogIndex.get(a.id) ?? 0)
+      );
     case "rabatt":
       return sorted.sort((a, b) => b.discountPercent - a.discountPercent);
     case "preis":
@@ -158,7 +167,7 @@ export function DealsSection({
   const t = useT();
   const reduce = useReducedMotion();
   const heading = title ?? t("home.dealsTitle");
-  const [sort, setSort] = useState<SortOption>("beliebtheit");
+  const [sort, setSort] = useState<SortOption>("neueste");
   const clicks = useSyncExternalStore(subscribeClicks, getAllDealClickCounts, getServerDealClickCounts);
   const sortedDeals = useMemo(() => sortDeals(deals, sort, clicks), [deals, sort, clicks]);
 

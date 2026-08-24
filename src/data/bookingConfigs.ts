@@ -1,4 +1,4 @@
-import type { ChildPricingRule, Deal, HotelBookingConfig, RoomCategoryDetail } from "@/types";
+import type { ChildPricingRule, CheckoutAddon, Deal, HotelBookingConfig, RoomCategoryDetail } from "@/types";
 import { deals } from "@/data/deals";
 
 /**
@@ -14,6 +14,56 @@ const defaultChildPricingRules: ChildPricingRule[] = [
   { id: "teen", minAge: 12, maxAge: 17.9, type: "percent", value: 0 },
 ];
 
+/** Sample per-offer add-ons (frontend stand-in for admin configuration). */
+const rewayaAddons: CheckoutAddon[] = [
+  {
+    id: "parking",
+    name: "Parkplatz am Hotel",
+    description: "Gesicherter Parkplatz für die gesamte Aufenthaltsdauer.",
+    price: 39,
+  },
+  {
+    id: "airport-transfer",
+    name: "Flughafentransfer",
+    description: "Hin- und Rücktransfer vom Flughafen zum Hotel.",
+    price: 89,
+    allowQuantity: true,
+    maxQuantity: 4,
+  },
+  {
+    id: "late-checkout",
+    name: "Late Check-out",
+    description: "Zimmer bis 16:00 Uhr behalten (nach Verfügbarkeit).",
+    price: 45,
+  },
+  {
+    id: "spa",
+    name: "Spa / Wellness-Paket",
+    description: "Zugang zum Spa-Bereich inkl. Sauna und Ruhezone.",
+    price: 69,
+    allowQuantity: true,
+    maxQuantity: 4,
+  },
+];
+
+/** Smaller default set for generated configs — some deals intentionally get none. */
+const defaultAddons: CheckoutAddon[] = [
+  {
+    id: "parking",
+    name: "Parkplatz am Hotel",
+    description: "Optional buchbar für die gesamte Aufenthaltsdauer.",
+    price: 29,
+  },
+  {
+    id: "airport-transfer",
+    name: "Flughafentransfer",
+    description: "Einmaliger Transfer vom Flughafen zum Hotel.",
+    price: 59,
+    allowQuantity: true,
+    maxQuantity: 3,
+  },
+];
+
 /**
  * Full hand-authored booking config for Rewaya Luxury Resort, matching the
  * approved desktop/mobile mockups (room categories, prices, offers, meal
@@ -24,6 +74,7 @@ const rewayaBookingConfig: HotelBookingConfig = {
   minStayNights: 2,
   maxStayNights: 7,
   childPricingRules: defaultChildPricingRules,
+  addons: rewayaAddons,
   roomCategories: [
     {
       id: "doppelzimmer-balkon",
@@ -222,6 +273,8 @@ function generateDefaultBookingConfig(deal: Deal): HotelBookingConfig {
     minStayNights: 2,
     maxStayNights: 7,
     childPricingRules: defaultChildPricingRules,
+    // Roughly every 3rd deal has no add-ons → section stays hidden (admin-empty case).
+    addons: deal.slug.length % 3 === 0 ? [] : defaultAddons,
     roomCategories: [standard, superior],
     offers: [
       {

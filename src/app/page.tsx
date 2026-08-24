@@ -13,8 +13,8 @@ export default function Home() {
       <JsonLd data={dealsItemListJsonLd(deals)} />
       <HomeHero />
       <PopularDestinations />
-      <Suspense fallback={<DealsExplorerFallback deals={deals} />}>
-        <DealsExplorer deals={deals} />
+      <Suspense fallback={<DealsExplorerFallback deals={deals} showAllDealsLink={false} />}>
+        <DealsExplorer deals={deals} showAllDealsLink={false} />
       </Suspense>
       <TrustStrip />
     </main>

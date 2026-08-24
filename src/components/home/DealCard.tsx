@@ -14,9 +14,11 @@ import {
 import type { Deal } from "@/types";
 import { DealImageSlider } from "@/components/home/DealImageSlider";
 import { ReviewBadge } from "@/components/home/ReviewBadge";
+import { FreeCancellationBadge } from "@/components/booking/FreeCancellationBadge";
 import { PriceBlock } from "@/components/home/PriceBlock";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { mealPlanLabel, nightLabel, regionDisplay, tx } from "@/i18n/content";
+import { hasFreeCancellation } from "@/lib/freeCancellation";
 
 const chipClass =
   "inline-flex items-center gap-1.5 rounded-full bg-[#F1F5F9] px-2.5 py-1 text-[12px] font-medium text-ink";
@@ -89,6 +91,12 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
               reviewCount={deal.reviewCount}
               size="sm"
             />
+          </div>
+        )}
+
+        {hasFreeCancellation() && (
+          <div className="mt-2.5">
+            <FreeCancellationBadge variant="inline" size="sm" />
           </div>
         )}
 

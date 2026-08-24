@@ -8,6 +8,7 @@ import { Container } from "@/components/layout/Container";
 import { Carousel } from "@/components/ui/Carousel";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { tx } from "@/i18n/content";
+import { scrollToOffersFiltersHeadline } from "@/lib/scrollToOffersFilters";
 
 interface CountryTopDestinationsProps {
   countryName: string;
@@ -15,28 +16,17 @@ interface CountryTopDestinationsProps {
   selectedOrt: string | null;
   onSelectOrt: (ort: string) => void;
   onClearOrt: () => void;
+  showViewAllDeals?: boolean;
 }
 
-function scrollToFilters() {
-  const run = () => {
-    const el = document.getElementById("filter-chips");
-    if (!el) return;
-    const header = document.querySelector("header");
-    const headerOffset = header?.getBoundingClientRect().height ?? 72;
-    const top = window.scrollY + el.getBoundingClientRect().top - headerOffset;
-    window.scrollTo({ top: Math.max(0, Math.round(top)), behavior: "smooth" });
-  };
-  // Clear Ort first (URL update), then scroll after layout settles.
-  window.setTimeout(run, 120);
-}
-
-/** “Top-Destinationen für {country}” — click filters deals by Ort, then scrolls to filters. */
+/** “Top-Destinationen für {country}” — click filters deals by Ort, then scrolls to filters headline. */
 export function CountryTopDestinations({
   countryName,
   spots,
   selectedOrt,
   onSelectOrt,
   onClearOrt,
+  showViewAllDeals = true,
 }: CountryTopDestinationsProps) {
   const t = useT();
   const { locale } = useLocale();
@@ -44,7 +34,7 @@ export function CountryTopDestinations({
 
   const handleViewAllDeals = () => {
     onClearOrt();
-    scrollToFilters();
+    scrollToOffersFiltersHeadline();
   };
 
   return (
@@ -64,13 +54,15 @@ export function CountryTopDestinations({
             >
               {t("country.topFor", { name: countryName })}
             </h2>
-            <button
-              type="button"
-              onClick={handleViewAllDeals}
-              className="shrink-0 text-[13px] font-semibold text-brand-500 transition hover:text-brand-600"
-            >
-              {t("country.viewAllDeals")}
-            </button>
+            {showViewAllDeals && (
+              <button
+                type="button"
+                onClick={handleViewAllDeals}
+                className="shrink-0 text-[13px] font-semibold text-brand-500 transition hover:text-brand-600"
+              >
+                {t("country.viewAllDeals")}
+              </button>
+            )}
           </div>
         </div>
 
@@ -92,11 +84,11 @@ export function CountryTopDestinations({
                   aria-pressed={active}
                   onClick={() => {
                     onSelectOrt(spot.name);
-                    scrollToFilters();
+                    scrollToOffersFiltersHeadline();
                   }}
                   className={cn(
-                    "group relative block aspect-3/4 w-[9.75rem] shrink-0 snap-start overflow-hidden rounded-[12px] bg-ink text-left shadow-[0_8px_24px_rgba(15,23,42,0.12)] transition-[transform,box-shadow] duration-500 ease-out hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,23,42,0.16)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:w-[10.5rem] md:w-[11rem] lg:w-[calc((100%-5*1rem)/6)]",
-                    active && "ring-2 ring-inset ring-brand-500"
+                    "group relative block aspect-3/4 w-[9.75rem] shrink-0 snap-start overflow-hidden rounded-[12px] border-[3px] bg-ink text-left shadow-[0_8px_24px_rgba(15,23,42,0.12)] transition-[transform,box-shadow,border-color] duration-500 ease-out hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,23,42,0.16)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:w-[10.5rem] md:w-[11rem] lg:w-[calc((100%-5*1rem)/6)]",
+                    active ? "border-brand-500" : "border-transparent"
                   )}
                 >
                   <Image
@@ -120,16 +112,18 @@ export function CountryTopDestinations({
           </Carousel>
         </div>
 
-        <div className="mt-6 flex justify-center pb-2 sm:mt-8 sm:pb-3">
-          <button
-            type="button"
-            onClick={handleViewAllDeals}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 text-sm font-bold text-white shadow-[0_8px_20px_rgba(27,99,235,0.18)] transition hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
-          >
-            {t("country.viewAllDeals")}
-            <ArrowDown className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
+        {showViewAllDeals && (
+          <div className="mt-6 flex justify-center pb-2 sm:mt-8 sm:pb-3">
+            <button
+              type="button"
+              onClick={handleViewAllDeals}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 text-sm font-bold text-white shadow-[0_8px_20px_rgba(27,99,235,0.18)] transition hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+            >
+              {t("country.viewAllDeals")}
+              <ArrowDown className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+        )}
       </Container>
     </section>
   );

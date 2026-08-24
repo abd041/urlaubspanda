@@ -10,8 +10,9 @@ import { NoIndexMeta } from "@/components/seo/NoIndexMeta";
 import { HOMEPAGE_FILTER_KEYS } from "@/data/filters";
 import { dealMatchesAllFilters } from "@/lib/dealFilters";
 import { dealMatchesOrt } from "@/lib/ortFilter";
-import { destinationDealsHeadingLocalized, destinationName } from "@/i18n/content";
+import { destinationDealsHeadingLocalized, destinationName, tx } from "@/i18n/content";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
+import { scrollToOffersFiltersHeadline } from "@/lib/scrollToOffersFilters";
 import { useMemo } from "react";
 
 interface DealsExplorerProps {
@@ -19,6 +20,8 @@ interface DealsExplorerProps {
   sectionTitle?: string;
   allDealsHref?: string;
   showAllDealsLink?: boolean;
+  /** Country landing “View all deals” CTA under top destinations / fallback. */
+  showDestinationViewAll?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
   filterKeys?: FilterKey[];
@@ -68,6 +71,7 @@ export function DealsExplorer({
   sectionTitle,
   allDealsHref,
   showAllDealsLink = true,
+  showDestinationViewAll = true,
   emptyTitle,
   emptyDescription,
   filterKeys = HOMEPAGE_FILTER_KEYS,
@@ -83,13 +87,18 @@ export function DealsExplorer({
   const localizedCountry = destinationSlug
     ? destinationName(destinationSlug, locale)
     : "";
-  const { title, resolvedEmptyTitle, resolvedEmptyDescription } = useExplorerCopy({
-    sectionTitle,
-    sectionTitleKey,
-    destinationSlug,
-    emptyTitle,
-    emptyDescription,
-  });
+  const { title: countryOrSectionTitle, resolvedEmptyTitle, resolvedEmptyDescription } =
+    useExplorerCopy({
+      sectionTitle,
+      sectionTitleKey,
+      destinationSlug,
+      emptyTitle,
+      emptyDescription,
+    });
+
+  const title = selectedOrt
+    ? t("deals.inCountry", { name: tx(selectedOrt, locale) })
+    : countryOrSectionTitle;
 
   const filteredDeals = useMemo(
     () =>
@@ -99,6 +108,8 @@ export function DealsExplorer({
       ),
     [deals, selected, selectedOrt]
   );
+
+  const showViewAll = showDestinationViewAll && destinationSlug !== "suedtirol";
 
   return (
     <>
@@ -110,22 +121,16 @@ export function DealsExplorer({
           selectedOrt={selectedOrt}
           onSelectOrt={toggleOrt}
           onClearOrt={clearOrt}
+          showViewAllDeals={showViewAll}
         />
-      ) : destinationSlug ? (
+      ) : destinationSlug && showViewAll ? (
         <div className="bg-surface px-4 pb-2 pt-4 sm:px-6 sm:pt-5">
           <div className="mx-auto flex max-w-7xl justify-center">
             <button
               type="button"
               onClick={() => {
                 clearOrt();
-                window.setTimeout(() => {
-                  const el = document.getElementById("filter-chips");
-                  if (!el) return;
-                  const header = document.querySelector("header");
-                  const headerOffset = header?.getBoundingClientRect().height ?? 72;
-                  const top = window.scrollY + el.getBoundingClientRect().top - headerOffset;
-                  window.scrollTo({ top: Math.max(0, Math.round(top)), behavior: "smooth" });
-                }, 120);
+                scrollToOffersFiltersHeadline();
               }}
               className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 text-sm font-bold text-white shadow-[0_8px_20px_rgba(27,99,235,0.18)] transition hover:bg-brand-600"
             >

@@ -6,8 +6,8 @@ import { calculateStayPrice } from "@/lib/pricingEngine";
 import type { BookingOffer, ChildPricingRule, RoomCategoryDetail } from "@/types";
 import type { RoomSelection } from "@/hooks/useBookingState";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
+import { localeTag } from "@/i18n/config";
 import { mealPlanLabel, tx } from "@/i18n/content";
-import { PriceHierarchy } from "@/components/booking/PriceHierarchy";
 
 interface RoomConfirmedSummaryProps {
   roomIndex: number;
@@ -48,7 +48,10 @@ export function RoomConfirmedSummary({
     baseStay.total +
     (mealPlan?.supplementTotal ?? 0) +
     (occupancy.cancellationSelected ? offer.cancellation?.supplementTotal ?? 0 : 0);
-  const perPerson = total / Math.max(baseStay.travelerCount, 1);
+  const priceFormatter = new Intl.NumberFormat(localeTag(locale), {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
 
   const occupancyLine = [
     t("booking.adultsCount", { count: occupancy.adults }),
@@ -74,7 +77,9 @@ export function RoomConfirmedSummary({
         <p className="truncate text-xs text-muted">{occupancyLine}</p>
       </div>
       <div className="text-right">
-        <PriceHierarchy perPerson={perPerson} total={total} size="sm" className="text-right" />
+        <p className="text-sm font-extrabold tabular-nums text-ink">
+          {t("booking.gesamtpreisLine", { price: priceFormatter.format(Math.round(total)) })}
+        </p>
         <button type="button" onClick={onEdit} className="mt-1 text-xs font-semibold text-brand-500 hover:underline">
           {t("booking.edit")}
         </button>

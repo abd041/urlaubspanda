@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { CalendarDays, ChevronRight, CreditCard, Info, ShieldCheck, Utensils } from "lucide-react";
+import { CalendarDays, ChevronRight, CreditCard, ShieldCheck, Utensils } from "lucide-react";
 import { calculateStayPrice } from "@/lib/pricingEngine";
 import type { BookingOffer, ChildPricingRule, RoomCategoryDetail } from "@/types";
 import type { RoomSelection } from "@/hooks/useBookingState";
@@ -10,7 +10,9 @@ import { FavoriteButton } from "@/components/offer/FavoriteButton";
 import { ShareButton } from "@/components/offer/ShareButton";
 import { ProviderLogo } from "@/components/booking/ProviderLogo";
 import { PriceBreakdown } from "@/components/booking/PriceBreakdown";
+import { FreeCancellationBadge } from "@/components/booking/FreeCancellationBadge";
 import { cn } from "@/lib/utils";
+import { hasFreeCancellation } from "@/lib/freeCancellation";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { localeTag } from "@/i18n/config";
 import { mealPlanLabel, nightLabel, tx } from "@/i18n/content";
@@ -52,7 +54,6 @@ export function OfferBookingCard({
   const defaultMealPlan = offer.mealPlans.find((plan) => plan.includedInBase) ?? offer.mealPlans[0];
   const [activeMealPlanId, setActiveMealPlanId] = useState(defaultMealPlan?.id ?? "");
   const [cancellationSelected, setCancellationSelected] = useState(false);
-  const [priceDetailsOpen, setPriceDetailsOpen] = useState(false);
   const selectedMealPlan = offer.mealPlans.find((plan) => plan.id === activeMealPlanId) ?? defaultMealPlan;
 
   const departure = new Date(arrival);
@@ -70,7 +71,6 @@ export function OfferBookingCard({
   const mealSupplement = selectedMealPlan?.supplementTotal ?? 0;
   const cancellationSupplement = cancellationSelected ? offer.cancellation?.supplementTotal ?? 0 : 0;
   const total = baseStay.total + mealSupplement + cancellationSupplement;
-  const perPerson = total / baseStay.travelerCount;
 
   const travelerLabel =
     occupancy.childAges.length > 0
@@ -222,7 +222,6 @@ export function OfferBookingCard({
           </div>
           <PriceBreakdown
             lines={baseStay.lines}
-            perPerson={perPerson}
             extras={[
               ...(mealSupplement > 0 && selectedMealPlan
                 ? [{ label: mealPlanLabel(selectedMealPlan.label, locale), amount: mealSupplement }]
@@ -234,18 +233,8 @@ export function OfferBookingCard({
             total={total}
             size="md"
           />
-          <button
-            type="button"
-            onClick={() => setPriceDetailsOpen((v) => !v)}
-            className="inline-flex w-fit items-center gap-1 text-xs font-semibold text-brand-500 hover:underline"
-          >
-            {t("booking.priceDetails")}
-            <Info className="h-3 w-3" aria-hidden="true" />
-          </button>
-          {priceDetailsOpen && (
-            <p className="rounded-lg bg-surface px-3 py-2 text-xs leading-relaxed text-body">
-              {t("booking.calendarText")}
-            </p>
+          {hasFreeCancellation() && arrival && (
+            <FreeCancellationBadge arrival={arrival} size="sm" />
           )}
           <button
             type="button"

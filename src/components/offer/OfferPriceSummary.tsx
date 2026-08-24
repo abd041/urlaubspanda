@@ -3,6 +3,7 @@
 import type { Deal } from "@/types";
 import { localeTag } from "@/i18n/config";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
+import { cn } from "@/lib/utils";
 
 function formatOfferEuro(value: number, locale: "de" | "en") {
   const whole = Number.isInteger(value);
@@ -32,18 +33,21 @@ export function OfferPriceSummary({ deal, size = "default" }: { deal: Deal; size
           {formatOfferEuro(deal.oldPrice, locale)}
         </p>
       )}
-      <p className="mt-1 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0.5 lg:justify-start">
-        <span className="text-[13px] text-muted">{t("deal.from")}</span>
-        <span
-          className={
-            large
-              ? "text-[1.85rem] font-extrabold leading-none tracking-tight text-ink"
-              : "text-[1.65rem] font-extrabold leading-none tracking-tight text-ink"
-          }
-        >
-          {formatOfferEuro(deal.currentPrice, locale)}
+      <p className="mt-1 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0.5 md:flex-nowrap lg:justify-start">
+        <span className="shrink-0 text-[13px] text-muted">{t("deal.from")}</span>
+        <span className="inline-flex shrink-0 items-baseline whitespace-nowrap">
+          <span
+            className={cn(
+              "font-extrabold leading-none tracking-tight text-ink",
+              large ? "text-[1.85rem]" : "text-[1.65rem]"
+            )}
+          >
+            {formatOfferEuro(deal.currentPrice, locale)}
+          </span>
+          <span className="ml-1.5 shrink-0 text-[12px] font-normal leading-none text-muted">
+            {t("deal.perPerson")}
+          </span>
         </span>
-        <span className="text-[12px] text-muted">{t("deal.perPerson")}</span>
       </p>
       <p className="mt-2 text-[12px] font-medium text-ink">
         {t("offer.totalTwoAdults", { price: formatOfferEuro(deal.currentPrice * 2, locale) })}

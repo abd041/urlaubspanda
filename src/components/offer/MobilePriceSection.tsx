@@ -6,9 +6,11 @@ import type { Deal, OfferDetail } from "@/types";
 import { formatEuro } from "@/lib/utils";
 import { hasInternalBooking } from "@/lib/bookingRoute";
 import { OfferCtaButton } from "@/components/offer/OfferCtaButton";
+import { FreeCancellationBadge } from "@/components/booking/FreeCancellationBadge";
 import { useOfferCountdown } from "@/components/offer/useOfferCountdown";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { tx } from "@/i18n/content";
+import { hasFreeCancellation } from "@/lib/freeCancellation";
 
 /**
  * Mobile price + booking block directly under photos (req 11).
@@ -61,6 +63,12 @@ export function MobilePriceSection({ deal, detail }: { deal: Deal; detail: Offer
             </span>
             <span className="text-[12px] text-muted">{t("deal.perPerson")}</span>
           </p>
+
+          {hasFreeCancellation() && (
+            <div className="mt-3 flex justify-center">
+              <FreeCancellationBadge variant="inline" size="sm" />
+            </div>
+          )}
         </div>
 
         {/* Booking button */}

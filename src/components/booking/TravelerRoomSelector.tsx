@@ -18,8 +18,8 @@ interface TravelerRoomSelectorProps {
 
 /**
  * Guest/room selector.
- * Desktop: one room = compact horizontal row; multiple rooms = stacked with labels.
- * Mobile: stacked rooms + “Add Nth Room” / “Weiter”.
+ * Desktop: adults + children + add-room share one row (single or multi-room).
+ * Mobile: stacked counters; add-room beside counters when only one room.
  */
 export function TravelerRoomSelector({
   rooms,
@@ -56,45 +56,54 @@ export function TravelerRoomSelector({
   const addRoom = () => onRoomsCountChange(rooms.length + 1);
 
   const addBtnClass =
-    "min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-sm font-semibold text-ink transition hover:border-brand-500 hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-40";
+    "inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-2 text-sm font-semibold text-ink transition hover:border-brand-500 hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-11 sm:px-3";
 
-  const renderCounters = (room: RoomSelection, roomIndex: number, compactDesktop: boolean) => (
-    <div
-      className={cn(
-        "grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2",
-        compactDesktop && "lg:flex lg:min-w-0 lg:flex-1 lg:items-center lg:gap-8"
-      )}
+  const addRoomButton = (
+    <button
+      type="button"
+      onClick={addRoom}
+      disabled={!canAddRoom}
+      aria-label={t("booking.addRoom")}
+      className={addBtnClass}
     >
-      <div className={cn("min-w-0", compactDesktop && "lg:flex-1")}>
-        <CounterStepper
-          label={t("booking.adults")}
-          sublabel={t("booking.adultsSub")}
-          icon={User}
-          iconClassName="lg:hidden"
-          value={room.adults}
-          min={1}
-          max={6}
-          onChange={(next) => onRoomOccupancyChange(roomIndex, next, room.childAges)}
-        />
-      </div>
-      <div className={cn("min-w-0", compactDesktop && "lg:flex-1")}>
-        <CounterStepper
-          label={t("booking.children")}
-          sublabel={t("booking.childrenSub")}
-          icon={Users}
-          iconClassName="lg:hidden"
-          value={room.childAges.length}
-          min={0}
-          max={4}
-          onChange={(next) => setChildrenCount(roomIndex, next)}
-        />
-      </div>
-    </div>
+      <BedDouble className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
+      <span className="whitespace-nowrap">{t("booking.addRoom")}</span>
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-500 text-white sm:h-6 sm:w-6">
+        <Plus className="h-3 w-3 stroke-[2.5] sm:h-3.5 sm:w-3.5" aria-hidden="true" />
+      </span>
+    </button>
+  );
+
+  const renderCounters = (room: RoomSelection, roomIndex: number, compact: boolean) => (
+    <>
+      <CounterStepper
+        compact={compact}
+        label={t("booking.adults")}
+        sublabel={t("booking.adultsSub")}
+        icon={User}
+        iconClassName="lg:hidden"
+        value={room.adults}
+        min={1}
+        max={6}
+        onChange={(next) => onRoomOccupancyChange(roomIndex, next, room.childAges)}
+      />
+      <CounterStepper
+        compact={compact}
+        label={t("booking.children")}
+        sublabel={t("booking.childrenSub")}
+        icon={Users}
+        iconClassName="lg:hidden"
+        value={room.childAges.length}
+        min={0}
+        max={4}
+        onChange={(next) => setChildrenCount(roomIndex, next)}
+      />
+    </>
   );
 
   const renderChildAges = (room: RoomSelection, roomIndex: number) =>
     room.childAges.length > 0 ? (
-      <div className="mt-4 space-y-1.5">
+      <div className="mt-3 space-y-1.5">
         {room.childAges.map((age, i) => (
           <ChildAgeSelect
             key={i}
@@ -106,27 +115,12 @@ export function TravelerRoomSelector({
       </div>
     ) : null;
 
-  const addRoomButton = (
-    <button
-      type="button"
-      onClick={addRoom}
-      aria-label={t("booking.addRoom")}
-      className={`inline-flex ${addBtnClass}`}
-    >
-      <BedDouble className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
-      <span className="whitespace-nowrap">{t("booking.addRoom")}</span>
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500 text-white">
-        <Plus className="h-3.5 w-3.5 stroke-[2.5]" aria-hidden="true" />
-      </span>
-    </button>
-  );
-
   return (
     <div className="min-w-0">
       <div className="min-w-0 max-w-full lg:rounded-xl lg:border lg:border-line lg:p-4">
         {rooms.map((room, roomIndex) => {
           const isLast = roomIndex === rooms.length - 1;
-          const compactDesktop = !hasExtraRooms;
+          const singleRoom = !hasExtraRooms;
 
           return (
             <div
@@ -151,34 +145,42 @@ export function TravelerRoomSelector({
                 </div>
               )}
 
-              {compactDesktop ? (
-                <div className="hidden items-center gap-4 lg:flex">
-                  {renderCounters(room, roomIndex, true)}
-                  {canAddRoom && addRoomButton}
-                </div>
-              ) : null}
+              {/* Desktop: one row — adults, children, add room (last room only) */}
+              <div className="hidden min-w-0 items-center gap-6 lg:flex xl:gap-8">
+                {renderCounters(room, roomIndex, true)}
+                {isLast && canAddRoom && <div className="ml-auto shrink-0">{addRoomButton}</div>}
+              </div>
 
-              {/* Mobile always; desktop multi-room stacked */}
-              <div className={compactDesktop ? "lg:hidden" : undefined}>
-                {renderCounters(room, roomIndex, false)}
+              {/* Mobile / tablet */}
+              <div className="min-w-0 lg:hidden">
+                <div
+                  className={cn(
+                    singleRoom && canAddRoom && "flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2",
+                      singleRoom && canAddRoom && "min-w-0 flex-1 sm:min-w-[14rem]"
+                    )}
+                  >
+                    {renderCounters(room, roomIndex, false)}
+                  </div>
+                  {singleRoom && canAddRoom && <div className="shrink-0 sm:self-center">{addRoomButton}</div>}
+                </div>
               </div>
 
               {renderChildAges(room, roomIndex)}
 
-              {/* Desktop multi-room: Add Room under the latest room */}
-              {hasExtraRooms && isLast && canAddRoom && (
-                <div className="mt-4 hidden justify-end lg:flex">{addRoomButton}</div>
-              )}
-
-              {/* Mobile only: Add Nth Room + Continue */}
-              {isLast && (
+              {/* Mobile multi-room: add Nth room + continue */}
+              {hasExtraRooms && isLast && (
                 <div className="mt-4 grid grid-cols-2 gap-2 lg:hidden">
                   <button
                     type="button"
                     onClick={addRoom}
                     disabled={!canAddRoom}
                     aria-label={addRoomNLabel}
-                    className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-line bg-white px-2 py-2 text-sm font-semibold text-ink transition hover:border-brand-500 hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-line bg-white px-2 py-2 text-sm font-semibold text-ink transition hover:border-brand-500 hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Plus className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
                     <span className="truncate">{addRoomNLabel}</span>
@@ -186,7 +188,20 @@ export function TravelerRoomSelector({
                   <button
                     type="button"
                     onClick={onContinue}
-                    className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-500 px-2 py-2 text-sm font-bold text-white transition hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                    className="inline-flex min-h-10 items-center justify-center rounded-lg bg-brand-500 px-2 py-2 text-sm font-bold text-white transition hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                  >
+                    {t("booking.continue")}
+                  </button>
+                </div>
+              )}
+
+              {/* Mobile single-room: continue */}
+              {singleRoom && isLast && (
+                <div className="mt-4 lg:hidden">
+                  <button
+                    type="button"
+                    onClick={onContinue}
+                    className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-brand-500 px-3 py-2.5 text-sm font-bold text-white transition hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
                   >
                     {t("booking.continue")}
                   </button>

@@ -10,8 +10,6 @@ interface PriceBreakdownProps {
   /** Extra rows after travelers (meal plan, cancellation, extras…). */
   extras?: { label: string; amount: number }[];
   total: number;
-  /** Optional average p.P. shown above the traveler lines. */
-  perPerson?: number;
   size?: "sm" | "md";
   className?: string;
 }
@@ -21,7 +19,6 @@ export function PriceBreakdown({
   lines,
   extras = [],
   total,
-  perPerson,
   size = "md",
   className,
 }: PriceBreakdownProps) {
@@ -42,18 +39,7 @@ export function PriceBreakdown({
 
   return (
     <div className={cn(className)}>
-      {perPerson != null && (
-        <p
-          className={cn(
-            "font-extrabold leading-tight tracking-tight text-ink",
-            size === "md" ? "text-[1.35rem]" : "text-sm"
-          )}
-        >
-          {t("booking.ppAmount", { price: priceFormatter.format(perPerson) })}
-        </p>
-      )}
-
-      <ul className={cn("space-y-1.5", perPerson != null ? "mt-2.5" : undefined)}>
+      <ul className="space-y-1.5">
         {lines.map((line) => (
           <li
             key={`${line.kind}-${line.index}`}

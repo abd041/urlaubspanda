@@ -16,6 +16,8 @@ interface ReviewBadgeProps {
   className?: string;
   /** Override for the review-count link/text (e.g. sidebar uses ink instead of brand blue). */
   countClassName?: string;
+  /** Hide the review-count text (checkout travel summary). */
+  showReviewCount?: boolean;
 }
 
 /**
@@ -31,6 +33,7 @@ export function ReviewBadge({
   size = "sm",
   className,
   countClassName,
+  showReviewCount = true,
 }: ReviewBadgeProps) {
   const { locale } = useLocale();
   const t = useT();
@@ -88,13 +91,14 @@ export function ReviewBadge({
           </span>
         </span>
       </span>
-      {href ? (
-        <a href={href} className={countClass}>
-          {reviewsLabel}
-        </a>
-      ) : (
-        <span className={countClass}>{reviewsLabel}</span>
-      )}
+      {showReviewCount &&
+        (href ? (
+          <a href={href} className={countClass}>
+            {reviewsLabel}
+          </a>
+        ) : (
+          <span className={countClass}>{reviewsLabel}</span>
+        ))}
     </div>
   );
 }

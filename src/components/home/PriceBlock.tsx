@@ -40,12 +40,16 @@ export function PriceBlock({ oldPrice, currentPrice, discountPercent, action }: 
             {formatEuro(oldPrice, locale)}
           </p>
         )}
-        <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
-          <span className="text-[13px] font-normal text-muted">{t("deal.from")}</span>
-          <span className="text-[1.65rem] font-extrabold leading-none tracking-tight text-ink sm:text-[1.75rem]">
-            {formatEuro(currentPrice, locale)}
+        <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 md:flex-nowrap">
+          <span className="shrink-0 text-[13px] font-normal text-muted">{t("deal.from")}</span>
+          <span className="inline-flex shrink-0 items-baseline whitespace-nowrap">
+            <span className="text-[1.65rem] font-extrabold leading-none tracking-tight text-ink sm:text-[1.75rem]">
+              {formatEuro(currentPrice, locale)}
+            </span>
+            <span className="ml-1.5 shrink-0 text-[12px] font-normal leading-none text-muted">
+              {t("deal.perPerson")}
+            </span>
           </span>
-          <span className="text-[12px] font-normal text-muted">{t("deal.perPerson")}</span>
         </p>
       </div>
       {action ? <div className="shrink-0 self-center">{action}</div> : null}

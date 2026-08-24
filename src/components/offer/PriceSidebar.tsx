@@ -11,9 +11,11 @@ import { OfferCtaButton } from "@/components/offer/OfferCtaButton";
 import { OfferPriceSummary } from "@/components/offer/OfferPriceSummary";
 import { FavoriteButton } from "@/components/offer/FavoriteButton";
 import { ShareButton } from "@/components/offer/ShareButton";
+import { FreeCancellationBadge } from "@/components/booking/FreeCancellationBadge";
 import { localeTag } from "@/i18n/config";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { mealPlanLabel, nightLabel, tx } from "@/i18n/content";
+import { hasFreeCancellation } from "@/lib/freeCancellation";
 
 /**
  * Sticky desktop price card. Hierarchy: old price → current → savings → CTA.
@@ -88,6 +90,12 @@ export function PriceSidebar({ deal, detail }: { deal: Deal; detail: OfferDetail
           <div className="mt-3">
             <OfferPriceSummary deal={deal} size="lg" />
           </div>
+
+          {hasFreeCancellation() && (
+            <div className="mt-3">
+              <FreeCancellationBadge variant="inline" size="md" />
+            </div>
+          )}
 
           <div className="mt-6">
             <OfferCtaButton
