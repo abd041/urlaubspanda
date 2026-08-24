@@ -2,7 +2,7 @@
 
 import { Minus, Plus } from "lucide-react";
 import type { CheckoutAddon } from "@/types";
-import { checkoutInputClass } from "@/components/booking/BillingContactSection";
+import { checkoutQtyInputClass } from "@/components/booking/checkoutFormStyles";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { localeTag } from "@/i18n/config";
 import { tx } from "@/i18n/content";
@@ -110,7 +110,7 @@ export function CheckoutAddonsSection({ addons, selection, onChange }: CheckoutA
                       aria-label={t("booking.addonQuantityDecrease")}
                       onClick={() => setQuantity(addon, quantity - 1)}
                       disabled={quantity <= 1}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8dce3] bg-white text-ink transition hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40"
+                      className="flex h-11 w-11 items-center justify-center rounded-lg border border-[#d8dce3] bg-white text-ink transition hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <Minus className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
@@ -120,14 +120,14 @@ export function CheckoutAddonsSection({ addons, selection, onChange }: CheckoutA
                       max={maxQty(addon)}
                       value={quantity}
                       onChange={(e) => setQuantity(addon, Number(e.target.value) || 1)}
-                      className={cn(checkoutInputClass, "h-8 w-14 appearance-none px-1 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none")}
+                      className={checkoutQtyInputClass}
                     />
                     <button
                       type="button"
                       aria-label={t("booking.addonQuantityIncrease")}
                       onClick={() => setQuantity(addon, quantity + 1)}
                       disabled={quantity >= maxQty(addon)}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8dce3] bg-white text-ink transition hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40"
+                      className="flex h-11 w-11 items-center justify-center rounded-lg border border-[#d8dce3] bg-white text-ink transition hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <Plus className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>

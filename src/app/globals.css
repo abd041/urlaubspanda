@@ -76,6 +76,21 @@ textarea {
   font-family: inherit;
 }
 
+/**
+ * Checkout forms: keep control type at ≥16px so iOS Safari does not auto-zoom
+ * on focus. Prefer `checkoutInputClass` in components; this is a safety net.
+ */
+#checkout-form input[type="text"],
+#checkout-form input[type="email"],
+#checkout-form input[type="tel"],
+#checkout-form input[type="number"],
+#checkout-form input[type="search"],
+#checkout-form input[type="password"],
+#checkout-form select,
+#checkout-form textarea {
+  font-size: 16px;
+}
+
 /* Utility: hide scrollbar for horizontally-scrollable carousels while keeping
    native scroll/swipe behaviour and keyboard/focus accessibility. */
 .no-scrollbar {

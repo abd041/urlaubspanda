@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, X } from "lucide-react";
-import { checkoutInputClass } from "@/components/booking/BillingContactSection";
+import { checkoutInputClass } from "@/components/booking/checkoutFormStyles";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { localeTag } from "@/i18n/config";
 import { cn } from "@/lib/utils";

@@ -5,21 +5,18 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   BedDouble,
-  CalendarRange,
   Check,
   CheckCircle2,
   CreditCard,
+  Info,
   Landmark,
-  MapPin,
-  Moon,
   Printer,
-  Star,
-  Users,
+  Utensils,
 } from "lucide-react";
 import type { BookingConfirmationSnapshot } from "@/lib/bookingConfirmation";
 import { formatContactAddress, formatGuestName } from "@/lib/bookingConfirmation";
-import { formatFreeCancellationDeadline, hasFreeCancellation } from "@/lib/freeCancellation";
-import { PHONE_PREFIX } from "@/components/booking/checkoutHelpers";
+import { formatCheckoutCancellationDeadline, hasFreeCancellation } from "@/lib/freeCancellation";
+import { CHECKOUT_TOURIST_TAX_PER_ROOM, PHONE_PREFIX } from "@/components/booking/checkoutHelpers";
 import { ReviewBadge } from "@/components/home/ReviewBadge";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { localeTag } from "@/i18n/config";
@@ -51,12 +48,21 @@ export function BookingConfirmationView({ snapshot }: BookingConfirmationViewPro
   departure.setDate(departure.getDate() + snapshot.nights);
 
   const phonePrefix = snapshot.contact.country ? PHONE_PREFIX[snapshot.contact.country] : "";
-  const childAgesLabel =
-    snapshot.travelers.childAges.length > 0
-      ? snapshot.travelers.childAges
-          .map((age) => (age === 0 ? t("booking.underOne") : t("booking.years", { n: age })))
-          .join(", ")
-      : "";
+
+  const travelPeriodLine = t("booking.travelPeriodLine", {
+    duration: nightLabel(snapshot.nights, locale),
+    from: dateFormatter.format(arrival),
+    to: dateFormatter.format(departure),
+  });
+
+  const cancelDeadline = formatCheckoutCancellationDeadline(arrival, locale);
+  const cancelDeadlineDisplay = cancelDeadline.includes(",")
+    ? cancelDeadline.replace(", ", " (") + ")"
+    : cancelDeadline;
+
+  const mealPlans = Array.from(
+    new Set(snapshot.rooms.map((room) => room.mealPlanLabel).filter(Boolean) as string[])
+  );
 
   useEffect(() => {
     document.body.classList.add("booking-confirmation-active");
@@ -81,6 +87,146 @@ export function BookingConfirmationView({ snapshot }: BookingConfirmationViewPro
     { n: 3, title: t("booking.confirmStep3Title"), text: t("booking.confirmStep3Text") },
   ];
 
+  const travelDetailsColumn = (
+    <div className="min-w-0 space-y-5">
+      <div>
+        <h3 className="text-sm font-extrabold text-ink">{t("booking.travelers")}</h3>
+        <ul className="mt-2 space-y-1 text-sm text-ink">
+          <li>{t("booking.adultsCount", { count: snapshot.travelers.adults })}</li>
+          {snapshot.travelers.children > 0 && (
+            <li>{t("booking.childrenCount", { count: snapshot.travelers.children })}</li>
+          )}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-extrabold text-ink">{t("booking.roomsLabel")}</h3>
+        <ul className="mt-2 space-y-2 text-sm">
+          {snapshot.rooms.map((room) => (
+            <li key={room.roomIndex}>
+              <p className="font-semibold text-ink">{room.categoryName}</p>
+              <p className="mt-1 flex items-center gap-1.5 text-body">
+                <BedDouble className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {t("booking.overnightsCount", { count: snapshot.nights })}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {mealPlans.length > 0 && (
+        <div>
+          <h3 className="text-sm font-extrabold text-ink">{t("booking.checkoutServicesLabel")}</h3>
+          <ul className="mt-2 space-y-1.5">
+            {mealPlans.map((plan) => (
+              <li key={plan} className="flex items-center gap-1.5 text-sm text-body">
+                <Utensils className="h-3.5 w-3.5 shrink-0 text-ink" aria-hidden="true" />
+                {plan}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {hasFreeCancellation() && (
+        <div>
+          <p className="flex flex-wrap items-center gap-1.5 text-sm font-extrabold text-success">
+            <Check className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.4} />
+            {t("booking.cancelFreeCancellable")}
+            <Info className="h-3.5 w-3.5 shrink-0 text-success/80" aria-hidden="true" />
+          </p>
+          <p className="mt-0.5 text-sm text-success">
+            {t("booking.cancelUntilDate", { date: cancelDeadline })}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+
+  const priceColumn = (
+    <div className="min-w-0 space-y-5">
+      {snapshot.rooms.map((room) => (
+        <div key={room.roomIndex} className="space-y-1.5">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="min-w-0 text-sm font-extrabold text-ink">{room.categoryName}</p>
+            <span className="shrink-0 text-sm font-extrabold tabular-nums text-ink">
+              {priceFormatter.format(room.total)} €
+            </span>
+          </div>
+          <ul className="space-y-1 text-sm">
+            {room.lines.map((line) => (
+              <li key={`${line.kind}-${line.index}`} className="flex justify-between gap-2">
+                <span className="text-body">
+                  {line.kind === "adult"
+                    ? t("booking.summaryAdultLine")
+                    : t("booking.summaryChildLine", {
+                        age: line.age === 0 ? t("booking.underOne") : t("booking.years", { n: line.age ?? 0 }),
+                      })}
+                </span>
+                <span className="shrink-0 tabular-nums text-ink">{priceFormatter.format(line.amount)} €</span>
+              </li>
+            ))}
+            {room.mealSupplement > 0 && room.mealPlanLabel && (
+              <li className="flex justify-between gap-2">
+                <span className="text-body">{room.mealPlanLabel}</span>
+                <span className="shrink-0 tabular-nums text-ink">+{priceFormatter.format(room.mealSupplement)} €</span>
+              </li>
+            )}
+            {room.cancellationSupplement > 0 && room.cancellationLabel && (
+              <li className="flex justify-between gap-2">
+                <span className="text-body">{room.cancellationLabel}</span>
+                <span className="shrink-0 tabular-nums text-ink">
+                  +{priceFormatter.format(room.cancellationSupplement)} €
+                </span>
+              </li>
+            )}
+          </ul>
+        </div>
+      ))}
+
+      {snapshot.extras.length > 0 && (
+        <ul className="space-y-1.5 border-t border-line pt-4 text-sm">
+          {snapshot.extras.map((extra) => (
+            <li key={extra.id} className="flex justify-between gap-2">
+              <span className="text-body">
+                {extra.quantity && extra.quantity > 1
+                  ? t("booking.addonQtyLabel", { label: extra.label, count: extra.quantity })
+                  : extra.label}
+              </span>
+              <span className="shrink-0 tabular-nums text-ink">+{priceFormatter.format(extra.amount)} €</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {snapshot.voucherDiscount > 0 && (
+        <div className="flex justify-between gap-2 text-sm font-semibold text-success">
+          <span>{t("booking.voucherDiscount")}</span>
+          <span className="tabular-nums">−{priceFormatter.format(snapshot.voucherDiscount)} €</span>
+        </div>
+      )}
+
+      <div className="flex items-end justify-between gap-3 border-t border-line pt-4">
+        <span className="text-sm font-extrabold text-ink">{t("booking.yourTravelPrice")}</span>
+        <span className="text-[1.85rem] font-extrabold leading-none tabular-nums tracking-tight text-ink">
+          {formatEuro(snapshot.totalPrice, locale)}
+        </span>
+      </div>
+
+      <ul className="space-y-1 text-sm">
+        {snapshot.rooms.map((room) => (
+          <li key={`tax-${room.roomIndex}`} className="flex justify-between gap-3">
+            <span className="text-body">{t("booking.touristTaxLine")}</span>
+            <span className="shrink-0 tabular-nums text-ink">
+              {priceFormatter.format(CHECKOUT_TOURIST_TAX_PER_ROOM)} €
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="text-xs leading-relaxed text-muted">{t("booking.checkoutTaxDisclaimer")}</p>
+    </div>
+  );
+
   return (
     <>
       <style>{`
@@ -92,9 +238,10 @@ export function BookingConfirmationView({ snapshot }: BookingConfirmationViewPro
         }
       `}</style>
 
-      <div id="confirmation-print" className="confirmation-print-area space-y-4 pb-6">
-        <section className="rounded-2xl border border-success/25 bg-[#e8f8ee] p-5 sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+      {/* Always a vertical stack of sections; multi-column only inside cards from lg+ */}
+      <div id="confirmation-print" className="confirmation-print-area flex flex-col gap-4 pb-6">
+        <section className="rounded-2xl border border-success/25 bg-[#e8f8ee] p-4 sm:p-6">
+          <div className="flex flex-col gap-4">
             <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-success/15">
               <CheckCircle2 className="h-8 w-8 text-success" aria-hidden="true" />
             </span>
@@ -102,26 +249,26 @@ export function BookingConfirmationView({ snapshot }: BookingConfirmationViewPro
               <h1 className="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
                 {t("booking.confirmThankYou")}
               </h1>
-              <p className="mt-2 text-sm leading-relaxed text-body">
-                {t("booking.confirmEmailSent", { email: snapshot.contact.email })}
-              </p>
-              <p className="mt-2 text-sm font-bold text-brand-500">
+              <p className="mt-2 text-sm leading-relaxed text-body">{t("booking.confirmEmailSentLead")}</p>
+              <p className="mt-1 break-all text-base font-extrabold text-ink">{snapshot.contact.email}</p>
+              <p className="mt-3 text-sm font-bold text-brand-500">
                 {t("booking.requestNo", { ref: snapshot.requestRef })}
               </p>
             </div>
           </div>
-          <div className="no-print mt-4 flex flex-wrap gap-2">
+
+          <div className="no-print mt-5 flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap">
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-brand-500 bg-white px-4 text-sm font-bold text-brand-500 transition hover:bg-brand-50"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-brand-500 bg-white px-4 text-sm font-bold text-brand-500 transition hover:bg-brand-50 sm:w-auto"
             >
               <Printer className="h-4 w-4" aria-hidden="true" />
               {t("booking.confirmPrint")}
             </button>
             <Link
               href="/"
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-brand-500 px-4 text-sm font-bold text-white transition hover:bg-brand-600"
+              className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-brand-500 px-4 text-sm font-bold text-white transition hover:bg-brand-600 sm:w-auto"
             >
               {t("booking.confirmBackHome")}
             </Link>
@@ -129,155 +276,95 @@ export function BookingConfirmationView({ snapshot }: BookingConfirmationViewPro
         </section>
 
         <section className={cardClass}>
-          <h2 className="text-base font-extrabold text-ink sm:text-lg">{snapshot.hotel.name}</h2>
-          <div className="mt-3 flex gap-3 sm:gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
             {snapshot.hotel.image && (
-              <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-surface sm:h-24 sm:w-28">
-                <Image src={snapshot.hotel.image} alt={snapshot.hotel.name} fill sizes="112px" className="object-cover" />
+              <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-xl bg-surface sm:h-24 sm:w-28">
+                <Image
+                  src={snapshot.hotel.image}
+                  alt={snapshot.hotel.name}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 112px"
+                  className="object-cover"
+                />
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <span className="flex items-center gap-0.5 text-[#FDB919]" aria-label={t("deal.stars", { count: snapshot.hotel.stars })}>
-                {Array.from({ length: snapshot.hotel.stars }).map((_, i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-[#FDB919]" aria-hidden="true" />
-                ))}
-              </span>
+              <h2 className="text-base font-extrabold leading-snug text-ink sm:text-lg">{snapshot.hotel.name}</h2>
+              <div className="mt-1.5 flex items-center gap-1">
+                <span className="flex items-center gap-0.5" aria-label={t("deal.stars", { count: snapshot.hotel.stars })}>
+                  {Array.from({ length: snapshot.hotel.stars }).map((_, i) => (
+                    <span key={i} className="h-2 w-2 rounded-full bg-ink" aria-hidden="true" />
+                  ))}
+                </span>
+                <Info className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />
+              </div>
+              <p className="mt-1.5 text-sm leading-snug text-muted">
+                {snapshot.hotel.region}, {snapshot.hotel.country}
+              </p>
               {snapshot.hotel.reviewEnabled && (
-                <div className="mt-1.5">
+                <div className="mt-2">
                   <ReviewBadge
                     reviewPercent={snapshot.hotel.reviewPercent}
                     reviewScore={snapshot.hotel.reviewScore}
                     reviewMaxScore={snapshot.hotel.reviewMaxScore}
                     reviewCount={snapshot.hotel.reviewCount}
                     size="sm"
+                    showReviewCount={false}
                     countClassName="text-ink"
                   />
                 </div>
               )}
-              <p className="mt-2 flex items-start gap-1.5 text-sm text-body">
-                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                {snapshot.hotel.region}, {snapshot.hotel.country}
-              </p>
             </div>
           </div>
         </section>
 
         <section className={cardClass}>
-          <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.yourTravelDetails")}</h2>
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            <p className="flex items-center gap-2 text-sm">
-              <Moon className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span>
-                <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t("booking.duration")}</span>
-                {nightLabel(snapshot.nights, locale)}
-              </span>
-            </p>
-            <p className="flex items-center gap-2 text-sm">
-              <CalendarRange className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span>
-                <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t("booking.arrivalDate")}</span>
-                {dateFormatter.format(arrival)}
-              </span>
-            </p>
-            <p className="flex items-center gap-2 text-sm">
-              <CalendarRange className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span>
-                <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t("booking.departureDate")}</span>
-                {dateFormatter.format(departure)}
-              </span>
-            </p>
-          </div>
-          <div className="mt-4 border-t border-line pt-4">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t("booking.travelers")}</p>
-            <ul className="mt-2 space-y-1 text-sm text-ink">
-              <li className="flex items-center gap-2">
-                <Users className="h-4 w-4 shrink-0" aria-hidden="true" />
-                {t("booking.adultsCount", { count: snapshot.travelers.adults })}
-              </li>
-              {snapshot.travelers.children > 0 && (
-                <li className="flex items-center gap-2">
-                  <Users className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  {t("booking.childrenCount", { count: snapshot.travelers.children })}
-                </li>
-              )}
-              {childAgesLabel && (
-                <li className="text-body">{t("booking.confirmChildAges", { ages: childAgesLabel })}</li>
-              )}
-              <li className="flex items-center gap-2">
-                <BedDouble className="h-4 w-4 shrink-0" aria-hidden="true" />
-                {t("booking.roomsLabel")}: {snapshot.rooms.length}
-              </li>
-            </ul>
+          <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.yourTravelData")}</h2>
+          <p className="mt-2 text-sm font-extrabold text-ink">{travelPeriodLine}</p>
+
+          {/* Mobile: single column (details → price). Desktop: two columns. */}
+          <div className="mt-5 flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:gap-8">
+            {travelDetailsColumn}
+            <div className="min-w-0 border-t border-line pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+              {priceColumn}
+            </div>
           </div>
         </section>
 
         <section className={cardClass}>
-          <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.confirmBookingSummary")}</h2>
-          <div className="mt-4 space-y-4">
+          <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.confirmYourDetails")}</h2>
+          <div className="mt-4 flex flex-col gap-4">
             {snapshot.rooms.map((room) => (
               <div key={room.roomIndex} className="rounded-xl border border-[#e8eaef] bg-[#fafbfc] p-3.5">
-                <p className="text-sm font-extrabold text-ink">{room.categoryName}</p>
-                <p className="mt-1 text-xs text-muted">{room.occupancy}</p>
-                <p className="mt-2 text-sm text-body">
-                  <span className="font-semibold text-ink">{t("booking.confirmMainGuest")}: </span>
-                  {formatGuestName(room.mainGuest, t)}
+                <p className="text-sm font-extrabold text-ink">
+                  {room.roomIndex + 1}. {room.categoryName}
                 </p>
-                {room.mealPlanLabel && (
-                  <p className="mt-1 text-sm text-body">
-                    <span className="font-semibold text-ink">{t("booking.includedServices")}: </span>
-                    {room.mealPlanLabel}
-                  </p>
-                )}
+                <p className="mt-1 text-xs text-muted">{room.occupancy}</p>
+                <dl className="mt-3 grid gap-2 text-sm">
+                  <div className="flex flex-col gap-0.5">
+                    <dt className="text-xs font-semibold uppercase tracking-wide text-muted">
+                      {t("booking.confirmMainGuest")}
+                    </dt>
+                    <dd className="font-medium text-ink">{formatGuestName(room.mainGuest, t)}</dd>
+                  </div>
+                  {room.mealPlanLabel && (
+                    <div className="flex flex-col gap-0.5">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-muted">
+                        {t("booking.checkoutServicesLabel")}
+                      </dt>
+                      <dd className="font-medium text-ink">{room.mealPlanLabel}</dd>
+                    </div>
+                  )}
+                </dl>
               </div>
             ))}
           </div>
         </section>
 
-        {hasFreeCancellation() && (
-          <section className={cardClass}>
-            <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.confirmCancellation")}</h2>
-            <p className="mt-3 flex items-start gap-2 rounded-lg bg-[#EAF8F0] px-3 py-2.5 text-sm font-semibold leading-snug text-success">
-              <Check className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.4} />
-              {t("booking.cancelNoRisk", { date: formatFreeCancellationDeadline(arrival, locale) })}
-            </p>
-          </section>
-        )}
-
-        {snapshot.extras.length > 0 && (
-          <section className={cardClass}>
-            <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.extrasTitle")}</h2>
-            <ul className="mt-3 space-y-2 text-sm">
-              {snapshot.extras.map((extra) => (
-                <li key={extra.id} className="flex justify-between gap-3">
-                  <span className="text-body">
-                    {extra.quantity && extra.quantity > 1
-                      ? t("booking.addonQtyLabel", { label: extra.label, count: extra.quantity })
-                      : extra.label}
-                  </span>
-                  <span className="shrink-0 font-semibold tabular-nums text-ink">+{priceFormatter.format(extra.amount)} €</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        <section className={cardClass}>
-          <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.confirmPaymentMethod")}</h2>
-          <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-ink">
-            {snapshot.payment === "card" ? (
-              <CreditCard className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
-            ) : (
-              <Landmark className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
-            )}
-            {paymentLabel}
-          </p>
-          <p className="mt-2 text-sm leading-relaxed text-muted">{paymentNote}</p>
-        </section>
-
         <section className={cardClass}>
           <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.confirmContactDetails")}</h2>
-          <dl className="mt-3 space-y-2 text-sm">
-            <div>
+          <dl className="mt-3 flex flex-col gap-3 text-sm">
+            <div className="flex flex-col gap-0.5">
               <dt className="text-muted">{t("booking.contact")}</dt>
               <dd className="font-medium text-ink">
                 {formatGuestName(
@@ -290,100 +377,61 @@ export function BookingConfirmationView({ snapshot }: BookingConfirmationViewPro
                 )}
               </dd>
             </div>
-            <div>
-              <dt className="text-muted">{t("booking.email")}</dt>
-              <dd className="font-medium text-ink break-all">{snapshot.contact.email}</dd>
+            <div className="flex flex-col gap-0.5">
+              <dt className="text-muted">{t("booking.billingAddress")}</dt>
+              <dd className="font-medium text-ink">{formatContactAddress(snapshot.contact, t)}</dd>
             </div>
-            <div>
+            <div className="flex flex-col gap-0.5">
               <dt className="text-muted">{t("booking.phone")}</dt>
               <dd className="font-medium text-ink">
                 {phonePrefix} {snapshot.contact.phoneLocal}
               </dd>
             </div>
-            <div>
-              <dt className="text-muted">{t("booking.billingAddress")}</dt>
-              <dd className="font-medium text-ink">{formatContactAddress(snapshot.contact, t)}</dd>
+            <div className="flex flex-col gap-0.5">
+              <dt className="text-muted">{t("booking.email")}</dt>
+              <dd className="break-all font-medium text-ink">{snapshot.contact.email}</dd>
             </div>
           </dl>
-        </section>
 
-        {snapshot.remarks && (
-          <section className={cardClass}>
-            <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.confirmRemarks")}</h2>
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-body">{snapshot.remarks}</p>
-          </section>
-        )}
+          <div className="mt-5 flex flex-col gap-4 border-t border-line pt-5">
+            <div>
+              <h3 className="text-sm font-extrabold text-ink">{t("booking.confirmPaymentMethod")}</h3>
+              <p className="mt-2 inline-flex items-center gap-2 rounded-lg border border-[#d8dce3] bg-white px-3 py-2 text-sm font-semibold text-ink">
+                {snapshot.payment === "card" ? (
+                  <CreditCard className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
+                ) : (
+                  <Landmark className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
+                )}
+                {paymentLabel}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{paymentNote}</p>
+            </div>
 
-        <section className={cardClass}>
-          <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.priceBreakdown")}</h2>
-          <div className="mt-3 space-y-3">
-            {snapshot.rooms.map((room) => (
-              <div key={room.roomIndex} className="rounded-xl border border-[#e8eaef] bg-[#f7f8fb] p-3.5">
-                <p className="text-sm font-extrabold text-ink">
-                  {t("booking.roomLine", { n: room.roomIndex + 1 })} · {room.categoryName}
-                </p>
-                <ul className="mt-2 space-y-1 text-sm">
-                  {room.lines.map((line) => (
-                    <li key={`${line.kind}-${line.index}`} className="flex justify-between gap-2">
-                      <span className="text-body">
-                        {line.kind === "adult"
-                          ? t("booking.adultPriceLine", { n: line.index })
-                          : t("booking.childPriceLine", {
-                              n: line.index,
-                              age: line.age === 0 ? t("booking.underOne") : t("booking.years", { n: line.age ?? 0 }),
-                            })}
-                      </span>
-                      <span className="shrink-0 font-semibold tabular-nums text-ink">{priceFormatter.format(line.amount)} €</span>
-                    </li>
-                  ))}
-                  {room.mealSupplement > 0 && room.mealPlanLabel && (
-                    <li className="flex justify-between gap-2">
-                      <span className="text-body">{room.mealPlanLabel}</span>
-                      <span className="shrink-0 font-semibold tabular-nums text-ink">+{priceFormatter.format(room.mealSupplement)} €</span>
-                    </li>
-                  )}
-                  {room.cancellationSupplement > 0 && room.cancellationLabel && (
-                    <li className="flex justify-between gap-2">
-                      <span className="text-body">{room.cancellationLabel}</span>
-                      <span className="shrink-0 font-semibold tabular-nums text-ink">+{priceFormatter.format(room.cancellationSupplement)} €</span>
-                    </li>
-                  )}
-                </ul>
-                <div className="mt-2 flex justify-between gap-2 border-t border-dashed border-line pt-2 text-sm">
-                  <span className="font-bold text-ink">{t("booking.roomTotalLine")}</span>
-                  <span className="font-extrabold tabular-nums text-ink">{priceFormatter.format(room.total)} €</span>
-                </div>
-              </div>
-            ))}
-            {snapshot.extras.map((extra) => (
-              <div key={extra.id} className="flex justify-between gap-2 text-sm">
-                <span className="text-body">{extra.label}</span>
-                <span className="font-semibold tabular-nums text-ink">+{priceFormatter.format(extra.amount)} €</span>
-              </div>
-            ))}
-            {snapshot.voucherDiscount > 0 && (
-              <div className="flex justify-between gap-2 text-sm text-success">
-                <span>{t("booking.voucherDiscount")}</span>
-                <span className="font-semibold tabular-nums">−{priceFormatter.format(snapshot.voucherDiscount)} €</span>
-              </div>
-            )}
+            <div>
+              <h3 className="text-sm font-extrabold text-ink">{t("booking.confirmRemarks")}</h3>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-body">
+                {snapshot.remarks?.trim() || t("booking.confirmNoRemarks")}
+              </p>
+            </div>
           </div>
-          <div className="mt-4 flex items-end justify-between gap-3 border-t-2 border-ink pt-4">
-            <span className="text-base font-extrabold text-ink">{t("booking.totalPriceLabel")}</span>
-            <span className="text-2xl font-extrabold tabular-nums text-ink sm:text-3xl">{formatEuro(snapshot.totalPrice, locale)}</span>
-          </div>
-          <p className="mt-2 text-xs text-muted">{t("booking.taxesIncluded")}</p>
-          <p className="text-xs text-muted">{t("booking.touristTaxNote")}</p>
         </section>
 
         <section className={cardClass}>
           <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.confirmWhatNext")}</h2>
-          <ol className="mt-4 grid gap-4 sm:grid-cols-3">
+          {/* Mobile: stacked steps. Desktop: 3 columns. */}
+          <ol className="mt-4 flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:gap-4">
             {nextSteps.map((step) => (
-              <li key={step.n} className="flex flex-col gap-2 rounded-xl border border-[#e8eaef] bg-[#fafbfc] p-4">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-sm font-bold text-white">{step.n}</span>
+              <li
+                key={step.n}
+                className={cn(
+                  "flex flex-col gap-2 rounded-xl border border-[#e8eaef] bg-[#fafbfc] p-4"
+                )}
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-sm font-bold text-white">
+                  {step.n}
+                </span>
                 <p className="text-sm font-extrabold text-ink">{step.title}</p>
-                <p className="text-xs leading-relaxed text-body sm:text-sm">{step.text}</p>
+                <p className="text-sm leading-relaxed text-body">{step.text}</p>
               </li>
             ))}
           </ol>

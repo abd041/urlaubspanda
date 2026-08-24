@@ -7,7 +7,7 @@ import {
   type RoomGuestForm,
   type Salutation,
 } from "@/components/booking/checkoutHelpers";
-import { checkoutInputClass } from "@/components/booking/BillingContactSection";
+import { checkoutInputClass } from "@/components/booking/checkoutFormStyles";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { tx } from "@/i18n/content";
 import { cn } from "@/lib/utils";
@@ -42,7 +42,7 @@ function GuestFormRow({
         align === "center" ? "lg:items-center" : "lg:items-start"
       )}
     >
-      <div className={cn("text-left text-sm text-body", align === "start" && "lg:pt-2.5")}>{label}</div>
+      <div className={cn("text-left text-sm font-semibold text-ink lg:font-normal lg:text-body", align === "start" && "lg:pt-2.5")}>{label}</div>
       <div className="min-w-0 w-full max-w-md text-left">{children}</div>
     </div>
   );
@@ -69,7 +69,7 @@ function RoomSalutationRadios({
             { value: "ms" as const, label: t("booking.salutationMs") },
           ]
         ).map((option) => (
-          <label key={option.value} className="inline-flex cursor-pointer items-center gap-2 text-sm text-ink">
+          <label key={option.value} className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-base text-ink">
             <input
               type="radio"
               name={name}
