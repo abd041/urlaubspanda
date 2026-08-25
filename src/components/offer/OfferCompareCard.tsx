@@ -100,6 +100,8 @@ function CompareOfferRow({
           ctaMode={detail.ctaMode}
           bookingUrl={offer.bookingUrl ?? detail.bookingUrl}
           bookingUrls={detail.bookingUrls}
+          ctaOptions={detail.ctaOptions}
+          countrySelectionNotice={detail.countrySelectionNotice}
           variant="quiet"
           label={t("offer.toOffer")}
         />

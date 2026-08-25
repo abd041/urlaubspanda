@@ -16,6 +16,9 @@ export const phrasesEn: Record<string, string> = {
   Ostsee: "Baltic Sea",
   "Luxor, Hurghada, …": "Luxor, Hurghada, …",
 
+  "Bitte wähle dein Wohnsitzland aus, damit wir dir die richtigen Preise und Verfügbarkeiten anzeigen können.":
+    "Please select your country of residence so we can show you the correct prices and availability.",
+
   // Deal summaries
   "7 Nächte im 4★ Hotel mit Flügen, Halbpension & Transfer":
     "7 nights in a 4★ hotel with flights, half board & transfer",
@@ -137,7 +140,20 @@ export const phrasesEn: Record<string, string> = {
     "4.5 out of 5 from 91 reviews, Certificate of Excellence",
   "Familienfreundliches Strandhotel an der Ostküste von Rhodos":
     "Family-friendly beach hotel on the east coast of Rhodes",
-  "Über dieses Angebot": "About this deal",
+  "Über dieses Angebot": "About this offer",
+  "Das Apollo Beach Rhodos": "Apollo Beach Rhodes",
+  "Das Rewaya Luxury Resort": "Rewaya Luxury Resort",
+  "Das Kreta Sun Village": "Crete Sun Village",
+  "Die Anlage verfügt über einen großzügigen Pool- und Gartenbereich, mehrere Restaurants sowie ein tägliches Animationsprogramm für Kinder und Erwachsene. **Familienfreundliches 4★-Hotel** mit Halbpension, Direktflug und Hoteltransfer – ideal für einen entspannten Strandurlaub.":
+    "The resort has a spacious pool and garden area, several restaurants, and a daily entertainment programme for children and adults. **Family-friendly 4★ hotel** with half board, direct flight and hotel transfer – ideal for a relaxed beach holiday.",
+  "**Besonders geeignet für Familien und Paare**, die Strandlage, Flug inklusive und Halbpension in einem Paket suchen.":
+    "**Especially suitable for families and couples** looking for a beach location, flight included and half board in one package.",
+  "Gleichzeitig liegt El Gouna nur etwa 10 km entfernt. Die Anlage erstreckt sich über rund **55.000 m²** und bietet einen wunderschönen Blick auf das Rote Meer.":
+    "At the same time, El Gouna is only about 10 km away. The resort spans around **55,000 m²** and offers a beautiful view of the Red Sea.",
+  "Highlight der Anlage ist der Infinity-Pool mit direktem Blick auf das Mittelmeer, ergänzt durch einen großzügigen Spa- und Wellnessbereich. **Adults Only 5-Sterne-Superior Hotel** mit All Inclusive und Hoteltransfer.":
+    "The highlight is the infinity pool with a direct view of the Mediterranean, complemented by a spacious spa and wellness area. **Adults Only 5-star superior hotel** with all inclusive and hotel transfer.",
+  "**Das Hotel ist ein „ADULTS ONLY“ – für Erwachsene und junge Erwachsene ab dem 16. Lebensjahr.**":
+    "**The hotel is “ADULTS ONLY” – for adults and young adults from the age of 16.**",
   "Lage: direkt am Sandstrand von Rhodos": "Location: right on the sandy beach of Rhodes",
   "Pool, Strand & Animation": "Pool, beach & entertainment",
   "Zimmer & Ausstattung": "Rooms & facilities",

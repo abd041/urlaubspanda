@@ -7,7 +7,17 @@ import {
   type RoomGuestForm,
   type Salutation,
 } from "@/components/booking/checkoutHelpers";
-import { checkoutInputClass } from "@/components/booking/checkoutFormStyles";
+import {
+  checkoutFieldErrorTextClass,
+  checkoutInputClass,
+  checkoutInputErrorClass,
+  checkoutSalutationErrorClass,
+} from "@/components/booking/checkoutFormStyles";
+import {
+  checkoutFieldDomId,
+  type CheckoutFieldErrors,
+  type CheckoutFieldKey,
+} from "@/components/booking/checkoutValidation";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { tx } from "@/i18n/content";
 import { cn } from "@/lib/utils";
@@ -24,25 +34,45 @@ interface RoomGuestsSectionProps {
   rooms: RoomSelection[];
   roomGuests: RoomGuestForm[];
   onUpdateGuest: (index: number, patch: Partial<RoomGuestForm>) => void;
+  errors?: CheckoutFieldErrors;
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p className={checkoutFieldErrorTextClass} role="alert">
+      {message}
+    </p>
+  );
 }
 
 function GuestFormRow({
   label,
   children,
   align = "start",
+  fieldId,
 }: {
   label: string;
   children: React.ReactNode;
   align?: "start" | "center";
+  fieldId?: string;
 }) {
   return (
     <div
+      id={fieldId}
       className={cn(
-        "grid gap-x-4 gap-y-1.5 border-b border-[#eef0f4] py-3 last:border-b-0 lg:grid-cols-[7.5rem_minmax(0,1fr)]",
+        "scroll-mt-24 grid gap-x-4 gap-y-1.5 border-b border-[#eef0f4] py-3 last:border-b-0 lg:grid-cols-[7.5rem_minmax(0,1fr)]",
         align === "center" ? "lg:items-center" : "lg:items-start"
       )}
     >
-      <div className={cn("text-left text-sm font-semibold text-ink lg:font-normal lg:text-body", align === "start" && "lg:pt-2.5")}>{label}</div>
+      <div
+        className={cn(
+          "text-left text-sm font-semibold text-ink lg:font-normal lg:text-body",
+          align === "start" && "lg:pt-2.5"
+        )}
+      >
+        {label}
+      </div>
       <div className="min-w-0 w-full max-w-md text-left">{children}</div>
     </div>
   );
@@ -52,15 +82,17 @@ function RoomSalutationRadios({
   name,
   value,
   onChange,
+  invalid,
 }: {
   name: string;
   value: Salutation;
   onChange: (value: Salutation) => void;
+  invalid?: boolean;
 }) {
   const t = useT();
 
   return (
-    <fieldset className="min-w-0">
+    <fieldset className={cn("min-w-0", invalid && checkoutSalutationErrorClass)}>
       <legend className="sr-only">{t("booking.salutation")}</legend>
       <div className="flex flex-wrap items-center gap-5">
         {(
@@ -73,7 +105,6 @@ function RoomSalutationRadios({
             <input
               type="radio"
               name={name}
-              required
               checked={value === option.value}
               onChange={() => onChange(option.value)}
               className="h-4 w-4 accent-brand-500"
@@ -92,10 +123,14 @@ export function RoomGuestsSection({
   rooms,
   roomGuests,
   onUpdateGuest,
+  errors = {},
 }: RoomGuestsSectionProps) {
   const t = useT();
   const { locale } = useLocale();
   const showRoomNumbers = rows.length > 1;
+
+  const guestKey = (index: number, part: "Salutation" | "FirstName" | "LastName"): CheckoutFieldKey =>
+    `room${index}${part}`;
 
   return (
     <section className={cardClass}>
@@ -107,6 +142,9 @@ export function RoomGuestsSection({
           const room = rooms[row.roomIndex];
           const guest = roomGuests[row.roomIndex] ?? { salutation: "", firstName: "", lastName: "" };
           const heading = `${tx(row.category.name, locale)} – ${formatRoomOccupancyHeading(room, locale, t)}`;
+          const salutationKey = guestKey(row.roomIndex, "Salutation");
+          const firstNameKey = guestKey(row.roomIndex, "FirstName");
+          const lastNameKey = guestKey(row.roomIndex, "LastName");
 
           return (
             <div
@@ -120,36 +158,50 @@ export function RoomGuestsSection({
               )}
               <h3 className="mb-3 text-sm font-extrabold leading-snug text-ink sm:text-base">{heading}</h3>
 
-              <GuestFormRow label={`${t("booking.salutation")} *`} align="center">
+              <GuestFormRow
+                label={`${t("booking.salutation")} *`}
+                align="center"
+                fieldId={checkoutFieldDomId(salutationKey)}
+              >
                 <RoomSalutationRadios
                   name={`room-${row.roomIndex}-salutation`}
                   value={guest.salutation}
                   onChange={(salutation) => onUpdateGuest(row.roomIndex, { salutation })}
+                  invalid={Boolean(errors[salutationKey])}
                 />
+                <FieldError message={errors[salutationKey]} />
               </GuestFormRow>
 
-              <GuestFormRow label={`${t("booking.firstName")} *`}>
+              <GuestFormRow
+                label={`${t("booking.firstName")} *`}
+                fieldId={checkoutFieldDomId(firstNameKey)}
+              >
                 <input
                   type="text"
-                  required
                   autoComplete={row.roomIndex === 0 ? "given-name" : "off"}
                   value={guest.firstName}
                   onChange={(e) => onUpdateGuest(row.roomIndex, { firstName: e.target.value })}
                   placeholder={t("booking.nameAsOnId")}
-                  className={checkoutInputClass}
+                  aria-invalid={Boolean(errors[firstNameKey]) || undefined}
+                  className={cn(checkoutInputClass, errors[firstNameKey] && checkoutInputErrorClass)}
                 />
+                <FieldError message={errors[firstNameKey]} />
               </GuestFormRow>
 
-              <GuestFormRow label={`${t("booking.lastName")} *`}>
+              <GuestFormRow
+                label={`${t("booking.lastName")} *`}
+                fieldId={checkoutFieldDomId(lastNameKey)}
+              >
                 <input
                   type="text"
-                  required
                   autoComplete={row.roomIndex === 0 ? "family-name" : "off"}
                   value={guest.lastName}
                   onChange={(e) => onUpdateGuest(row.roomIndex, { lastName: e.target.value })}
                   placeholder={t("booking.nameAsOnId")}
-                  className={checkoutInputClass}
+                  aria-invalid={Boolean(errors[lastNameKey]) || undefined}
+                  className={cn(checkoutInputClass, errors[lastNameKey] && checkoutInputErrorClass)}
                 />
+                <FieldError message={errors[lastNameKey]} />
               </GuestFormRow>
             </div>
           );

@@ -153,6 +153,32 @@ export function calculateStayPrice({
   return { total, perPerson: total / travelerCount, travelerCount, lines };
 }
 
+/**
+ * Fold a meal-plan stay supplement into per-traveler lines (equal share).
+ * Meal upgrades are part of the core room price — not a separate breakdown row.
+ * Cancellation upgrades / add-ons stay outside this helper.
+ */
+export function withMealSupplementInLines(
+  lines: TravelerPriceLine[],
+  mealSupplement: number
+): TravelerPriceLine[] {
+  if (!(mealSupplement > 0) || lines.length === 0) return lines;
+
+  const count = lines.length;
+  const totalCents = Math.round(mealSupplement * 100);
+  const baseShare = Math.floor(totalCents / count);
+  let remainder = totalCents - baseShare * count;
+
+  return lines.map((line) => {
+    const extraCents = baseShare + (remainder > 0 ? 1 : 0);
+    if (remainder > 0) remainder -= 1;
+    return {
+      ...line,
+      amount: Math.round(line.amount * 100 + extraCents) / 100,
+    };
+  });
+}
+
 
 /**
  * "Ab X € p.P." starting price for a given stay length, shown on the nights

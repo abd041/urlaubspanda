@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
-import { calculateStayPrice } from "@/lib/pricingEngine";
+import { calculateStayPrice, withMealSupplementInLines } from "@/lib/pricingEngine";
 import type { BookingOffer, CheckoutAddon, ChildPricingRule, Deal, RoomCategoryDetail } from "@/types";
 import type { RoomSelection } from "@/hooks/useBookingState";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
@@ -31,6 +31,13 @@ import {
   type PaymentMethod,
   type RoomGuestForm,
 } from "@/components/booking/checkoutHelpers";
+import {
+  firstCheckoutErrorKey,
+  scrollToCheckoutField,
+  validateCheckoutForm,
+  type CheckoutFieldErrors,
+  type CheckoutFieldKey,
+} from "@/components/booking/checkoutValidation";
 
 interface BookingSummarySectionProps {
   deal: Deal;
@@ -74,9 +81,6 @@ export function BookingSummarySection({
   const router = useRouter();
 
   const [submitting, setSubmitting] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [acceptedCancellation, setAcceptedCancellation] = useState(false);
-  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [newsletter, setNewsletter] = useState(false);
   const [payment, setPayment] = useState<PaymentMethod>("invoice");
   const [addonSelection, setAddonSelection] = useState<AddonSelectionState>({});
@@ -86,6 +90,7 @@ export function BookingSummarySection({
   const [contact, setContact] = useState<ContactForm>(emptyContact);
   const [roomGuests, setRoomGuests] = useState<RoomGuestForm[]>(() => rooms.map(() => emptyRoomGuest()));
   const [room0Touched, setRoom0Touched] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<CheckoutFieldErrors>({});
 
   const departure = useMemo(() => {
     const next = new Date(arrival);
@@ -110,6 +115,7 @@ export function BookingSummarySection({
         });
         const mealSupplement = mealPlan?.supplementTotal ?? 0;
         const cancellationSupplement = room.cancellationSelected ? offer.cancellation?.supplementTotal ?? 0 : 0;
+        const lines = withMealSupplementInLines(baseStay.lines, mealSupplement);
         const total = baseStay.total + mealSupplement + cancellationSupplement;
         return {
           roomIndex: i,
@@ -119,7 +125,7 @@ export function BookingSummarySection({
           total,
           travelerCount: baseStay.travelerCount,
           perPerson: total / Math.max(baseStay.travelerCount, 1),
-          lines: baseStay.lines,
+          lines,
           mealSupplement,
           cancellationSupplement,
         };
@@ -169,13 +175,26 @@ export function BookingSummarySection({
     });
   }, [contact.salutation, contact.firstName, contact.lastName, room0Touched]);
 
+  const clearFieldError = (key: CheckoutFieldKey) => {
+    setFieldErrors((prev) => {
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  };
+
   const updateContact = <K extends keyof ContactForm>(key: K, value: ContactForm[K]) => {
     setContact((prev) => ({ ...prev, [key]: value }));
+    if (key !== "remarks") clearFieldError(key as CheckoutFieldKey);
   };
 
   const updateRoomGuest = (index: number, patch: Partial<RoomGuestForm>) => {
     if (index === 0) setRoom0Touched(true);
     setRoomGuests((prev) => prev.map((guest, i) => (i === index ? { ...guest, ...patch } : guest)));
+    if (patch.salutation !== undefined) clearFieldError(`room${index}Salutation`);
+    if (patch.firstName !== undefined) clearFieldError(`room${index}FirstName`);
+    if (patch.lastName !== undefined) clearFieldError(`room${index}LastName`);
   };
 
   const applyVoucher = () => {
@@ -202,7 +221,7 @@ export function BookingSummarySection({
     setVoucherError(false);
   };
 
-  const canSubmit = acceptedTerms && acceptedCancellation && acceptedPrivacy && !submitting;
+  const canSubmit = !submitting;
 
   const buildSnapshot = (): BookingConfirmationSnapshot => ({
     version: 1,
@@ -212,6 +231,7 @@ export function BookingSummarySection({
     createdAt: new Date().toISOString(),
     arrivalIso: arrival.toISOString(),
     nights,
+    tourOperator: validRows[0]?.offer.provider || deal.provider,
     hotel: {
       name: deal.name,
       image: deal.images[0] ?? "",
@@ -262,6 +282,16 @@ export function BookingSummarySection({
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
+
+    const errors = validateCheckoutForm(contact, roomGuests, t);
+    const firstError = firstCheckoutErrorKey(errors, roomGuests.length);
+    if (firstError) {
+      setFieldErrors(errors);
+      scrollToCheckoutField(firstError);
+      return;
+    }
+
+    setFieldErrors({});
     setSubmitting(true);
     saveBookingConfirmation(buildSnapshot());
     router.push(`/hotel/${deal.slug}/checkout/confirmation`);
@@ -317,14 +347,15 @@ export function BookingSummarySection({
         offerHref={offerHref}
       />
 
-      <form id="checkout-form" onSubmit={handleSubmit} className="mt-4 space-y-4">
-        <BillingContactSection contact={contact} onUpdate={updateContact} />
+      <form id="checkout-form" noValidate onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <BillingContactSection contact={contact} onUpdate={updateContact} errors={fieldErrors} />
 
         <RoomGuestsSection
           rows={validRows.map((row) => ({ roomIndex: row.roomIndex, category: row.category }))}
           rooms={rooms}
           roomGuests={roomGuests}
           onUpdateGuest={updateRoomGuest}
+          errors={fieldErrors}
         />
 
         {/* Part 4 — travel protection (hidden in v1; see CHECKOUT_FEATURES.travelProtection) */}
@@ -363,12 +394,6 @@ export function BookingSummarySection({
           arrival={arrival}
           newsletter={newsletter}
           onNewsletterChange={setNewsletter}
-          acceptedTerms={acceptedTerms}
-          onAcceptedTermsChange={setAcceptedTerms}
-          acceptedCancellation={acceptedCancellation}
-          onAcceptedCancellationChange={setAcceptedCancellation}
-          acceptedPrivacy={acceptedPrivacy}
-          onAcceptedPrivacyChange={setAcceptedPrivacy}
           canSubmit={canSubmit}
           submitting={submitting}
         />

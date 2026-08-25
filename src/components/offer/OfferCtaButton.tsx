@@ -7,6 +7,7 @@ import type { CtaMode, OfferBookingUrls, OfferCtaOption } from "@/types";
 import { cn } from "@/lib/utils";
 import { hasInternalBooking, internalBookingPath } from "@/lib/bookingRoute";
 import { CountrySelectionModal } from "@/components/offer/CountrySelectionModal";
+import type { CountrySelectionNoticeConfig } from "@/data/countrySelectionNotice";
 import { useT } from "@/i18n/LocaleProvider";
 
 interface OfferCtaButtonProps {
@@ -16,6 +17,8 @@ interface OfferCtaButtonProps {
   bookingUrls?: OfferBookingUrls;
   /** Custom popup choices with optional emoji/flags (admin/data configurable). */
   ctaOptions?: OfferCtaOption[];
+  /** Per-offer override for the country popup orange info box. */
+  countrySelectionNotice?: Partial<CountrySelectionNoticeConfig> | null;
   className?: string;
   label?: string;
   variant?: "primary" | "quiet";
@@ -51,6 +54,7 @@ export function OfferCtaButton({
   bookingUrl,
   bookingUrls,
   ctaOptions,
+  countrySelectionNotice,
   className,
   label,
   variant = "primary",
@@ -108,6 +112,7 @@ export function OfferCtaButton({
           onClose={() => setCountryModalOpen(false)}
           bookingUrls={bookingUrls}
           ctaOptions={ctaOptions}
+          notice={countrySelectionNotice}
         />
       )}
     </>

@@ -104,6 +104,7 @@ export function PriceSidebar({ deal, detail }: { deal: Deal; detail: OfferDetail
               bookingUrl={detail.bookingUrl}
               bookingUrls={detail.bookingUrls}
               ctaOptions={detail.ctaOptions}
+              countrySelectionNotice={detail.countrySelectionNotice}
             />
           </div>
 

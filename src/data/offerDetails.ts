@@ -7,6 +7,8 @@ import type { OfferDetail } from "@/types";
  * - `ctaMode: "direct"` + `bookingUrl` → open partner site immediately
  * - `ctaMode: "country_selection"` + `bookingUrls` and/or `ctaOptions`
  *   → popup with choices (emoji/flags supported on each option)
+ * - Country popup orange info box: global `countrySelectionNotice` (+ optional
+ *   per-offer `countrySelectionNotice` override)
  */
 export const offerDetails: Record<string, OfferDetail> = {
   "apollo-beach-rhodos": {
@@ -31,8 +33,8 @@ export const offerDetails: Record<string, OfferDetail> = {
     descriptionHeading: "Familienfreundliches Strandhotel an der Ostküste von Rhodos",
     descriptionParagraphs: [
       "Das Apollo Beach Rhodos liegt direkt am Sandstrand der beliebten Ostküste und ist rund 25 Minuten vom Flughafen Rhodos entfernt.",
-      "Die Anlage verfügt über einen großzügigen Pool- und Gartenbereich, mehrere Restaurants sowie ein tägliches Animationsprogramm für Kinder und Erwachsene.",
-      "Die Zimmer sind modern eingerichtet und bieten Platz für Familien mit bis zu zwei Kindern.",
+      "Die Anlage verfügt über einen großzügigen Pool- und Gartenbereich, mehrere Restaurants sowie ein tägliches Animationsprogramm für Kinder und Erwachsene. **Familienfreundliches 4★-Hotel** mit Halbpension, Direktflug und Hoteltransfer – ideal für einen entspannten Strandurlaub.",
+      "**Besonders geeignet für Familien und Paare**, die Strandlage, Flug inklusive und Halbpension in einem Paket suchen.",
     ],
     contentSections: [
       {
@@ -43,27 +45,11 @@ export const offerDetails: Record<string, OfferDetail> = {
         ],
       },
       {
-        heading: "Lage: direkt am Sandstrand von Rhodos",
+        heading: "Das Apollo Beach Rhodos",
         paragraphs: [
           "In erster Strandlinie an der Ostküste von Rhodos gelegen, erreichst du Liegen und Sonnenschirme ohne lange Wege. Geschäfte und Restaurants der Umgebung sind gut erreichbar; der Transfer vom Flughafen ist im Angebot inklusive.",
-        ],
-      },
-      {
-        heading: "Pool, Strand & Animation",
-        paragraphs: [
           "Großer Pool- und Gartenbereich, direkter Strandzugang sowie Kinderclub und Animation sorgen für Abwechslung. Halbpension mit reichhaltigem Buffet hält die Verpflegung unkompliziert.",
-        ],
-      },
-      {
-        heading: "Zimmer & Ausstattung",
-        paragraphs: [
           "Die Zimmer sind modern eingerichtet und bieten Platz für Familien mit bis zu zwei Kindern. Klimaanlage und WLAN gehören zur Standardausstattung.",
-        ],
-      },
-      {
-        heading: "Für wen sich dieses Hotel eignet",
-        paragraphs: [
-          "Besonders geeignet für Familien und Paare, die Strandlage, Flug inklusive und Halbpension in einem Paket suchen – ohne auf Animation und Pool zu verzichten.",
         ],
       },
     ],
@@ -265,7 +251,7 @@ export const offerDetails: Record<string, OfferDetail> = {
     descriptionHeading: "Neu eröffnetes Resort direkt am Roten Meer",
     descriptionParagraphs: [
       "Das Rewaya Luxury Resort liegt rund 20 km vom Flughafen Hurghada entfernt, sodass ihr nach der Landung keine lange Anreise vor euch habt.",
-      "Gleichzeitig liegt El Gouna nur etwa 10 km entfernt. Die Anlage erstreckt sich über rund 55.000 m² und bietet einen wunderschönen Blick auf das Rote Meer.",
+      "Gleichzeitig liegt El Gouna nur etwa 10 km entfernt. Die Anlage erstreckt sich über rund **55.000 m²** und bietet einen wunderschönen Blick auf das Rote Meer.",
       "Die Zimmer sind modern gestaltet und in verschiedenen Kategorien buchbar – darunter Zimmer mit Meerblick, Junior Suiten und sogar Swim-up-Zimmer, bei denen ihr direkten Zugang zum Pool habt.",
     ],
     contentSections: [
@@ -276,20 +262,10 @@ export const offerDetails: Record<string, OfferDetail> = {
         ],
       },
       {
-        heading: "Lage: am Roten Meer nahe El Gouna",
+        heading: "Das Rewaya Luxury Resort",
         paragraphs: [
           "El Gouna liegt nur etwa 10 km entfernt. Transfer und All Inclusive sind im Angebot enthalten – ideal für Strand-, Pool- und Wellnessurlaub.",
-        ],
-      },
-      {
-        heading: "Wellness, Pool & Aquapark",
-        paragraphs: [
           "Große Pool- und Aquapark-Landschaft, moderner Wellnessbereich sowie mehrere Restaurants und Bars erwarten dich vor Ort.",
-        ],
-      },
-      {
-        heading: "Zimmer & Ausstattung",
-        paragraphs: [
           "Modern gestaltete Zimmer in verschiedenen Kategorien – darunter Meerblick, Junior Suiten und Swim-up-Zimmer mit direktem Poolzugang.",
         ],
       },
@@ -361,7 +337,8 @@ export const offerDetails: Record<string, OfferDetail> = {
     descriptionHeading: "Adults-Only-Resort mit Infinity-Pool über dem Meer",
     descriptionParagraphs: [
       "Das Kreta Sun Village liegt an der ruhigen Nordküste Kretas und richtet sich ausschließlich an erwachsene Gäste, die eine entspannte Auszeit suchen.",
-      "Highlight der Anlage ist der Infinity-Pool mit direktem Blick auf das Mittelmeer, ergänzt durch einen großzügigen Spa- und Wellnessbereich.",
+      "Highlight der Anlage ist der Infinity-Pool mit direktem Blick auf das Mittelmeer, ergänzt durch einen großzügigen Spa- und Wellnessbereich. **Adults Only 5-Sterne-Superior Hotel** mit All Inclusive und Hoteltransfer.",
+      "**Das Hotel ist ein „ADULTS ONLY“ – für Erwachsene und junge Erwachsene ab dem 16. Lebensjahr.**",
     ],
     contentSections: [
       {
@@ -371,14 +348,9 @@ export const offerDetails: Record<string, OfferDetail> = {
         ],
       },
       {
-        heading: "Lage: Adults Only an der Nordküste",
+        heading: "Das Kreta Sun Village",
         paragraphs: [
           "Ruhige Lage mit Strandzugang und Infinity-Pool über dem Mittelmeer – ohne Familientrubel.",
-        ],
-      },
-      {
-        heading: "Wellness & Kulinarik",
-        paragraphs: [
           "Preisgekrönter Spa-Bereich und À-la-carte-Restaurants inklusive machen den Aufenthalt besonders.",
         ],
       },

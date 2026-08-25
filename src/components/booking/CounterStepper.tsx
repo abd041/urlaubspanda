@@ -39,10 +39,10 @@ export function CounterStepper({
     <div
       className={cn(
         "flex min-w-0 items-center",
-        compact ? "w-auto gap-3" : "w-full justify-between gap-2"
+        compact ? "w-auto gap-4" : "w-full justify-between gap-3"
       )}
     >
-      <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden", !compact && "flex-1")}>
+      <div className={cn("flex min-w-0 items-center gap-2 overflow-hidden", !compact && "flex-1")}>
         {Icon && (
           <span
             className={cn(
@@ -58,7 +58,7 @@ export function CounterStepper({
           {sublabel && <p className="text-xs leading-snug text-muted">{sublabel}</p>}
         </div>
       </div>
-      <div className={cn("flex shrink-0 items-center", compact ? "gap-0" : "gap-0.5 sm:gap-1")}>
+      <div className={cn("flex shrink-0 items-center", compact ? "gap-0.5" : "gap-0.5 sm:gap-1")}>
         <button
           type="button"
           onClick={() => onChange(Math.max(value - 1, min))}
@@ -71,7 +71,7 @@ export function CounterStepper({
         <span
           className={cn(
             "text-center font-bold tabular-nums text-ink",
-            compact ? "w-5 text-sm" : "min-w-[1.25rem] px-0.5 text-base"
+            compact ? "w-6 text-sm" : "min-w-[1.5rem] px-0.5 text-base"
           )}
           aria-live="polite"
         >

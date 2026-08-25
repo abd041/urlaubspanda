@@ -10,15 +10,10 @@ import { offerDetails } from "@/data/offerDetails";
 import { destinations } from "@/data/destinations";
 import { OfferGallery } from "@/components/offer/OfferGallery";
 import { OfferHeroHeader } from "@/components/offer/OfferHeroHeader";
-import { OfferAtAGlance } from "@/components/offer/OfferAtAGlance";
 import { OfferContentSections } from "@/components/offer/OfferContentSections";
-import { OfferIncludedList } from "@/components/offer/OfferIncludedList";
-import { OfferCompareCard } from "@/components/offer/OfferCompareCard";
 import { OfferLocationSection } from "@/components/offer/OfferLocationSection";
 import { OfferImpressions } from "@/components/offer/OfferImpressions";
 import { OfferSimilarDeals } from "@/components/offer/OfferSimilarDeals";
-import { OfferAmenities } from "@/components/offer/OfferAmenities";
-import { OfferHighlights } from "@/components/offer/OfferHighlights";
 import { MobilePriceSection } from "@/components/offer/MobilePriceSection";
 import { MobileStickyCta } from "@/components/offer/MobileStickyCta";
 import { OfferClickTracker } from "@/components/offer/OfferClickTracker";
@@ -26,6 +21,7 @@ import { PriceSidebar } from "@/components/offer/PriceSidebar";
 import { SITE_URL } from "@/lib/site";
 import { OfferBreadcrumb } from "@/components/offer/OfferBreadcrumb";
 import { OfferOpenAtTop } from "@/components/offer/OfferOpenAtTop";
+import { OfferBackToListing } from "@/components/offer/OfferBackToListing";
 
 function getOffer(slug: string) {
   const deal = deals.find((d) => d.slug === slug);
@@ -94,6 +90,12 @@ export default async function OfferPage({ params }: PageProps<"/angebot/[slug]">
       <OfferClickTracker dealId={deal.id} />
       <OfferOpenAtTop />
 
+      <OfferBackToListing
+        fallbackHref={
+          countryDestination ? destinationPath(countryDestination.slug) : "/angebote"
+        }
+      />
+
       <OfferBreadcrumb
         country={deal.destinationCountry}
         countrySlug={countryDestination?.slug}
@@ -120,25 +122,15 @@ export default async function OfferPage({ params }: PageProps<"/angebot/[slug]">
 
           <div className="lg:flex lg:items-start lg:gap-8">
             <div className="flex min-w-0 flex-1 flex-col gap-10 sm:gap-12">
-              <OfferAtAGlance deal={deal} detail={detail} />
-
-              <OfferIncludedList items={detail.inclusions} />
-
-              <OfferHighlights items={detail.highlights} />
-
               <OfferContentSections
                 sections={detail.contentSections}
                 fallbackHeading={detail.descriptionHeading}
                 fallbackParagraphs={detail.descriptionParagraphs}
               />
 
-              <OfferCompareCard deal={deal} detail={detail} />
-
               <OfferLocationSection deal={deal} />
 
               <OfferImpressions deal={deal} detail={detail} />
-
-              {detail.amenities.length > 0 && <OfferAmenities amenities={detail.amenities} />}
             </div>
 
             <PriceSidebar deal={deal} detail={detail} />

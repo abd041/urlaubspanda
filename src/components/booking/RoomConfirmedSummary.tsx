@@ -74,6 +74,9 @@ export function RoomConfirmedSummary({
             : t("booking.roomSelected")}
         </p>
         <p className="truncate text-sm font-bold text-ink">{tx(room.name, locale)}</p>
+        {room.sizeLabel ? (
+          <p className="truncate text-xs text-muted">{tx(room.sizeLabel, locale)}</p>
+        ) : null}
         <p className="truncate text-xs text-muted">{occupancyLine}</p>
       </div>
       <div className="text-right">

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useState, type MouseEvent } from "react";
 import { ChevronRight } from "lucide-react";
 import type { TravelerPriceLine } from "@/lib/pricingEngine";
 import type { BookingOffer, RoomCategoryDetail } from "@/types";
@@ -9,11 +9,12 @@ import {
   formatCheckoutCancellationDeadline,
   hasFreeCancellation,
 } from "@/lib/freeCancellation";
-import { formatEuro } from "@/lib/utils";
+import { formatEuro, cn } from "@/lib/utils";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { localeTag } from "@/i18n/config";
-import { mealPlanLabel, tx } from "@/i18n/content";
-import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/content";
+import { LegalDocumentModal } from "@/components/legal/LegalDocumentModal";
+import type { LegalDocKind } from "@/components/legal/LegalDocumentSections";
 
 const cardClass = "rounded-2xl border border-[#e8eaef] bg-white p-4 shadow-[0_4px_16px_rgba(15,26,43,0.06)] sm:p-5";
 
@@ -38,12 +39,6 @@ interface CheckoutFinalSummaryProps {
   arrival: Date;
   newsletter: boolean;
   onNewsletterChange: (value: boolean) => void;
-  acceptedTerms: boolean;
-  onAcceptedTermsChange: (value: boolean) => void;
-  acceptedCancellation: boolean;
-  onAcceptedCancellationChange: (value: boolean) => void;
-  acceptedPrivacy: boolean;
-  onAcceptedPrivacyChange: (value: boolean) => void;
   canSubmit: boolean;
   submitting: boolean;
 }
@@ -67,17 +62,12 @@ export function CheckoutFinalSummary({
   arrival,
   newsletter,
   onNewsletterChange,
-  acceptedTerms,
-  onAcceptedTermsChange,
-  acceptedCancellation,
-  onAcceptedCancellationChange,
-  acceptedPrivacy,
-  onAcceptedPrivacyChange,
   canSubmit,
   submitting,
 }: CheckoutFinalSummaryProps) {
   const t = useT();
   const { locale } = useLocale();
+  const [legalDoc, setLegalDoc] = useState<LegalDocKind | null>(null);
   const priceFormatter = new Intl.NumberFormat(localeTag(locale), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -88,6 +78,14 @@ export function CheckoutFinalSummary({
   const deadlineDisplay = deadline.includes(",")
     ? deadline.replace(", ", " (") + ")"
     : deadline;
+
+  const openLegal = (kind: LegalDocKind) => (event: MouseEvent) => {
+    event.preventDefault();
+    setLegalDoc(kind);
+  };
+
+  const legalLinkClass =
+    "font-semibold text-brand-500 underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500";
 
   return (
     <section className={cardClass}>
@@ -117,14 +115,6 @@ export function CheckoutFinalSummary({
                     </span>
                   </li>
                 ))}
-                {row.mealSupplement > 0 && row.mealPlan && (
-                  <li className="flex justify-between gap-3 text-sm">
-                    <span className="text-body">{mealPlanLabel(row.mealPlan.label, locale)}</span>
-                    <span className="shrink-0 tabular-nums text-ink">
-                      +{priceFormatter.format(row.mealSupplement)} €
-                    </span>
-                  </li>
-                )}
                 {row.cancellationSupplement > 0 && row.offer.cancellation && (
                   <li className="flex justify-between gap-3 text-sm">
                     <span className="text-body">{tx(row.offer.cancellation.label, locale)}</span>
@@ -192,9 +182,9 @@ export function CheckoutFinalSummary({
           />
           <span>
             {t("booking.newsletterOptInLong")}{" "}
-            <Link href="/datenschutz" className="font-semibold text-brand-500 underline-offset-2 hover:underline">
+            <button type="button" onClick={openLegal("privacy")} className={legalLinkClass}>
               {t("booking.newsletterMoreInfo")}
-            </Link>
+            </button>
           </span>
         </label>
       </div>
@@ -202,51 +192,19 @@ export function CheckoutFinalSummary({
       <div className="mt-6 space-y-3 border-t border-[#eef0f4] pt-5">
         <p className="text-sm leading-relaxed text-body">
           {t("booking.legalAcceptLead")}{" "}
-          <Link href="/agb" className="font-semibold text-brand-500 underline-offset-2 hover:underline">
+          <button type="button" onClick={openLegal("agb")} className={legalLinkClass}>
             {t("booking.legalAgbLink")}
-          </Link>
+          </button>
           {", "}
-          <Link href="/agb" className="font-semibold text-brand-500 underline-offset-2 hover:underline">
+          <button type="button" onClick={openLegal("cancellation")} className={legalLinkClass}>
             {t("booking.legalCancelLink")}
-          </Link>
-          {" "}
+          </button>{" "}
           {t("booking.legalAcceptMid")}{" "}
-          <Link href="/datenschutz" className="font-semibold text-brand-500 underline-offset-2 hover:underline">
+          <button type="button" onClick={openLegal("privacy")} className={legalLinkClass}>
             {t("booking.legalPrivacyLink")}
-          </Link>
+          </button>
           .
         </p>
-
-        <label className="flex items-start gap-3 text-sm leading-relaxed text-body">
-          <input
-            type="checkbox"
-            required
-            checked={acceptedTerms}
-            onChange={(e) => onAcceptedTermsChange(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 accent-brand-500"
-          />
-          {t("booking.acceptTermsAgb")}
-        </label>
-        <label className="flex items-start gap-3 text-sm leading-relaxed text-body">
-          <input
-            type="checkbox"
-            required
-            checked={acceptedCancellation}
-            onChange={(e) => onAcceptedCancellationChange(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 accent-brand-500"
-          />
-          {t("booking.acceptCancellation")}
-        </label>
-        <label className="flex items-start gap-3 text-sm leading-relaxed text-body">
-          <input
-            type="checkbox"
-            required
-            checked={acceptedPrivacy}
-            onChange={(e) => onAcceptedPrivacyChange(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 accent-brand-500"
-          />
-          {t("booking.acceptPrivacy")}
-        </label>
       </div>
 
       <button
@@ -267,6 +225,8 @@ export function CheckoutFinalSummary({
           {t("booking.cancelNoRisk", { date: deadlineDisplay })}
         </p>
       )}
+
+      <LegalDocumentModal kind={legalDoc} onClose={() => setLegalDoc(null)} />
     </section>
   );
 }

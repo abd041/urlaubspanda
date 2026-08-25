@@ -8,7 +8,18 @@ import {
   type ContactForm,
   type CheckoutCountry,
 } from "@/components/booking/checkoutHelpers";
-import { checkoutInputClass, checkoutSelectTriggerClass } from "@/components/booking/checkoutFormStyles";
+import {
+  checkoutFieldErrorTextClass,
+  checkoutInputClass,
+  checkoutInputErrorClass,
+  checkoutSalutationErrorClass,
+  checkoutSelectTriggerClass,
+} from "@/components/booking/checkoutFormStyles";
+import {
+  checkoutFieldDomId,
+  type CheckoutFieldErrors,
+  type CheckoutFieldKey,
+} from "@/components/booking/checkoutValidation";
 import { useT } from "@/i18n/LocaleProvider";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +32,7 @@ const COUNTRY_OPTIONS: Exclude<CheckoutCountry, "">[] = ["AT", "DE", "CH"];
 interface BillingContactSectionProps {
   contact: ContactForm;
   onUpdate: <K extends keyof ContactForm>(key: K, value: ContactForm[K]) => void;
+  errors?: CheckoutFieldErrors;
 }
 
 function FieldHint({ children }: { children: ReactNode }) {
@@ -32,23 +44,35 @@ function FieldHint({ children }: { children: ReactNode }) {
   );
 }
 
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p className={checkoutFieldErrorTextClass} role="alert">
+      {message}
+    </p>
+  );
+}
+
 function FormRow({
   label,
   children,
   hint,
   className,
   align = "start",
+  fieldId,
 }: {
   label: string;
   children: ReactNode;
   hint?: ReactNode;
   className?: string;
   align?: "start" | "center";
+  fieldId?: string;
 }) {
   return (
     <div
+      id={fieldId}
       className={cn(
-        "grid gap-x-4 gap-y-1.5 border-b border-[#eef0f4] py-3.5 last:border-b-0 lg:grid-cols-[minmax(7.5rem,11rem)_minmax(0,1fr)]",
+        "scroll-mt-24 grid gap-x-4 gap-y-1.5 border-b border-[#eef0f4] py-3.5 last:border-b-0 lg:grid-cols-[minmax(7.5rem,11rem)_minmax(0,1fr)]",
         align === "center" ? "lg:items-center" : "lg:items-start",
         className
       )}
@@ -74,14 +98,16 @@ function FormRow({
 function SalutationRadios({
   value,
   onChange,
+  invalid,
 }: {
   value: ContactForm["salutation"];
   onChange: (value: ContactForm["salutation"]) => void;
+  invalid?: boolean;
 }) {
   const t = useT();
 
   return (
-    <fieldset className="min-w-0">
+    <fieldset className={cn("min-w-0", invalid && checkoutSalutationErrorClass)}>
       <legend className="sr-only">{t("booking.salutation")}</legend>
       <div className="flex flex-wrap items-center gap-5">
         {(
@@ -94,7 +120,6 @@ function SalutationRadios({
             <input
               type="radio"
               name="billing-salutation"
-              required
               checked={value === option.value}
               onChange={() => onChange(option.value)}
               className="h-4 w-4 accent-brand-500"
@@ -136,16 +161,14 @@ function countryLabel(code: Exclude<CheckoutCountry, "">, t: (key: string) => st
   return t("booking.countryCH");
 }
 
-/**
- * Custom country picker — native select popups can render wider/offset on
- * some browsers; this listbox is always width-matched to the trigger.
- */
 function CountrySelect({
   value,
   onChange,
+  invalid,
 }: {
   value: CheckoutCountry;
   onChange: (value: CheckoutCountry) => void;
+  invalid?: boolean;
 }) {
   const t = useT();
   const listId = useId();
@@ -170,35 +193,18 @@ function CountrySelect({
 
   return (
     <div ref={rootRef} className="relative w-full min-w-0 max-w-full">
-      {/* Native select for HTML5 required validation; visually hidden */}
-      <select
-        required
-        tabIndex={-1}
-        aria-hidden="true"
-        value={value}
-        onChange={(e) => onChange(e.target.value as CheckoutCountry)}
-        className="pointer-events-none absolute h-px w-px opacity-0"
-      >
-        <option value="" disabled>
-          {t("booking.chooseCountry")}
-        </option>
-        {COUNTRY_OPTIONS.map((code) => (
-          <option key={code} value={code}>
-            {countryLabel(code, t)}
-          </option>
-        ))}
-      </select>
-
       <button
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
+        aria-invalid={invalid || undefined}
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
           checkoutSelectTriggerClass,
           open && "border-brand-500",
-          value && "border-success"
+          value && !invalid && "border-success",
+          invalid && checkoutInputErrorClass
         )}
       >
         <span className={cn("truncate", !value && "text-muted/70")}>
@@ -243,9 +249,12 @@ function CountrySelect({
 }
 
 /** Part 2 — billing contact form matching checkout reference layout. */
-export function BillingContactSection({ contact, onUpdate }: BillingContactSectionProps) {
+export function BillingContactSection({ contact, onUpdate, errors = {} }: BillingContactSectionProps) {
   const t = useT();
   const [remarksOpen, setRemarksOpen] = useState(false);
+
+  const field = (key: CheckoutFieldKey) => checkoutFieldDomId(key);
+  const err = (key: CheckoutFieldKey) => errors[key];
 
   return (
     <section className={cn(cardClass, "overflow-visible")}>
@@ -253,117 +262,151 @@ export function BillingContactSection({ contact, onUpdate }: BillingContactSecti
       <p className="mt-1 text-sm text-body">{t("booking.allFieldsRequired")}</p>
 
       <div className="mt-2">
-        <FormRow label={`${t("booking.salutation")} *`} align="center">
-          <SalutationRadios value={contact.salutation} onChange={(value) => onUpdate("salutation", value)} />
+        <FormRow label={`${t("booking.salutation")} *`} align="center" fieldId={field("salutation")}>
+          <SalutationRadios
+            value={contact.salutation}
+            onChange={(value) => onUpdate("salutation", value)}
+            invalid={Boolean(err("salutation"))}
+          />
+          <FieldError message={err("salutation")} />
         </FormRow>
 
-        <FormRow label={`${t("booking.firstName")} *`} hint={<FieldHint>{t("booking.firstNameHint")}</FieldHint>}>
+        <FormRow label={`${t("booking.firstName")} *`} fieldId={field("firstName")}>
           <input
             type="text"
-            required
             autoComplete="given-name"
             value={contact.firstName}
             onChange={(e) => onUpdate("firstName", e.target.value)}
             placeholder={t("booking.nameAsOnId")}
-            className={checkoutInputClass}
+            aria-invalid={Boolean(err("firstName")) || undefined}
+            className={cn(checkoutInputClass, err("firstName") && checkoutInputErrorClass)}
           />
+          <FieldError message={err("firstName")} />
         </FormRow>
 
-        <FormRow label={`${t("booking.lastName")} *`}>
+        <FormRow label={`${t("booking.lastName")} *`} fieldId={field("lastName")}>
           <input
             type="text"
-            required
             autoComplete="family-name"
             value={contact.lastName}
             onChange={(e) => onUpdate("lastName", e.target.value)}
             placeholder={t("booking.nameAsOnId")}
-            className={checkoutInputClass}
+            aria-invalid={Boolean(err("lastName")) || undefined}
+            className={cn(checkoutInputClass, err("lastName") && checkoutInputErrorClass)}
           />
+          <FieldError message={err("lastName")} />
         </FormRow>
 
-        <FormRow label={`${t("booking.country")} *`}>
-          <CountrySelect value={contact.country} onChange={(country) => onUpdate("country", country)} />
+        <FormRow label={`${t("booking.country")} *`} fieldId={field("country")}>
+          <CountrySelect
+            value={contact.country}
+            onChange={(country) => onUpdate("country", country)}
+            invalid={Boolean(err("country"))}
+          />
+          <FieldError message={err("country")} />
         </FormRow>
 
         <FormRow label={`${t("booking.streetAndHouseNumber")} *`}>
-          <div className="flex min-w-0 items-center gap-2">
-            <input
-              type="text"
-              required
-              autoComplete="address-line1"
-              value={contact.street}
-              onChange={(e) => onUpdate("street", e.target.value)}
-              placeholder={t("booking.streetPlaceholder")}
-              className={cn(checkoutInputClass, "min-w-0 flex-[1_1_70%]")}
-            />
-            <input
-              type="text"
-              required
-              autoComplete="off"
-              value={contact.houseNumber}
-              onChange={(e) => onUpdate("houseNumber", e.target.value)}
-              placeholder={t("booking.houseNumberPlaceholder")}
-              pattern="[0-9A-Za-z/\\-]+"
-              className={cn(checkoutInputClass, "w-[30%] min-w-[4.5rem] shrink-0")}
-            />
+          <div className="flex min-w-0 items-start gap-2">
+            <div id={field("street")} className="min-w-0 flex-[1_1_70%] scroll-mt-24">
+              <input
+                type="text"
+                autoComplete="address-line1"
+                value={contact.street}
+                onChange={(e) => onUpdate("street", e.target.value)}
+                placeholder={t("booking.streetPlaceholder")}
+                aria-invalid={Boolean(err("street")) || undefined}
+                className={cn(checkoutInputClass, err("street") && checkoutInputErrorClass)}
+              />
+              <FieldError message={err("street")} />
+            </div>
+            <div id={field("houseNumber")} className="w-[30%] min-w-[4.5rem] shrink-0 scroll-mt-24">
+              <input
+                type="text"
+                autoComplete="off"
+                value={contact.houseNumber}
+                onChange={(e) => onUpdate("houseNumber", e.target.value)}
+                placeholder={t("booking.houseNumberPlaceholder")}
+                aria-invalid={Boolean(err("houseNumber")) || undefined}
+                className={cn(checkoutInputClass, err("houseNumber") && checkoutInputErrorClass)}
+              />
+              <FieldError message={err("houseNumber")} />
+            </div>
           </div>
         </FormRow>
 
         <FormRow label={`${t("booking.zipAndCity")} *`}>
-          <div className="flex min-w-0 items-center gap-2">
-            <input
-              type="text"
-              required
-              inputMode="numeric"
-              autoComplete="postal-code"
-              value={contact.zip}
-              onChange={(e) => onUpdate("zip", e.target.value)}
-              placeholder={t("booking.zipPlaceholder")}
-              className={cn(checkoutInputClass, "w-[35%] min-w-[5rem] shrink-0")}
-            />
-            <input
-              type="text"
-              required
-              autoComplete="address-level2"
-              value={contact.city}
-              onChange={(e) => onUpdate("city", e.target.value)}
-              placeholder={t("booking.cityPlaceholder")}
-              className={cn(checkoutInputClass, "min-w-0 flex-[1_1_65%]")}
-            />
+          <div className="flex min-w-0 items-start gap-2">
+            <div id={field("zip")} className="w-[35%] min-w-[5rem] shrink-0 scroll-mt-24">
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="postal-code"
+                value={contact.zip}
+                onChange={(e) => onUpdate("zip", e.target.value)}
+                placeholder={t("booking.zipPlaceholder")}
+                aria-invalid={Boolean(err("zip")) || undefined}
+                className={cn(checkoutInputClass, err("zip") && checkoutInputErrorClass)}
+              />
+              <FieldError message={err("zip")} />
+            </div>
+            <div id={field("city")} className="min-w-0 flex-[1_1_65%] scroll-mt-24">
+              <input
+                type="text"
+                autoComplete="address-level2"
+                value={contact.city}
+                onChange={(e) => onUpdate("city", e.target.value)}
+                placeholder={t("booking.cityPlaceholder")}
+                aria-invalid={Boolean(err("city")) || undefined}
+                className={cn(checkoutInputClass, err("city") && checkoutInputErrorClass)}
+              />
+              <FieldError message={err("city")} />
+            </div>
           </div>
         </FormRow>
 
-        <FormRow label={`${t("booking.email")} *`} hint={<FieldHint>{t("booking.emailHint")}</FieldHint>}>
+        <FormRow
+          label={`${t("booking.email")} *`}
+          hint={<FieldHint>{t("booking.emailHint")}</FieldHint>}
+          fieldId={field("email")}
+        >
           <input
             type="email"
-            required
             autoComplete="email"
             inputMode="email"
             value={contact.email}
             onChange={(e) => onUpdate("email", e.target.value)}
             placeholder={t("booking.emailPlaceholder")}
-            className={checkoutInputClass}
+            aria-invalid={Boolean(err("email")) || undefined}
+            className={cn(checkoutInputClass, err("email") && checkoutInputErrorClass)}
           />
+          <FieldError message={err("email")} />
         </FormRow>
 
-        <FormRow label={`${t("booking.phone")} *`} hint={<FieldHint>{t("booking.phoneHint")}</FieldHint>}>
+        <FormRow
+          label={`${t("booking.phone")} *`}
+          hint={<FieldHint>{t("booking.phoneHint")}</FieldHint>}
+          fieldId={field("phoneLocal")}
+        >
           <div className="flex min-w-0 items-center gap-2">
             <PhonePrefixDisplay country={contact.country} />
             <input
               type="tel"
-              required={Boolean(contact.country)}
               inputMode="tel"
               autoComplete="tel-national"
               value={contact.phoneLocal}
               onChange={(e) => onUpdate("phoneLocal", e.target.value)}
               disabled={!contact.country}
               placeholder={contact.country ? t("booking.phonePlaceholder") : t("booking.chooseCountry")}
+              aria-invalid={Boolean(err("phoneLocal")) || undefined}
               className={cn(
                 checkoutInputClass,
-                "min-w-0 flex-1 disabled:cursor-not-allowed disabled:bg-[#f7f8fb] disabled:text-muted"
+                "min-w-0 flex-1 disabled:cursor-not-allowed disabled:bg-[#f7f8fb] disabled:text-muted",
+                err("phoneLocal") && checkoutInputErrorClass
               )}
             />
           </div>
+          <FieldError message={err("phoneLocal")} />
         </FormRow>
       </div>
 

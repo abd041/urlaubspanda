@@ -28,17 +28,23 @@ export function HeaderSearch({
   className,
   onNavigate,
   compact = false,
+  autoFocus = false,
+  /** Inline results panel (mobile overlay) instead of floating dropdown. */
+  panel = false,
 }: {
   className?: string;
   onNavigate?: () => void;
   compact?: boolean;
+  autoFocus?: boolean;
+  panel?: boolean;
 }) {
   const t = useT();
   const { locale } = useLocale();
   const router = useRouter();
   const rootRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(autoFocus);
   const [active, setActive] = useState(0);
 
   const suggestions = useMemo(() => {
@@ -89,12 +95,19 @@ export function HeaderSearch({
   }, [query, locale]);
 
   useEffect(() => {
+    if (!autoFocus) return;
+    const id = window.setTimeout(() => inputRef.current?.focus(), 50);
+    return () => window.clearTimeout(id);
+  }, [autoFocus]);
+
+  useEffect(() => {
+    if (panel) return;
     const onPointerDown = (event: MouseEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", onPointerDown);
     return () => document.removeEventListener("mousedown", onPointerDown);
-  }, []);
+  }, [panel]);
 
   const go = (href: string) => {
     setOpen(false);
@@ -110,6 +123,7 @@ export function HeaderSearch({
     }
     if (event.key === "Escape") {
       setOpen(false);
+      onNavigate?.();
       return;
     }
     if (event.key === "ArrowDown") {
@@ -124,6 +138,55 @@ export function HeaderSearch({
     }
   };
 
+  const showResults = open && query.trim().length > 0;
+
+  const resultsList =
+    showResults &&
+    (suggestions.length === 0 ? (
+      <p className={cn("text-sm text-muted", panel ? "px-1 py-4" : "px-4 py-3")}>
+        {t("nav.searchEmpty")}
+      </p>
+    ) : (
+      <ul className={cn(panel ? "flex flex-col gap-0.5" : "max-h-80 overflow-y-auto py-1")}>
+        {suggestions.map((item, index) => {
+          const Icon = item.type === "hotel" ? Building2 : MapPin;
+          return (
+            <li key={item.id}>
+              <Link
+                href={item.href}
+                onClick={() => {
+                  setOpen(false);
+                  setQuery("");
+                  onNavigate?.();
+                }}
+                className={cn(
+                  "flex items-start gap-3 text-left transition hover:bg-brand-50",
+                  panel ? "rounded-xl px-3 py-3" : "px-4 py-2.5",
+                  index === active && "bg-brand-50"
+                )}
+              >
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface text-brand-500">
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-ink">{item.title}</span>
+                  <span className="block truncate text-xs text-muted">
+                    {item.type === "country"
+                      ? t("nav.searchCountry")
+                      : item.type === "city"
+                        ? t("nav.searchCity")
+                        : t("nav.searchHotel")}
+                    {" · "}
+                    {item.subtitle}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    ));
+
   return (
     <div ref={rootRef} className={cn("relative", className)}>
       <label className="relative block">
@@ -133,6 +196,7 @@ export function HeaderSearch({
           aria-hidden="true"
         />
         <input
+          ref={inputRef}
           value={query}
           onChange={(event) => {
             setQuery(event.target.value);
@@ -143,9 +207,10 @@ export function HeaderSearch({
           onKeyDown={onKeyDown}
           placeholder={t("nav.searchPlaceholder")}
           autoComplete="off"
+          enterKeyHint="search"
           className={cn(
-            "w-full rounded-full border border-line bg-white pl-9 pr-9 text-sm text-ink outline-none transition placeholder:text-muted focus:border-brand-400 focus:ring-2 focus:ring-brand-100",
-            compact ? "h-10" : "h-10 min-w-[14rem] lg:min-w-[16rem]"
+            "w-full rounded-full border border-line bg-white pl-9 pr-9 text-[16px] text-ink outline-none transition placeholder:text-muted focus:border-brand-400 focus:ring-2 focus:ring-brand-100 sm:text-sm",
+            compact || panel ? "h-11" : "h-10 min-w-[14rem] lg:min-w-[16rem]"
           )}
         />
         {query && (
@@ -153,7 +218,8 @@ export function HeaderSearch({
             type="button"
             onClick={() => {
               setQuery("");
-              setOpen(false);
+              setOpen(panel);
+              inputRef.current?.focus();
             }}
             aria-label={t("nav.clearSearch")}
             className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-ink"
@@ -163,50 +229,14 @@ export function HeaderSearch({
         )}
       </label>
 
-      {open && query.trim().length > 0 && (
-        <div className="absolute left-0 right-0 top-[calc(100%+0.4rem)] z-50 overflow-hidden rounded-2xl border border-line bg-white shadow-[0_16px_40px_rgba(15,26,43,0.14)]">
-          {suggestions.length === 0 ? (
-            <p className="px-4 py-3 text-sm text-muted">{t("nav.searchEmpty")}</p>
-          ) : (
-            <ul className="max-h-80 overflow-y-auto py-1">
-              {suggestions.map((item, index) => {
-                const Icon = item.type === "hotel" ? Building2 : MapPin;
-                return (
-                  <li key={item.id}>
-                    <Link
-                      href={item.href}
-                      onClick={() => {
-                        setOpen(false);
-                        setQuery("");
-                        onNavigate?.();
-                      }}
-                      className={cn(
-                        "flex items-start gap-3 px-4 py-2.5 text-left transition hover:bg-brand-50",
-                        index === active && "bg-brand-50"
-                      )}
-                    >
-                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface text-brand-500">
-                        <Icon className="h-4 w-4" aria-hidden="true" />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-semibold text-ink">{item.title}</span>
-                        <span className="block truncate text-xs text-muted">
-                          {item.type === "country"
-                            ? t("nav.searchCountry")
-                            : item.type === "city"
-                              ? t("nav.searchCity")
-                              : t("nav.searchHotel")}
-                          {" · "}
-                          {item.subtitle}
-                        </span>
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
+      {panel ? (
+        <div className="mt-3">{resultsList}</div>
+      ) : (
+        showResults && (
+          <div className="absolute left-0 right-0 top-[calc(100%+0.4rem)] z-50 overflow-hidden rounded-2xl border border-line bg-white shadow-[0_16px_40px_rgba(15,26,43,0.14)]">
+            {resultsList}
+          </div>
+        )
       )}
     </div>
   );

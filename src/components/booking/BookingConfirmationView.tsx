@@ -17,11 +17,13 @@ import type { BookingConfirmationSnapshot } from "@/lib/bookingConfirmation";
 import { formatContactAddress, formatGuestName } from "@/lib/bookingConfirmation";
 import { formatCheckoutCancellationDeadline, hasFreeCancellation } from "@/lib/freeCancellation";
 import { CHECKOUT_TOURIST_TAX_PER_ROOM, PHONE_PREFIX } from "@/components/booking/checkoutHelpers";
+import { ProviderLogo } from "@/components/booking/ProviderLogo";
 import { ReviewBadge } from "@/components/home/ReviewBadge";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { localeTag } from "@/i18n/config";
 import { nightLabel } from "@/i18n/content";
-import { cn, formatEuro } from "@/lib/utils";
+import { deals } from "@/data/deals";
+import { formatEuro } from "@/lib/utils";
 
 const cardClass = "rounded-2xl border border-[#e8eaef] bg-white p-4 shadow-[0_4px_16px_rgba(15,26,43,0.06)] sm:p-5";
 
@@ -74,16 +76,14 @@ export function BookingConfirmationView({ snapshot }: BookingConfirmationViewPro
   const paymentNote =
     snapshot.payment === "card" ? t("booking.paymentCardNote") : t("booking.paymentInvoiceNote");
 
+  const tourOperator =
+    snapshot.tourOperator ||
+    deals.find((deal) => deal.slug === snapshot.slug)?.provider ||
+    "";
+
   const nextSteps = [
     { n: 1, title: t("booking.confirmStep1Title"), text: t("booking.confirmStep1Text") },
-    {
-      n: 2,
-      title: t("booking.confirmStep2Title"),
-      text:
-        snapshot.payment === "card"
-          ? t("booking.confirmStep2Card")
-          : t("booking.confirmStep2Invoice"),
-    },
+    { n: 2, title: t("booking.confirmStep2Title"), text: t("booking.confirmStep2Text") },
     { n: 3, title: t("booking.confirmStep3Title"), text: t("booking.confirmStep3Text") },
   ];
 
@@ -166,12 +166,6 @@ export function BookingConfirmationView({ snapshot }: BookingConfirmationViewPro
                 <span className="shrink-0 tabular-nums text-ink">{priceFormatter.format(line.amount)} €</span>
               </li>
             ))}
-            {room.mealSupplement > 0 && room.mealPlanLabel && (
-              <li className="flex justify-between gap-2">
-                <span className="text-body">{room.mealPlanLabel}</span>
-                <span className="shrink-0 tabular-nums text-ink">+{priceFormatter.format(room.mealSupplement)} €</span>
-              </li>
-            )}
             {room.cancellationSupplement > 0 && room.cancellationLabel && (
               <li className="flex justify-between gap-2">
                 <span className="text-body">{room.cancellationLabel}</span>
@@ -241,20 +235,50 @@ export function BookingConfirmationView({ snapshot }: BookingConfirmationViewPro
       {/* Always a vertical stack of sections; multi-column only inside cards from lg+ */}
       <div id="confirmation-print" className="confirmation-print-area flex flex-col gap-4 pb-6">
         <section className="rounded-2xl border border-success/25 bg-[#e8f8ee] p-4 sm:p-6">
-          <div className="flex flex-col gap-4">
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-success/15">
-              <CheckCircle2 className="h-8 w-8 text-success" aria-hidden="true" />
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-success/15 sm:h-14 sm:w-14">
+              <CheckCircle2 className="h-7 w-7 text-success sm:h-8 sm:w-8" aria-hidden="true" />
             </span>
-            <div className="min-w-0">
-              <h1 className="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
-                {t("booking.confirmThankYou")}
-              </h1>
-              <p className="mt-2 text-sm leading-relaxed text-body">{t("booking.confirmEmailSentLead")}</p>
-              <p className="mt-1 break-all text-base font-extrabold text-ink">{snapshot.contact.email}</p>
-              <p className="mt-3 text-sm font-bold text-brand-500">
-                {t("booking.requestNo", { ref: snapshot.requestRef })}
-              </p>
-            </div>
+            <h1 className="min-w-0 text-xl font-extrabold tracking-tight text-ink sm:pt-2 sm:text-2xl">
+              {t("booking.confirmThankYou")}
+            </h1>
+          </div>
+
+          <div className="mt-5">
+            <h2 className="text-base font-extrabold text-ink">{t("booking.confirmWhatNext")}</h2>
+            <ol className="mt-3 flex flex-col gap-2.5 md:grid md:grid-cols-3 md:gap-3">
+              {nextSteps.map((step) => (
+                <li
+                  key={step.n}
+                  className="flex gap-3 rounded-xl border border-success/20 bg-white/70 px-3.5 py-3 md:flex-col md:gap-2"
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-500 text-xs font-bold text-white">
+                    {step.n}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-extrabold text-ink">{step.title}</p>
+                    <p className="mt-1 text-[13px] leading-snug text-body">{step.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="mt-5 border-t border-success/20 pt-5">
+            <p className="text-sm leading-relaxed text-body">{t("booking.confirmEmailSentLead")}</p>
+            <p className="mt-1 break-all text-base font-extrabold text-ink">{snapshot.contact.email}</p>
+            <p className="mt-3 text-sm font-bold text-brand-500">
+              {t("booking.requestNo", { ref: snapshot.requestRef })}
+            </p>
+
+            {tourOperator ? (
+              <div className="mt-5">
+                <p className="text-sm font-extrabold text-ink">{t("booking.confirmTourOperator")}</p>
+                <div className="mt-2.5">
+                  <ProviderLogo name={tourOperator} size="lg" />
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <div className="no-print mt-5 flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -414,27 +438,6 @@ export function BookingConfirmationView({ snapshot }: BookingConfirmationViewPro
               </p>
             </div>
           </div>
-        </section>
-
-        <section className={cardClass}>
-          <h2 className="text-base font-extrabold text-ink sm:text-lg">{t("booking.confirmWhatNext")}</h2>
-          {/* Mobile: stacked steps. Desktop: 3 columns. */}
-          <ol className="mt-4 flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:gap-4">
-            {nextSteps.map((step) => (
-              <li
-                key={step.n}
-                className={cn(
-                  "flex flex-col gap-2 rounded-xl border border-[#e8eaef] bg-[#fafbfc] p-4"
-                )}
-              >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-sm font-bold text-white">
-                  {step.n}
-                </span>
-                <p className="text-sm font-extrabold text-ink">{step.title}</p>
-                <p className="text-sm leading-relaxed text-body">{step.text}</p>
-              </li>
-            ))}
-          </ol>
         </section>
       </div>
     </>

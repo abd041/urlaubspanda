@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, ChevronDown, Loader2 } from "lucide-react";
 import type { Deal } from "@/types";
@@ -11,10 +11,20 @@ import { cn } from "@/lib/utils";
 import { easePremium, motion, useReducedMotion } from "@/components/motion/Reveal";
 import { getAllDealClickCounts, getServerDealClickCounts } from "@/lib/dealClicks";
 import { deals as catalogDeals } from "@/data/deals";
+import {
+  consumeListingRestore,
+  endListingScrollRestore,
+  listingViewKey,
+  peekListingRestorePending,
+  readListingViewState,
+  restoreWindowScroll,
+  saveListingViewState,
+  type ListingSortOption,
+} from "@/lib/listingScrollRestore";
 
 const PAGE_SIZE = 30;
 
-type SortOption = "neueste" | "beliebtheit" | "rabatt" | "preis" | "bewertung";
+type SortOption = ListingSortOption;
 
 const sortOptionKeys: { value: SortOption; labelKey: string }[] = [
   { value: "neueste", labelKey: "deals.sortNewest" },
@@ -58,6 +68,13 @@ function subscribeClicks(onStoreChange: () => void) {
     window.removeEventListener("urlaubspanda:deal-click", onStoreChange);
     window.removeEventListener("storage", onStoreChange);
   };
+}
+
+function readPendingRestoreState(): ReturnType<typeof readListingViewState> {
+  if (typeof window === "undefined") return null;
+  const key = listingViewKey();
+  if (peekListingRestorePending() !== key) return null;
+  return readListingViewState(key);
 }
 
 /** Custom sort menu — avoids native OS select styling / overflow. */
@@ -167,13 +184,18 @@ export function DealsSection({
   const t = useT();
   const reduce = useReducedMotion();
   const heading = title ?? t("home.dealsTitle");
-  const [sort, setSort] = useState<SortOption>("neueste");
+  const pendingRestore = useRef(readPendingRestoreState());
+  const [sort, setSort] = useState<SortOption>(() => pendingRestore.current?.sort ?? "neueste");
   const clicks = useSyncExternalStore(subscribeClicks, getAllDealClickCounts, getServerDealClickCounts);
   const sortedDeals = useMemo(() => sortDeals(deals, sort, clicks), [deals, sort, clicks]);
 
   const dealsKey = useMemo(() => deals.map((deal) => deal.id).join(","), [deals]);
   const pageKey = `${dealsKey}:${sort}`;
-  const [visibleByKey, setVisibleByKey] = useState<Record<string, number>>({});
+  const [visibleByKey, setVisibleByKey] = useState<Record<string, number>>(() => {
+    const restored = pendingRestore.current;
+    if (!restored) return {};
+    return { [restored.pageKey]: restored.visibleCount };
+  });
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const visibleCount = visibleByKey[pageKey] ?? PAGE_SIZE;
 
@@ -184,6 +206,76 @@ export function DealsSection({
     () => sortOptionKeys.map((option) => ({ value: option.value, label: t(option.labelKey) })),
     [t]
   );
+
+  const sortRef = useRef(sort);
+  const visibleCountRef = useRef(visibleCount);
+  const pageKeyRef = useRef(pageKey);
+  sortRef.current = sort;
+  visibleCountRef.current = visibleCount;
+  pageKeyRef.current = pageKey;
+
+  // Restore scroll after returning from an offer; align visible count to current pageKey.
+  useLayoutEffect(() => {
+    const key = listingViewKey();
+    const state = consumeListingRestore(key);
+    if (!state) return;
+
+    const currentPageKey = `${dealsKey}:${state.sort}`;
+    if (state.pageKey !== currentPageKey) {
+      setVisibleByKey((prev) => ({ ...prev, [currentPageKey]: state.visibleCount }));
+    }
+
+    const y = state.scrollY;
+    const apply = () => restoreWindowScroll(y);
+    apply();
+    const raf = window.requestAnimationFrame(apply);
+    const t0 = window.setTimeout(apply, 50);
+    const t1 = window.setTimeout(apply, 150);
+    const t2 = window.setTimeout(apply, 350);
+    const done = window.setTimeout(() => endListingScrollRestore(), 400);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(t0);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.clearTimeout(done);
+      endListingScrollRestore();
+    };
+    // Only on mount for this listing visit
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep listing view state fresh so opening an offer can restore it later.
+  useEffect(() => {
+    const persist = () => {
+      saveListingViewState(listingViewKey(), {
+        scrollY: window.scrollY,
+        sort: sortRef.current,
+        visibleCount: visibleCountRef.current,
+        pageKey: pageKeyRef.current,
+      });
+    };
+
+    persist();
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        ticking = false;
+        persist();
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("pagehide", persist);
+    return () => {
+      persist();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pagehide", persist);
+    };
+  }, [sort, visibleCount, pageKey]);
 
   function handleLoadMore() {
     setIsLoadingMore(true);

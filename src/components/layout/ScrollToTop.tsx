@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { takeListingScrollTopSkip } from "@/lib/listingScrollRestore";
 
 const FILTER_SEGMENT_RE =
   /\/(mit-flug|all-inclusive|direkte-strandlage|adults-only|familienhotel|thermenurlaub|wellness|urlaub-am-see|urlaub-am-meer|in-den-bergen|skiurlaub|ab-85-weiterempfehlung|fruehbucher|last-minute|zentrale-lage)$/;
@@ -35,6 +36,8 @@ function resetWindowScroll() {
  * New pages (including offer pages) always start at the top.
  * Query-only updates do not reset scroll.
  * Country filter path toggles (/kroatien ↔ /kroatien/all-inclusive) keep scroll.
+ * Returning to an offer listing after opening a deal restores the prior position
+ * (see listingScrollRestore) — skip the forced top reset in that case.
  */
 export function ScrollToTop() {
   const pathname = usePathname();
@@ -46,6 +49,9 @@ export function ScrollToTop() {
 
     if (prev === null || prev === pathname) return;
     if (isFilterToggleNavigation(prev, pathname)) return;
+
+    const search = typeof window !== "undefined" ? window.location.search : "";
+    if (takeListingScrollTopSkip(pathname, search)) return;
 
     resetWindowScroll();
 

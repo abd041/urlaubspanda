@@ -19,9 +19,14 @@ import { PriceBlock } from "@/components/home/PriceBlock";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { mealPlanLabel, nightLabel, regionDisplay, tx } from "@/i18n/content";
 import { hasFreeCancellation } from "@/lib/freeCancellation";
+import { markListingRestorePending } from "@/lib/listingScrollRestore";
 
 const chipClass =
   "inline-flex items-center gap-1.5 rounded-full bg-[#F1F5F9] px-2.5 py-1 text-[12px] font-medium text-ink";
+
+function rememberListingPositionBeforeOffer() {
+  markListingRestorePending();
+}
 
 function FlightChipIcon({ included }: { included: boolean }) {
   if (included) {
@@ -45,7 +50,10 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
 
   return (
     <article
-      onClick={() => router.push(detailHref, { scroll: true })}
+      onClick={() => {
+        rememberListingPositionBeforeOffer();
+        router.push(detailHref, { scroll: true });
+      }}
       className="group/card flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#eeeef2] bg-white shadow-[0_8px_24px_rgba(15,26,43,0.08)] transition-[transform,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,26,43,0.12)]"
     >
       <DealImageSlider
@@ -61,7 +69,10 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
         <h3 className="text-[1.35rem] font-extrabold leading-[1.15] tracking-[-0.03em] text-ink">
           <Link
             href={detailHref}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              rememberListingPositionBeforeOffer();
+            }}
             className="hover:text-brand-600 focus-visible:outline-none focus-visible:underline"
           >
             {deal.name}
@@ -133,7 +144,10 @@ export function DealCard({ deal, priority = false }: { deal: Deal; priority?: bo
             action={
               <Link
                 href={detailHref}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  rememberListingPositionBeforeOffer();
+                }}
                 className="inline-flex h-11 items-center gap-1.5 rounded-xl bg-brand-500 px-4 text-[13px] font-bold text-white shadow-[0_4px_14px_rgba(27,99,235,0.22)] transition hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 sm:px-5"
               >
                 {t("deal.viewOffer")}

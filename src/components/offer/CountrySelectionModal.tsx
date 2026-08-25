@@ -3,13 +3,20 @@
 import { X } from "lucide-react";
 import type { OfferBookingUrls, OfferCtaOption } from "@/types";
 import { Modal } from "@/components/ui/Modal";
-import { useT } from "@/i18n/LocaleProvider";
+import {
+  resolveCountrySelectionNotice,
+  type CountrySelectionNoticeConfig,
+} from "@/data/countrySelectionNotice";
+import { useLocale, useT } from "@/i18n/LocaleProvider";
+import { tx } from "@/i18n/content";
 
 interface CountrySelectionModalProps {
   open: boolean;
   onClose: () => void;
   bookingUrls?: OfferBookingUrls;
   ctaOptions?: OfferCtaOption[];
+  /** Per-offer override for the orange info box (admin stand-in). */
+  notice?: Partial<CountrySelectionNoticeConfig> | null;
 }
 
 /**
@@ -21,8 +28,11 @@ export function CountrySelectionModal({
   onClose,
   bookingUrls,
   ctaOptions,
+  notice,
 }: CountrySelectionModalProps) {
   const t = useT();
+  const { locale } = useLocale();
+  const noticeText = resolveCountrySelectionNotice(notice);
 
   const options: OfferCtaOption[] =
     ctaOptions && ctaOptions.length > 0
@@ -60,6 +70,15 @@ export function CountrySelectionModal({
       </div>
 
       <div className="space-y-2.5 overflow-y-auto px-5 py-5 sm:px-6">
+        {noticeText ? (
+          <div
+            role="note"
+            className="rounded-xl border border-cal/40 bg-[#FFF8E8] px-3.5 py-2.5 text-sm font-medium leading-snug text-ink"
+          >
+            {tx(noticeText, locale)}
+          </div>
+        ) : null}
+
         {options.map((option) => (
           <button
             key={option.id}
@@ -68,7 +87,10 @@ export function CountrySelectionModal({
             className="flex w-full items-center gap-3 rounded-xl border border-line bg-white px-4 py-3.5 text-left transition hover:border-brand-500 hover:bg-[#F4F8FF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           >
             {option.emoji ? (
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-2xl leading-none" aria-hidden="true">
+              <span
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-2xl leading-none"
+                aria-hidden="true"
+              >
                 {option.emoji}
               </span>
             ) : null}

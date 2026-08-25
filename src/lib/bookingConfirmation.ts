@@ -32,6 +32,8 @@ export interface BookingConfirmationSnapshot {
   createdAt: string;
   arrivalIso: string;
   nights: number;
+  /** Tour operator / partner for the booked offer (drives logo on confirmation). */
+  tourOperator: string;
   hotel: {
     name: string;
     image: string;
@@ -108,9 +110,12 @@ export function loadBookingConfirmation(slug: string): BookingConfirmationSnapsh
   try {
     const raw = window.sessionStorage.getItem(storageKey(slug));
     if (!raw) return null;
-    const data = JSON.parse(raw) as BookingConfirmationSnapshot;
+    const data = JSON.parse(raw) as BookingConfirmationSnapshot & { tourOperator?: string };
     if (!data || data.version !== 1 || data.slug !== slug) return null;
-    return data;
+    return {
+      ...data,
+      tourOperator: typeof data.tourOperator === "string" ? data.tourOperator : "",
+    };
   } catch {
     return null;
   }

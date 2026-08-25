@@ -1,9 +1,10 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Heart, Menu, X } from "lucide-react";
+import { Heart, Menu, Search, X } from "lucide-react";
 import { PandaLogo } from "@/components/icons/PandaLogo";
 import { Container } from "@/components/layout/Container";
 import { LanguageToggle } from "@/components/layout/LanguageToggle";
@@ -166,15 +167,73 @@ function TravelTypeLinksBoundary(props: { onNavigate?: () => void; stacked?: boo
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
   const t = useT();
   const reduce = useReducedMotion();
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    setPortalReady(true);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen || mobileSearchOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [mobileOpen]);
+  }, [mobileOpen, mobileSearchOpen]);
+
+  useEffect(() => {
+    if (!mobileSearchOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileSearchOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileSearchOpen]);
+
+  const openMobileSearch = () => {
+    setMobileOpen(false);
+    setMobileSearchOpen(true);
+  };
+
+  const closeMobileSearch = () => setMobileSearchOpen(false);
+
+  const mobileSearchOverlay =
+    portalReady &&
+    createPortal(
+      <AnimatePresence>
+        {mobileSearchOpen && (
+          <motion.div
+            id="mobile-search"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("nav.search")}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduce ? 0.12 : 0.2, ease: easePremium }}
+            className="fixed inset-0 z-[100] flex flex-col bg-white sm:hidden"
+          >
+            <div className="flex h-[68px] shrink-0 items-center gap-2 border-b border-line px-4">
+              <p className="flex-1 text-sm font-semibold text-ink">{t("nav.search")}</p>
+              <button
+                type="button"
+                onClick={closeMobileSearch}
+                aria-label={t("nav.closeSearch")}
+                className="flex h-10 w-10 items-center justify-center rounded-full text-ink transition hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+              >
+                <X className="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+              <HeaderSearch panel autoFocus onNavigate={closeMobileSearch} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>,
+      document.body
+    );
 
   return (
     <header className="sticky top-0 z-40 min-w-0 border-b border-line bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80">
@@ -196,6 +255,16 @@ export function Header() {
           </div>
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={openMobileSearch}
+              aria-expanded={mobileSearchOpen}
+              aria-controls="mobile-search"
+              aria-label={t("nav.openSearch")}
+              className="flex h-10 w-10 items-center justify-center rounded-full text-ink transition hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:hidden"
+            >
+              <Search className="h-5 w-5" aria-hidden="true" />
+            </button>
             <LanguageToggle />
             <Link
               href="/merkliste"
@@ -206,7 +275,10 @@ export function Header() {
             </Link>
             <button
               type="button"
-              onClick={() => setMobileOpen((v) => !v)}
+              onClick={() => {
+                setMobileSearchOpen(false);
+                setMobileOpen((v) => !v);
+              }}
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
               aria-label={mobileOpen ? t("nav.closeMenu") : t("nav.openMenu")}
@@ -233,6 +305,8 @@ export function Header() {
         </div>
       </Container>
 
+      {mobileSearchOverlay}
+
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -245,9 +319,6 @@ export function Header() {
           >
             <Container>
               <nav aria-label={t("nav.mobile")} className="py-3">
-                <div className="mb-3 px-1">
-                  <HeaderSearch compact onNavigate={() => setMobileOpen(false)} />
-                </div>
                 <HeaderNav
                   onNavigate={() => setMobileOpen(false)}
                   className="flex flex-col gap-1"

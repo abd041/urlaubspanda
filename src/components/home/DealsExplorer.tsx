@@ -12,8 +12,14 @@ import { dealMatchesAllFilters } from "@/lib/dealFilters";
 import { dealMatchesOrt } from "@/lib/ortFilter";
 import { destinationDealsHeadingLocalized, destinationName, tx } from "@/i18n/content";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
-import { scrollToOffersFiltersHeadline } from "@/lib/scrollToOffersFilters";
-import { useMemo } from "react";
+import { scrollToOffersFiltersHeadline, scrollToOffersFiltersAfterOrtReady } from "@/lib/scrollToOffersFilters";
+import {
+  isListingScrollRestoreActive,
+  listingViewKey,
+  peekListingRestorePending,
+} from "@/lib/listingScrollRestore";
+import { useEffect, useMemo, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 interface DealsExplorerProps {
   deals: Deal[];
@@ -82,6 +88,7 @@ export function DealsExplorer({
   const { selected, isSelected, toggle, remove, reset, apply, isMultiFilterQuery } =
     useFilterSelection({ destinationSlug });
   const { selectedOrt, toggleOrt, clearOrt } = useOrtFilter();
+  const pathname = usePathname();
   const { locale } = useLocale();
   const t = useT();
   const localizedCountry = destinationSlug
@@ -110,6 +117,43 @@ export function DealsExplorer({
   );
 
   const showViewAll = showDestinationViewAll && destinationSlug !== "suedtirol";
+
+  // Google Ads / deep links: `?ort=Split` → select city and scroll to filters.
+  // Normal landings without `ort` stay at the top.
+  // Skip when restoring list position after returning from an offer.
+  const ortScrollKeyRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!selectedOrt) {
+      ortScrollKeyRef.current = null;
+      return;
+    }
+
+    if (
+      isListingScrollRestoreActive() ||
+      peekListingRestorePending() === listingViewKey()
+    ) {
+      ortScrollKeyRef.current = `${pathname}?ort=${selectedOrt}`;
+      return;
+    }
+
+    const key = `${pathname}?ort=${selectedOrt}`;
+    if (ortScrollKeyRef.current === key) return;
+    ortScrollKeyRef.current = key;
+
+    const previousRestoration =
+      "scrollRestoration" in history ? history.scrollRestoration : undefined;
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+
+    scrollToOffersFiltersAfterOrtReady();
+
+    return () => {
+      if (previousRestoration !== undefined && "scrollRestoration" in history) {
+        history.scrollRestoration = previousRestoration;
+      }
+    };
+  }, [selectedOrt, pathname]);
 
   return (
     <>

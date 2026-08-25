@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Info } from "lucide-react";
 import type { Deal, OfferDetail } from "@/types";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
@@ -31,7 +30,7 @@ function resolveImpressionTags(
 }
 
 /**
- * Impressionen — photo strip + tags + affiliate note (urlaubshamster).
+ * Offer meta chips + affiliate note (Impressionen photo strip removed).
  */
 export function OfferImpressions({
   deal,
@@ -42,51 +41,11 @@ export function OfferImpressions({
 }) {
   const t = useT();
   const { locale } = useLocale();
-  const photos = deal.images.slice(0, 4);
   const tags = resolveImpressionTags(deal, detail, t, locale);
 
-  return (
-    <section id="impressionen" className="scroll-mt-24" aria-labelledby="impressionen-heading">
-      <h2
-        id="impressionen-heading"
-        className="text-[1.75rem] font-medium tracking-[-0.03em] text-ink sm:text-[2.125rem]"
-      >
-        {tx("Impressionen", locale)}
-      </h2>
-      <p className="mt-1.5 text-sm text-body sm:text-[15px]">{t("offer.impressions")}</p>
-
-      <ul className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
-        {photos.map((src, i) => (
-          <li
-            key={src}
-            className="relative aspect-[4/3] overflow-hidden rounded-[1.25rem] bg-surface"
-          >
-            <Image
-              src={src}
-              alt={t("offer.impressionN", { name: deal.name, n: i + 1 })}
-              fill
-              sizes="(min-width: 640px) 25vw, 50vw"
-              className="object-cover"
-            />
-          </li>
-        ))}
-      </ul>
-
-      {tags.length > 0 && (
-        <div className="mt-6">
-          <ul className="flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <li key={tag}>
-                <span className="inline-flex rounded-full border border-line bg-white px-3.5 py-1.5 text-sm text-ink">
-                  {tag}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div className="mt-5 flex gap-3 text-sm leading-relaxed text-body">
+  if (tags.length === 0) {
+    return (
+      <div className="flex gap-3 text-sm leading-relaxed text-body">
         <span
           className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted/25 text-muted"
           aria-hidden="true"
@@ -95,6 +54,30 @@ export function OfferImpressions({
         </span>
         <p>{t("offer.affiliateNote")}</p>
       </div>
-    </section>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      <ul className="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <li key={tag}>
+            <span className="inline-flex rounded-full border border-line bg-white px-3.5 py-1.5 text-sm text-ink">
+              {tag}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="flex gap-3 text-sm leading-relaxed text-body">
+        <span
+          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted/25 text-muted"
+          aria-hidden="true"
+        >
+          <Info className="h-3 w-3" />
+        </span>
+        <p>{t("offer.affiliateNote")}</p>
+      </div>
+    </div>
   );
 }

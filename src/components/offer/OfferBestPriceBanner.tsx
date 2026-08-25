@@ -45,6 +45,8 @@ export function OfferBestPriceBanner({
             ctaMode={detail.ctaMode}
             bookingUrl={detail.bookingUrl}
             bookingUrls={detail.bookingUrls}
+            ctaOptions={detail.ctaOptions}
+            countrySelectionNotice={detail.countrySelectionNotice}
             className="w-full py-3 text-sm sm:min-w-[11rem] sm:px-4"
           />
         </div>

@@ -12,6 +12,7 @@ import { formatCheckoutCancellationDeadline, hasFreeCancellation } from "@/lib/f
 import { formatEuro } from "@/lib/utils";
 import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { localeTag } from "@/i18n/config";
+import { PaymentMethodBadges } from "@/components/booking/PaymentMethodBadges";
 import { countryDisplayName, mealPlanLabel, nightLabel, regionDisplay, tx } from "@/i18n/content";
 
 export type CheckoutBreakdownRow = {
@@ -61,19 +62,6 @@ function groupRoomCategories(rows: CheckoutBreakdownRow[], locale: "de" | "en") 
 
 function formatRoomGroupLabel(count: number, name: string) {
   return count > 1 ? `${count} ${name}` : name;
-}
-
-function PaymentMethodBadges() {
-  return (
-    <div className="mt-2 flex flex-wrap items-center gap-2" aria-hidden="true">
-      <span className="rounded border border-[#d8dce3] bg-white px-2.5 py-1 text-[10px] font-extrabold tracking-wide text-[#1A1F71]">
-        VISA
-      </span>
-      <span className="rounded border border-[#d8dce3] bg-white px-2.5 py-1 text-[10px] font-extrabold tracking-wide text-[#EB001B]">
-        Mastercard
-      </span>
-    </div>
-  );
 }
 
 function CheckoutCancellationSummary({ arrival }: { arrival: Date }) {

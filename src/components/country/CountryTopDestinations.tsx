@@ -19,7 +19,7 @@ interface CountryTopDestinationsProps {
   showViewAllDeals?: boolean;
 }
 
-/** “Top-Destinationen für {country}” — click filters deals by Ort, then scrolls to filters headline. */
+/** “Top-Destinationen für {country}” — click filters deals by Ort (`?ort=`). */
 export function CountryTopDestinations({
   countryName,
   spots,
@@ -84,7 +84,6 @@ export function CountryTopDestinations({
                   aria-pressed={active}
                   onClick={() => {
                     onSelectOrt(spot.name);
-                    scrollToOffersFiltersHeadline();
                   }}
                   className={cn(
                     "group relative block aspect-3/4 w-[9.75rem] shrink-0 snap-start overflow-hidden rounded-[12px] border-[3px] bg-ink text-left shadow-[0_8px_24px_rgba(15,23,42,0.12)] transition-[transform,box-shadow,border-color] duration-500 ease-out hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,23,42,0.16)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:w-[10.5rem] md:w-[11rem] lg:w-[calc((100%-5*1rem)/6)]",

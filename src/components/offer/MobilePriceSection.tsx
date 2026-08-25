@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { Deal, OfferDetail } from "@/types";
 import { formatEuro } from "@/lib/utils";
 import { hasInternalBooking } from "@/lib/bookingRoute";
@@ -21,8 +21,6 @@ export function MobilePriceSection({ deal, detail }: { deal: Deal; detail: Offer
   const { locale } = useLocale();
   const countdown = useOfferCountdown(detail.countdownEndsAt);
   const savings = Math.max(deal.oldPrice - deal.currentPrice, 0);
-  const loveItems = detail.highlights;
-  const includeItems = detail.inclusions;
 
   return (
     <div className="lg:hidden">
@@ -78,6 +76,7 @@ export function MobilePriceSection({ deal, detail }: { deal: Deal; detail: Offer
           bookingUrl={detail.bookingUrl}
           bookingUrls={detail.bookingUrls}
           ctaOptions={detail.ctaOptions}
+          countrySelectionNotice={detail.countrySelectionNotice}
           className="h-14 text-[15px]"
         />
 
@@ -86,10 +85,10 @@ export function MobilePriceSection({ deal, detail }: { deal: Deal; detail: Offer
         </p>
 
         <a
-          href="#was-wir-lieben"
+          href="#beschreibung"
           onClick={(event) => {
             event.preventDefault();
-            const el = document.getElementById("was-wir-lieben");
+            const el = document.getElementById("beschreibung");
             if (!el) return;
             const header = document.querySelector("header");
             const sticky = document.querySelector("[data-mobile-sticky-cta]");
@@ -106,40 +105,6 @@ export function MobilePriceSection({ deal, detail }: { deal: Deal; detail: Offer
           <ChevronDown className="h-4 w-4" aria-hidden="true" />
         </a>
       </div>
-
-      {/* Bullets: What we love + What’s included */}
-      {(loveItems.length > 0 || includeItems.length > 0) && (
-        <div id="was-wir-lieben" className="mt-6 scroll-mt-28 space-y-5">
-          {loveItems.length > 0 && (
-            <div>
-              <h3 className="text-base font-bold text-ink">{t("offer.whatWeLove")}</h3>
-              <ul className="mt-2.5 space-y-2">
-                {loveItems.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-[14px] leading-snug text-ink">
-                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
-                    <span>{tx(item, locale)}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {includeItems.length > 0 && (
-            <div>
-              <h3 className="text-base font-bold text-ink">{t("offer.included")}</h3>
-              <ul className="mt-2.5 space-y-2">
-                {includeItems.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-[14px] leading-snug text-ink">
-                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#E8F6EE] text-success">
-                      <Check className="h-2.5 w-2.5" strokeWidth={3} aria-hidden="true" />
-                    </span>
-                    <span>{tx(item, locale)}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
@@ -187,6 +152,7 @@ export function MobileStickyCta({ deal, detail }: { deal: Deal; detail: OfferDet
           bookingUrl={detail.bookingUrl}
           bookingUrls={detail.bookingUrls}
           ctaOptions={detail.ctaOptions}
+          countrySelectionNotice={detail.countrySelectionNotice}
           className="h-11 w-auto shrink-0 px-4 text-sm"
         />
       </div>

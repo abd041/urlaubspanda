@@ -7,7 +7,7 @@ import { useLocale, useT } from "@/i18n/LocaleProvider";
 
 interface PriceBreakdownProps {
   lines: TravelerPriceLine[];
-  /** Extra rows after travelers (meal plan, cancellation, extras…). */
+  /** Extra rows after travelers (cancellation upgrades, add-ons…). Meal plans are folded into traveler lines. */
   extras?: { label: string; amount: number }[];
   total: number;
   size?: "sm" | "md";

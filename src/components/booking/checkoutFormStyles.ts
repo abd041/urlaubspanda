@@ -8,6 +8,18 @@
 export const checkoutInputClass =
   "box-border h-11 w-full max-w-full min-w-0 rounded-lg border border-[#d8dce3] bg-white px-3 text-[16px] leading-normal text-ink transition placeholder:text-muted/70 focus-visible:border-brand-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500";
 
+/** Applied when a required checkout field fails validation — strong red for clear error vibe. */
+export const checkoutInputErrorClass =
+  "border-[#d01030] border-[1.5px] focus-visible:border-[#d01030] focus-visible:outline-[#d01030]";
+
+/** Error message under an invalid checkout field. */
+export const checkoutFieldErrorTextClass =
+  "mt-1.5 text-sm font-semibold leading-snug text-[#d01030]";
+
+/** Error highlight for salutation radio groups (not the row label). */
+export const checkoutSalutationErrorClass =
+  "rounded-lg border-[1.5px] border-[#d01030] px-3 py-2";
+
 /** Closed look for custom selects — chevron via icon, no native popup. */
 export const checkoutSelectTriggerClass = [
   checkoutInputClass,

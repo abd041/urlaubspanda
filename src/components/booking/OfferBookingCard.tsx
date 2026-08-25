@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { CalendarDays, ChevronRight, CreditCard, ShieldCheck, Utensils } from "lucide-react";
-import { calculateStayPrice } from "@/lib/pricingEngine";
+import { calculateStayPrice, withMealSupplementInLines } from "@/lib/pricingEngine";
 import type { BookingOffer, ChildPricingRule, RoomCategoryDetail } from "@/types";
 import type { RoomSelection } from "@/hooks/useBookingState";
 import { FavoriteButton } from "@/components/offer/FavoriteButton";
@@ -70,6 +70,7 @@ export function OfferBookingCard({
 
   const mealSupplement = selectedMealPlan?.supplementTotal ?? 0;
   const cancellationSupplement = cancellationSelected ? offer.cancellation?.supplementTotal ?? 0 : 0;
+  const pricedLines = withMealSupplementInLines(baseStay.lines, mealSupplement);
   const total = baseStay.total + mealSupplement + cancellationSupplement;
 
   const travelerLabel =
@@ -183,6 +184,11 @@ export function OfferBookingCard({
               <h4 className="text-[15px] font-bold leading-snug text-ink">{tx(room.name, locale)}</h4>
               <ProviderLogo name={offer.provider} />
             </div>
+            {room.sizeLabel ? (
+              <p className="mt-0.5 text-xs leading-snug text-muted sm:text-[13px]">
+                {tx(room.sizeLabel, locale)}
+              </p>
+            ) : null}
             <button
               type="button"
               onClick={onShowRoomDetails}
@@ -221,11 +227,8 @@ export function OfferBookingCard({
             />
           </div>
           <PriceBreakdown
-            lines={baseStay.lines}
+            lines={pricedLines}
             extras={[
-              ...(mealSupplement > 0 && selectedMealPlan
-                ? [{ label: mealPlanLabel(selectedMealPlan.label, locale), amount: mealSupplement }]
-                : []),
               ...(cancellationSupplement > 0 && offer.cancellation
                 ? [{ label: tx(offer.cancellation.label, locale), amount: cancellationSupplement }]
                 : []),

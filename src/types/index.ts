@@ -214,6 +214,15 @@ export interface OfferDetail {
    */
   importantNotice?: string;
   /**
+   * Optional override for the country-selection popup orange info box.
+   * Omit to use the global admin stand-in (`countrySelectionNotice`).
+   * `enabled: false` or empty `message` hides the box for this offer.
+   */
+  countrySelectionNotice?: {
+    enabled?: boolean;
+    message?: string;
+  };
+  /**
    * Optional custom CTA popup choices (emoji/icon + label + url).
    * When set with `ctaMode: "country_selection"`, these replace the default AT/DE/CH list.
    */

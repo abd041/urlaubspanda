@@ -154,9 +154,9 @@ export function renderBookingConfirmationEmail(snapshot: BookingConfirmationSnap
 
           <h3 style="margin:28px 0 12px;font-size:16px;color:#0f172a;">${t(locale, "confirmWhatNext")}</h3>
           <ol style="margin:0;padding-left:20px;color:#475569;font-size:14px;line-height:1.6;">
-            <li>${t(locale, "confirmStep1Text")}</li>
-            <li>${snapshot.payment === "card" ? t(locale, "confirmStep2Card") : t(locale, "confirmStep2Invoice")}</li>
-            <li>${t(locale, "confirmStep3Text")}</li>
+            <li><strong>${t(locale, "confirmStep1Title")}</strong> — ${t(locale, "confirmStep1Text")}</li>
+            <li><strong>${t(locale, "confirmStep2Title")}</strong> — ${t(locale, "confirmStep2Text")}</li>
+            <li><strong>${t(locale, "confirmStep3Title")}</strong> — ${t(locale, "confirmStep3Text")}</li>
           </ol>
         </td></tr>
         <tr><td style="padding:20px 28px;background:#f7f8fb;font-size:12px;color:#64748b;text-align:center;">
