@@ -50,7 +50,7 @@ export function PriceBreakdown({
           >
             <span className="min-w-0 text-body">{lineLabel(line)}</span>
             <span className="shrink-0 font-semibold tabular-nums text-ink">
-              {priceFormatter.format(line.amount)} €
+              {priceFormatter.format(line.amount)} € {t("deal.perPerson")}
             </span>
           </li>
         ))}

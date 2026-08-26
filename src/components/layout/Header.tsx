@@ -255,6 +255,7 @@ export function Header() {
           </div>
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <LanguageToggle />
             <button
               type="button"
               onClick={openMobileSearch}
@@ -265,7 +266,6 @@ export function Header() {
             >
               <Search className="h-5 w-5" aria-hidden="true" />
             </button>
-            <LanguageToggle />
             <Link
               href="/merkliste"
               className="flex items-center gap-1.5 rounded-full px-2.5 py-2 text-sm font-medium text-body transition hover:bg-surface hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:px-3"
